@@ -1,12 +1,12 @@
 .header {
   height: 70px;
+  background-color: #FFAB08;
   &__container {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
     justify-content: space-between;
     height: inherit;
-    background-color: transparent;
   }
   &__profile {
     margin: 0 25px 0 auto;
