@@ -10,7 +10,7 @@ import Link from "next/link";
 const Header = () => {
   return (
     <header className="header">
-      <div className="header__container container">
+      <div className="header-container container">
         <div className="header__logo">
           <Link href="/">
             <Image src={headerLogo} alt="header-logo" />
