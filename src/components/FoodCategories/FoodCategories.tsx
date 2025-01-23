@@ -43,7 +43,7 @@ const FoodCategories = () => {
         <input
           className="food-categories__search-input"
           type="text"
-          placeholder="Найти товар"
+          placeholder="Найти..."
         />
         <button className="food-categories__search-button">
           <Image src={searchIcon} alt="Поиск" />
