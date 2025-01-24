@@ -1,9 +1,20 @@
 body {
-  background-color: #F9F9F9;
+  overflow: hidden auto;
+  background-color: #f9f9f9;
 }
 
 .container {
   max-width: 1310px;
   padding: 0 10px;
   margin: 0 auto;
+}
+
+.food-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "left right";
+  gap: 50px 30px;
 }

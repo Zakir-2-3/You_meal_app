@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import "./CartSidebar.scss";
 
 import ff from "@/assets/images/hero-section-img-1.png";

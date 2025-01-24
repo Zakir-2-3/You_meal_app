@@ -4,7 +4,7 @@
   flex-direction: row;
   align-items: center;
   gap: 0px 18px;
-  margin-bottom: 50px;
+  grid-area: header;
   &__list {
     display: flex;
     justify-content: space-between;

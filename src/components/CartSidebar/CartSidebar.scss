@@ -3,8 +3,13 @@
   flex-direction: column;
   width: 300px;
   max-height: 467px;
+  height: fit-content;
   min-height: 109px;
   padding: 24px 16px;
+  grid-area: left;
+  position: sticky;
+  top: 30px;
+  margin-top: 76px;
   background-color: #fff;
   border-radius: 18px;
   -webkit-border-radius: 18px;
@@ -42,6 +47,7 @@
   &__description-orders {
     margin-bottom: 16px;
     box-shadow: 0px 1px 0px 0px #b1b1b13d;
+    overflow: hidden auto;
   }
   &__list {
   }
@@ -56,6 +62,7 @@
     &-img {
       width: 64px;
       height: 52px;
+      overflow: hidden;
       border-radius: 8px;
       -webkit-border-radius: 8px;
       -moz-border-radius: 8px;
@@ -114,18 +121,20 @@
     }
   }
   &__place-order {
-    height: 40px;
-    width: 100%;
     margin-bottom: 20px;
-    color: #fff;
-    background-color: #ff7020;
-    font-size: 16px;
-    font-weight: 400;
-    border-radius: 12px;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    -ms-border-radius: 12px;
-    -o-border-radius: 12px;
+    & button {
+      height: 40px;
+      width: 100%;
+      color: #fff;
+      background-color: #ff7020;
+      font-size: 16px;
+      font-weight: 400;
+      border-radius: 12px;
+      -webkit-border-radius: 12px;
+      -moz-border-radius: 12px;
+      -ms-border-radius: 12px;
+      -o-border-radius: 12px;
+    }
   }
   &__delivery {
     display: flex;
