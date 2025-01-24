@@ -9,7 +9,7 @@
     display: flex;
     flex-flow: row wrap;
     gap: 30px;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
   }
   &__card {
     display: flex;
@@ -71,7 +71,7 @@
   }
   &__load-more {
     display: block;
-    margin: 0 auto 100px;
+    margin: 0 auto 60px;
     height: 40px;
     width: 300px;
     color: #fff;
