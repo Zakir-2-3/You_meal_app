@@ -1,0 +1,29 @@
+.food-section {
+  grid-area: right;
+  &__title {
+    margin-bottom: 30px;
+    font-size: 40px;
+    font-weight: 600;
+  }
+  &__wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 30px;
+    margin-bottom: 60px;
+  }
+  &__load-more {
+    display: block;
+    margin: 0 auto 60px;
+    height: 40px;
+    width: 300px;
+    color: #fff;
+    background-color: #ff7020;
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 12px;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -ms-border-radius: 12px;
+    -o-border-radius: 12px;
+  }
+}

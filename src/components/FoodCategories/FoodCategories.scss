@@ -14,7 +14,6 @@
   }
   &__item {
     width: fit-content;
-    padding: 8px 14px;
     font-size: 16px;
     font-weight: 400;
     background-color: #fff;
@@ -28,6 +27,15 @@
     display: flex;
     gap: 0 8px;
     align-items: center;
+    padding: 8px 14px;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    &--active {
+      box-shadow: inset 0px 0px 0px 2px #FFAB08;
+    }
   }
   &__search {
     display: flex;
