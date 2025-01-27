@@ -10,6 +10,7 @@ interface FoodCardProps {
   price_rub: number;
   price_usd: number;
   size: number;
+  onAddToCart: () => void;
 }
 
 const FoodCard: FC<FoodCardProps> = ({
@@ -18,6 +19,7 @@ const FoodCard: FC<FoodCardProps> = ({
   price_rub,
   price_usd,
   size,
+  onAddToCart,
 }) => {
   return (
     <div className="food-section__card">
@@ -29,8 +31,8 @@ const FoodCard: FC<FoodCardProps> = ({
         <p>{name.ru}</p>
         <p>{size} г</p>
       </div>
-      <div className="food-section__card-add-btn">
-        <button>Добавить</button>
+      <div className="food-section__card-add">
+        <button className="food-section__card-add-btn" onClick={onAddToCart}>Добавить</button>
       </div>
     </div>
   );

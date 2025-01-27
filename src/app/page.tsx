@@ -12,11 +12,27 @@ import "@/styles/home.scss";
 export default function Home() {
   const [items, setItems] = useState([]);
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [activeCategoryName, setActiveCategoryName] = useState<string>("Бургеры");
+  const [activeCategoryName, setActiveCategoryName] =
+    useState<string>("Бургеры");
+  const [cartItems, setCartItems] = useState([]);
 
   const handleButtonClick = (index: number, title: string) => {
     setActiveIndex(index);
     setActiveCategoryName(title);
+  };
+
+  const handleAddToCart = (item) => {
+    setCartItems((prev) => {
+      const existingItem = prev.find((cartItem) => cartItem.id === item.id);
+      if (existingItem) {
+        return prev.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
+        );
+      }
+      return [...prev, { ...item, quantity: 1 }];
+    });
   };
 
   useEffect(() => {
@@ -29,13 +45,20 @@ export default function Home() {
     <>
       <HeroSection />
       <div className="container food-container">
-        <FoodCategories activeIndex={activeIndex} onButtonClick={handleButtonClick}/>
-        <CartSidebar />
+        <FoodCategories
+          activeIndex={activeIndex}
+          onButtonClick={handleButtonClick}
+        />
+        <CartSidebar cartItems={cartItems} />
         <section className="food-section">
           <h2 className="food-section__title">{activeCategoryName}</h2>
           <div className="food-section__wrapper">
             {items.map((obj) => (
-              <FoodCard key={obj.id} {...obj}/>
+              <FoodCard
+                key={obj.id}
+                {...obj}
+                onAddToCart={() => handleAddToCart(obj)}
+              />
             ))}
           </div>
           <button className="food-section__load-more">Загрузить еще</button>

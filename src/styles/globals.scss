@@ -1,21 +1,17 @@
 body {
+  display: flex;
+  flex-direction: column;
   overflow: hidden auto;
   background-color: #f9f9f9;
   font-family: cursive, sans-serif;
+}
+
+.main {
+  flex: 1;
 }
 
 .container {
   max-width: 1310px;
   padding: 0 10px;
   margin: 0 auto;
-}
-
-.food-container {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "header header"
-    "left right";
-  gap: 50px 30px;
 }

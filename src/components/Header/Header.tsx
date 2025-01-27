@@ -24,6 +24,7 @@ const Header = () => {
         <div className="header__cart">
           <Link href="/">
             <Image src={cartIcon} alt="cart-icon" />
+            <span>{1}</span>
           </Link>
         </div>
       </div>

@@ -5,11 +5,11 @@
   max-height: 467px;
   height: fit-content;
   min-height: 109px;
-  padding: 24px 16px;
+  padding: 16px 16px;
   grid-area: left;
   position: sticky;
   top: 30px;
-  margin-top: 76px;
+  margin-top: 86px;
   background-color: #fff;
   border-radius: 18px;
   -webkit-border-radius: 18px;
@@ -25,17 +25,17 @@
     padding-bottom: 12px;
     & h2 {
       font-size: 24px;
-      font-weight: 600;
+      font-weight: 400;
     }
     & span {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 41px;
-      height: 20px;
+      width: 42px;
+      height: 26px;
       text-align: center;
-      font-size: 12px;
-      font-weight: 400;
+      font-size: 13px;
+      font-weight: 600;
       background-color: #f2f2f3;
       border-radius: 6px;
       -webkit-border-radius: 6px;
@@ -48,65 +48,9 @@
     margin-bottom: 16px;
     box-shadow: 0px 1px 0px 0px #b1b1b13d;
     overflow: hidden auto;
+    scrollbar-width: none;
   }
   &__list {
-  }
-  &__item {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0 6px;
-    width: auto;
-    height: 84px;
-    &-img {
-      width: 64px;
-      height: 52px;
-      overflow: hidden;
-      border-radius: 8px;
-      -webkit-border-radius: 8px;
-      -moz-border-radius: 8px;
-      -ms-border-radius: 8px;
-      -o-border-radius: 8px;
-    }
-    &-description {
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: flex-start;
-      height: 52px;
-      & h3,
-      p {
-        font-size: 12px;
-        font-weight: 400;
-      }
-      & h3 {
-        margin-bottom: 5px;
-      }
-      & p:nth-child(2) {
-        color: #b1b1b1;
-      }
-      & p:nth-child(3) {
-        margin-top: auto;
-      }
-    }
-    &-quantity {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 12px;
-      width: 84px;
-      height: 40px;
-      margin-left: auto;
-      font-size: 16px;
-      font-weight: 400;
-      background-color: #f2f2f3;
-      border-radius: 12px;
-      -webkit-border-radius: 12px;
-      -moz-border-radius: 12px;
-      -ms-border-radius: 12px;
-      -o-border-radius: 12px;
-    }
   }
   &__total-price {
     display: flex;
@@ -118,6 +62,9 @@
     span {
       font-size: 16px;
       font-weight: 400;
+    }
+    & span {
+      font-weight: 600;
     }
   }
   &__place-order {

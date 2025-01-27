@@ -1,4 +1,18 @@
+.food-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "left right";
+  gap: 50px 30px;
+  margin-bottom: 60px;
+}
+
 .food-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   grid-area: right;
   &__title {
     margin-bottom: 30px;
@@ -13,7 +27,7 @@
   }
   &__load-more {
     display: block;
-    margin: 0 auto 60px;
+    margin: 0 auto 0;
     height: 40px;
     width: 300px;
     color: #fff;

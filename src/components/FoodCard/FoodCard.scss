@@ -32,7 +32,7 @@
     & h3 {
       margin-bottom: 13px;
       font-size: 24px;
-      font-weight: 600;
+      font-weight: 400;
     }
     & p:nth-child(2) {
       margin-bottom: 34px;
@@ -44,8 +44,8 @@
       margin-bottom: 13px;
     }
   }
-  &-add-btn {
-    & button {
+  &-add {
+    &-btn {
       width: 100%;
       height: 40px;
       color: #000;
@@ -57,6 +57,17 @@
       -moz-border-radius: 12px;
       -ms-border-radius: 12px;
       -o-border-radius: 12px;
+      transition: .3s ease;
+      -webkit-transition: .3s ease;
+      -moz-transition: .3s ease;
+      -ms-transition: .3s ease;
+      -o-transition: .3s ease;
+      &--active {
+        background-color: #F86310;
+      }
+      &:hover {
+        background-color: #FFAB08;
+      }
     }
   }
 }
