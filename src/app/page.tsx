@@ -11,9 +11,9 @@ import "@/styles/home.scss";
 
 export default function Home() {
   const [items, setItems] = useState([]);
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategoryName, setActiveCategoryName] =
-    useState<string>("Бургеры");
+    useState("Бургеры");
   const [cartItems, setCartItems] = useState([]);
 
   const handleButtonClick = (index: number, title: string) => {
@@ -44,7 +44,7 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <div className="container food-container">
+      <div className="container main-content-wrapper">
         <FoodCategories
           activeIndex={activeIndex}
           onButtonClick={handleButtonClick}

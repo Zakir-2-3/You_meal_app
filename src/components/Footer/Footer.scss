@@ -28,6 +28,14 @@
       gap: 0 4px;
       font-size: 16px;
       font-weight: 400;
+      transition: .3s ease;
+      -webkit-transition: .3s ease;
+      -moz-transition: .3s ease;
+      -ms-transition: .3s ease;
+      -o-transition: .3s ease;
+      &:hover {
+        color: #2b3b93;
+      }
     }
   }
   &__social {

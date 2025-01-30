@@ -3,6 +3,7 @@ import { FC } from "react";
 import CartSidebarItem from "../CartSidebarItem/CartSidebarItem";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import "./CartSidebar.scss";
 
@@ -35,7 +36,9 @@ const CartSidebar: FC<CartSidebarProps> = ({ cartItems }) => {
       <div className="cart-sidebar__description-orders">
         <ul className="cart-sidebar__list">
           {cartItems.length === 0 ? (
-            <li className="cart-sidebar__item cart-sidebar__item--empty">Пустая корзина :(</li>
+            <li className="cart-sidebar__item cart-sidebar__item--empty">
+              Пустая корзина :(
+            </li>
           ) : (
             cartItems.map((item) => <CartSidebarItem key={item.id} {...item} />)
           )}
@@ -49,8 +52,10 @@ const CartSidebar: FC<CartSidebarProps> = ({ cartItems }) => {
         <button>Оформить заказ</button>
       </div>
       <div className="cart-sidebar__delivery">
-        <Image src={deliveryIcon} alt="delivery-icon" />
-        <p>Бесплатная доставка*</p>
+        <Link href="/delivery" className="cart-sidebar__delivery-link">
+          <Image src={deliveryIcon} alt="delivery-icon" />
+          Бесплатная доставка*
+        </Link>
       </div>
     </aside>
   );

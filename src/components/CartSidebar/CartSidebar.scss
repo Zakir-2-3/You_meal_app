@@ -84,14 +84,22 @@
     }
   }
   &__delivery {
-    display: flex;
-    align-items: center;
-    gap: 0 8px;
-    flex-flow: row nowrap;
-    & p {
-      font-size: 12px;
-      font-weight: 400;
-      padding-top: 3px;
+    font-size: 12px;
+    font-weight: 400;
+    padding-top: 3px;
+    &-link {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: flex-end;
+      gap: 0 8px;
+      transition: .3s ease;
+      -webkit-transition: .3s ease;
+      -moz-transition: .3s ease;
+      -ms-transition: .3s ease;
+      -o-transition: .3s ease;
+      &:hover {
+        color: #2b3b93;
+      }
     }
   }
 }

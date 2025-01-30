@@ -1,0 +1,32 @@
+.delivery-section {
+  margin-bottom: 30px;
+  color: #444444;
+  &__title {
+    margin: 20px 0 30px;
+    font-size: 36px;
+  }
+  &__img {
+    max-width: 600px;
+    width: 100%;
+    margin: 20px 0;
+  }
+  &__info {
+    max-width: 870px;
+    padding: 0 10px;
+    & h2 {
+      margin: 10px 0;
+      font-size: 30px;
+    }
+    & ul {
+      padding-left: 26px;
+    }
+    & li,
+    p {
+      list-style: disc;
+      font-size: 16px;
+    }
+    & p:not(:last-child) {
+      margin-bottom: 5px;
+    }
+  }
+}
