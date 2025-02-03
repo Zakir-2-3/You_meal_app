@@ -1,12 +1,12 @@
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 
-import { Nunito } from 'next/font/google'
+import { Nunito } from "next/font/google";
 
 const nunito = Nunito({
-  weight: ['400', '600', '800'],
-  subsets: ['latin'],
-})
+  weight: ["400", "600", "800"],
+  subsets: ["latin"],
+});
 
 import "@/styles/reset.css";
 import "@/styles/globals.scss";

@@ -14,9 +14,12 @@ import category_7 from "@/assets/icons/food-icon-7.png";
 import category_8 from "@/assets/icons/food-icon-8.png";
 
 import searchIcon from "@/assets/icons/search-icon.svg";
+import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
 
 interface FoodCategoriesProps {
   activeIndex: number;
+  searchValue: string;
+  setSearchValue: () => void;
   onButtonClick: (index: number, title: string) => void;
 }
 
@@ -34,6 +37,8 @@ const items = [
 const FoodCategories: FC<FoodCategoriesProps> = ({
   activeIndex,
   onButtonClick,
+  searchValue,
+  setSearchValue,
 }) => {
   return (
     <nav className="food-categories">
@@ -55,11 +60,16 @@ const FoodCategories: FC<FoodCategoriesProps> = ({
       <div className="food-categories__search">
         <input
           className="food-categories__search-input"
+          onChange={(e) => setSearchValue(e.target.value)}
+          value={searchValue}
           type="text"
           placeholder="Найти..."
         />
-        <button className="food-categories__search-button">
-          <Image src={searchIcon} alt="Поиск" />
+        <button
+          className="food-categories__search-button"
+          onClick={() => setSearchValue('')}
+        >
+          <Image src={searchValue ? searchCloseIcon : searchIcon} alt="Поиск" />
         </button>
       </div>
     </nav>

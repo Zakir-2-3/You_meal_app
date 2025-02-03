@@ -13,7 +13,7 @@
   -o-border-radius: 18px;
   &-img {
     width: 100%;
-    height: 220px;
+    height: 212px;
     margin-bottom: 16px;
     border-radius: 12px;
     -webkit-border-radius: 12px;
@@ -22,10 +22,6 @@
     -o-border-radius: 12px;
     overflow: hidden;
     text-align: center;
-    & img {
-      width: 80%;
-      height: 100%;
-    }
   }
   &-description {
     margin-bottom: 8px;
@@ -36,7 +32,7 @@
     }
     & p:nth-child(2) {
       margin-bottom: 34px;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 400;
     }
     & p:nth-child(3) {
@@ -45,7 +41,8 @@
     }
   }
   &-add {
-    &-btn {
+    &-btn,
+    &-btn--delete {
       width: 100%;
       height: 40px;
       color: #000;
@@ -57,17 +54,25 @@
       -moz-border-radius: 12px;
       -ms-border-radius: 12px;
       -o-border-radius: 12px;
-      transition: .3s ease;
-      -webkit-transition: .3s ease;
-      -moz-transition: .3s ease;
-      -ms-transition: .3s ease;
-      -o-transition: .3s ease;
+      transition: all .3s ease-in;
+      -webkit-transition: all .3s ease-in;
+      -moz-transition: all .3s ease-in;
+      -ms-transition: all .3s ease-in;
+      -o-transition: all .3s ease-in;
       &--active {
-        background-color: #F86310;
+        background-color: #f86310;
       }
       &:hover {
-        background-color: #FFAB08;
+        background-color: #ffab08;
       }
+      &:active {
+        background-color: #f86310;
+      }
+    }
+    &-btn--delete {
+      
+      background-color: #f86310;
+      color: #fff;
     }
   }
 }

@@ -4,7 +4,7 @@ import "./delivery.scss";
 
 import deliveryImg from "@/assets/images/delivery-img.png";
 
-export default function Delivery() {
+export default function DeliveryPage() {
   return (
     <section className="delivery-section">
       <div className="container">

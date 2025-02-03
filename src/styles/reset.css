@@ -58,11 +58,11 @@ img {
   vertical-align: top;
 }
 
-img,
+/* img,
 svg {
   max-width: 100%;
   height: auto;
-}
+} */
 
 address {
   font-style: normal;

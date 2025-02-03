@@ -6,33 +6,45 @@ import "./FoodCard.scss";
 
 interface FoodCardProps {
   image: string;
-  name: string;
+  name_ru: string;
   price_rub: number;
-  price_usd: number;
   size: number;
   onAddToCart: () => void;
+  onRemoveFromCart: () => void;
+  isInCart: boolean;
 }
 
 const FoodCard: FC<FoodCardProps> = ({
   image,
-  name,
+  name_ru,
   price_rub,
-  price_usd,
   size,
   onAddToCart,
+  onRemoveFromCart,
+  isInCart,
 }) => {
   return (
     <div className="food-section__card">
       <div className="food-section__card-img">
-        <Image src={image} alt={name.ru} width={276} height={220} />
+        <Image src={image} alt={name_ru} width={220} height={212} />
       </div>
       <div className="food-section__card-description">
         <h3>{price_rub}₽</h3>
-        <p>{name.ru}</p>
+        <p>{name_ru}</p>
         <p>{size} г</p>
       </div>
       <div className="food-section__card-add">
-        <button className="food-section__card-add-btn" onClick={onAddToCart}>Добавить</button>
+        <button
+          // className="food-section__card-add-btn"
+          className={
+            isInCart
+              ? "food-section__card-add-btn--delete"
+              : "food-section__card-add-btn"
+          }
+          onClick={isInCart ? onRemoveFromCart : onAddToCart}
+        >
+          {isInCart ? "Удалить" : "Добавить"}
+        </button>
       </div>
     </div>
   );

@@ -6,33 +6,37 @@ import "./CartSidebarItem.scss";
 
 interface CartSidebarItemProps {
   image: string;
-  name: { ru: string };
+  name_ru: string;
   price_rub: number;
   size: number;
   quantity: number;
+  onIncrease: () => void;
+  onDecrease: () => void;
 }
 
 const CartSidebarItem: FC<CartSidebarItemProps> = ({
   image,
-  name,
+  name_ru,
   price_rub,
   size,
   quantity,
+  onIncrease,
+  onDecrease
 }) => {
   return (
     <li className="cart-sidebar__item">
       <div className="cart-sidebar__item-img">
-        <Image src={image} alt={name.ru} width={64} height={52} />
+        <Image src={image} alt={name_ru} width={64} height={64}  />
       </div>
       <div className="cart-sidebar__item-description">
-        <h3>{name.ru}</h3>
+        <h3>{name_ru}</h3>
         <p>{size}г</p>
         <p>{price_rub}₽</p>
       </div>
       <div className="cart-sidebar__item-quantity">
-        <button>-</button>
+        <button onClick={onDecrease}>-</button>
         <span>{quantity}</span>
-        <button>+</button>
+        <button onClick={onIncrease}>+</button>
       </div>
     </li>
   );
