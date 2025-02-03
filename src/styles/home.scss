@@ -24,6 +24,14 @@
     flex-flow: row wrap;
     gap: 30px;
     margin-bottom: 60px;
+    & svg {
+      border: 2px solid #f3f3f3;
+      border-radius: 12px;
+      -webkit-border-radius: 12px;
+      -moz-border-radius: 12px;
+      -ms-border-radius: 12px;
+      -o-border-radius: 12px;
+    }
   }
   &__load-more {
     display: block;
