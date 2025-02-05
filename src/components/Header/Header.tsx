@@ -24,7 +24,7 @@ const Header = () => {
           </button>
         </div>
         <div className="header__cart">
-          <Link href="/">
+          <Link href="/cart">
             <Image src={cartIcon} alt="cart-icon" />
             <span>{1}</span>
           </Link>

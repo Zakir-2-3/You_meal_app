@@ -1,18 +1,18 @@
 import Image from "next/image";
 
-import "./delivery.scss";
+import "./deliveryPage.scss";
 
-import deliveryImg from "@/assets/images/delivery-img.png";
+import deliveryPageImg from "@/assets/images/delivery-page-img.png";
 
 export default function DeliveryPage() {
   return (
-    <section className="delivery-section">
+    <section className="delivery-page-section">
       <div className="container">
-        <h1 className="delivery-section__title">Доставка YourMeal</h1>
-        <div className="delivery-section__img">
-          <Image src={deliveryImg} alt="delivery-img" />
+        <h1 className="delivery-page-section__title">Доставка YourMeal</h1>
+        <div className="delivery-page-section__img">
+          <Image src={deliveryPageImg} alt="delivery-page-img" width={500} height={562}/>
         </div>
-        <div className="delivery-section__info">
+        <div className="delivery-page-section__info">
           <h2>Как заказать YourMeal на дом</h2>
           <ul>
             <li>

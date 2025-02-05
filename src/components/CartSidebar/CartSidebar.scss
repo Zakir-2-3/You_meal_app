@@ -71,7 +71,10 @@
   }
   &__place-order {
     margin-bottom: 20px;
-    & button {
+    & a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       height: 40px;
       width: 100%;
       color: #fff;
@@ -89,7 +92,7 @@
       -ms-transition: all 0.3s ease-in;
       -o-transition: all 0.3s ease-in;
     }
-    & button:hover {
+    & a:hover {
       background-color: #ffab08;
     }
   }

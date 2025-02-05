@@ -92,7 +92,9 @@ const CartSidebar: FC<CartSidebarProps> = ({
         <span>{formattedTotalPrice}₽</span>
       </div>
       <div className="cart-sidebar__place-order">
-        <button>Оформить заказ</button>
+        <Link href='/cart'>
+        Оформить заказ
+        </Link>
       </div>
       <div className="cart-sidebar__delivery">
         <Link href="/delivery" className="cart-sidebar__delivery-link">
