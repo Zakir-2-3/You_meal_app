@@ -1,5 +1,7 @@
 import { FC } from "react";
 
+import FoodCategoriesSearch from "./FoodCategoriesSearch/FoodCategoriesSearch";
+
 import Image from "next/image";
 
 import "./FoodCategories.scss";
@@ -13,13 +15,9 @@ import category_6 from "@/assets/icons/food-icon-6.png";
 import category_7 from "@/assets/icons/food-icon-7.png";
 import category_8 from "@/assets/icons/food-icon-8.png";
 
-import searchIcon from "@/assets/icons/search-icon.svg";
-import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
-
 interface FoodCategoriesProps {
   activeIndex: number;
-  searchValue: string;
-  setSearchValue: () => void;
+  setSearchValue: (value: string) => void;
   onButtonClick: (index: number, title: string) => void;
 }
 
@@ -37,7 +35,6 @@ const items = [
 const FoodCategories: FC<FoodCategoriesProps> = ({
   activeIndex,
   onButtonClick,
-  searchValue,
   setSearchValue,
 }) => {
   return (
@@ -51,27 +48,15 @@ const FoodCategories: FC<FoodCategoriesProps> = ({
               }`}
               onClick={() => onButtonClick(index, item.title)}
             >
-              <Image src={item.image} alt={item.title} />
+              <Image src={item.image} alt={item.title} width={24} height={24} />
               {item.title}
             </button>
           </li>
         ))}
       </ul>
-      <div className="food-categories__search">
-        <input
-          className="food-categories__search-input"
-          onChange={(e) => setSearchValue(e.target.value)}
-          value={searchValue}
-          type="text"
-          placeholder="Найти..."
-        />
-        <button
-          className="food-categories__search-button"
-          onClick={() => setSearchValue('')}
-        >
-          <Image src={searchValue ? searchCloseIcon : searchIcon} alt="Поиск" />
-        </button>
-      </div>
+      <FoodCategoriesSearch
+        setSearchValue={setSearchValue}
+      />
     </nav>
   );
 };

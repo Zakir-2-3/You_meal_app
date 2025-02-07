@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 import HeroSection from "@/components/HeroSection/HeroSection";
 import FoodCategories from "@/components/FoodCategories/FoodCategories";
@@ -12,17 +13,12 @@ import FoodCardSkeleton from "@/components/ui/skeletons/FoodCardSkeleton";
 import "@/styles/home.scss";
 
 export default function Home() {
-  const [items, setItems] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCategoryName, setActiveCategoryName] = useState("Бургеры");
   const [cartItems, setCartItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-
-  const skeletonItems = "";
-
-  // const search = searchValue ? `search=${searchValue}` : "";
+  const [items, setItems] = useState([]);
 
   const handleButtonClick = (index: number, title: string) => {
     setActiveIndex(index);
@@ -48,22 +44,26 @@ export default function Home() {
   };
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    setIsLoading(true);
 
-  useEffect(() => {
-    // fetch(`https://6794c225aad755a134ea56b6.mockapi.io/items?${search}`)
-    fetch(
-      `https://6794c225aad755a134ea56b6.mockapi.io/items?category=${activeCategoryName}`
-    )
-      .then((res) => res.json())
-      // .then((data) => setItems(data[activeIndex]?.items || []));
-      .then((data) => {
-        setItems(data);
+    axios
+      .get(
+        `https://6794c225aad755a134ea56b6.mockapi.io/items${
+          searchValue
+            ? `?search=${searchValue}`
+            : `?category=${activeCategoryName}`
+        }`
+      )
+      .then((res) => {
+        setItems(res.data);
+      })
+      .catch(() => {
+        setItems([]);
+      })
+      .finally(() => {
         setIsLoading(false);
       });
-    // }, [activeIndex, searchValue]);
-  }, [activeCategoryName]);
+  }, [activeCategoryName, searchValue]);
 
   return (
     <>
@@ -72,36 +72,42 @@ export default function Home() {
         <FoodCategories
           activeIndex={activeIndex}
           onButtonClick={handleButtonClick}
-          searchValue={searchValue}
           setSearchValue={setSearchValue}
         />
         <CartSidebar
           cartItems={cartItems}
           setCartItems={setCartItems}
-          isClient={isClient}
           isLoading={isLoading}
         />
         <section className="food-section">
           <h2 className="food-section__title">{activeCategoryName}</h2>
           <div className="food-section__wrapper">
-            {isClient && isLoading
-              ? [...new Array(6)].map((_, index) => (
-                  <FoodCardSkeleton key={index} />
-                ))
-              : items.map((obj) => {
-                  const isInCart = cartItems.some(
-                    (cartItem) => cartItem.id === obj.id
-                  );
-                  return (
-                    <FoodCard
-                      key={obj.id}
-                      {...obj}
-                      isInCart={isInCart}
-                      onAddToCart={() => handleAddToCart(obj)}
-                      onRemoveFromCart={() => handleRemoveFromCart(obj)}
-                    />
-                  );
-                })}
+            {isLoading ? (
+              [...new Array(6)].map((_, index) => (
+                <FoodCardSkeleton key={index} />
+              ))
+            ) : items.length > 0 ? (
+              items.map((obj) => {
+                const isInCart = cartItems.some(
+                  (cartItem) => cartItem.id === obj.id
+                );
+                return (
+                  <FoodCard
+                    key={obj.id}
+                    {...obj}
+                    isInCart={isInCart}
+                    onAddToCart={() => handleAddToCart(obj)}
+                    onRemoveFromCart={() => handleRemoveFromCart(obj)}
+                  />
+                );
+              })
+            ) : (
+              <p className="food-section__empty">
+                {" "}
+                <b>¯\_(ツ)_/¯</b>
+                <br /> Ничего не найдено
+              </p>
+            )}
           </div>
           <button className="food-section__load-more">Загрузить еще</button>
         </section>

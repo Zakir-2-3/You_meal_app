@@ -8,6 +8,7 @@ const FoodCardSkeleton = () => (
     viewBox="0 0 300 430"
     backgroundColor="#f3f3f3"
     foregroundColor="#ecebeb"
+    uniqueKey="food-card-skeleton"
   >
     <rect x="12" y="12" rx="18" ry="18" width="276" height="200" />
     <rect x="12" y="238" rx="3" ry="3" width="44" height="26" />

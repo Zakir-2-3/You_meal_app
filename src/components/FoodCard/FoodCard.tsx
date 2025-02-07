@@ -35,7 +35,6 @@ const FoodCard: FC<FoodCardProps> = ({
       </div>
       <div className="food-section__card-add">
         <button
-          // className="food-section__card-add-btn"
           className={
             isInCart
               ? "food-section__card-add-btn--delete"

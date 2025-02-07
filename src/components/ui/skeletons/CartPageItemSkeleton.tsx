@@ -8,6 +8,7 @@ const CartPageItemSkeleton = () => (
     viewBox="0 0 810 140"
     backgroundColor="#f3f3f3"
     foregroundColor="#ffffff"
+    uniqueKey="cart-page-item-skeleton"
   >
     <rect x="0" y="20" rx="4" ry="4" width="100" height="100" />
     <rect x="120" y="20" rx="4" ry="4" width="580" height="30" />

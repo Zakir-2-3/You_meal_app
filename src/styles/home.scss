@@ -26,11 +26,23 @@
     margin-bottom: 60px;
     & svg {
       border: 3px solid #f3f3f3;
-      border-radius: 12px;
-      -webkit-border-radius: 12px;
-      -moz-border-radius: 12px;
-      -ms-border-radius: 12px;
-      -o-border-radius: 12px;
+      border-radius: 18px;
+      -webkit-border-radius: 18px;
+      -moz-border-radius: 18px;
+      -ms-border-radius: 18px;
+      -o-border-radius: 18px;
+    }
+  }
+  &__empty {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    gap: 15px 0;
+    margin: 0 auto;
+    font-size: 16px;
+    & b {
+      font-weight: 100;
+      font-size: 68px;
     }
   }
   &__load-more {

@@ -14,7 +14,7 @@
   &-img {
     width: 100%;
     height: 212px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     border-radius: 12px;
     -webkit-border-radius: 12px;
     -moz-border-radius: 12px;
@@ -54,11 +54,11 @@
       -moz-border-radius: 12px;
       -ms-border-radius: 12px;
       -o-border-radius: 12px;
-      transition: all .3s ease-in;
-      -webkit-transition: all .3s ease-in;
-      -moz-transition: all .3s ease-in;
-      -ms-transition: all .3s ease-in;
-      -o-transition: all .3s ease-in;
+      transition: all 0.3s ease-in;
+      -webkit-transition: all 0.3s ease-in;
+      -moz-transition: all 0.3s ease-in;
+      -ms-transition: all 0.3s ease-in;
+      -o-transition: all 0.3s ease-in;
       &--active {
         background-color: #f86310;
       }
@@ -70,7 +70,6 @@
       }
     }
     &-btn--delete {
-      
       background-color: #f86310;
       color: #fff;
     }

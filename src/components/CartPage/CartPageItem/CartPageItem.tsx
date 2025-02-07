@@ -1,4 +1,4 @@
-import CartPageItemSkeleton from "../ui/skeletons/CartPageItemSkeleton";
+import CartPageItemSkeleton from "../../ui/skeletons/CartPageItemSkeleton";
 
 import Image from "next/image";
 

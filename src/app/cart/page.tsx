@@ -1,5 +1,5 @@
-import CartPageItem from "@/components/CartPageItem/CartPageItem";
-import CartPageCheck from "@/components/CartPageCheck/CartPageCheck";
+import CartPageItem from "@/components/CartPage/CartPageItem/CartPageItem";
+import CartPageCheck from "@/components/CartPage/CartPageCheck/CartPageCheck";
 
 import "./cartPage.scss";
 

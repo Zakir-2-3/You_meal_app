@@ -15,17 +15,22 @@ const Header = () => {
       <div className="header-container container">
         <div className="header__logo">
           <Link href="/">
-            <Image src={headerLogo} alt="header-logo" />
+            <Image src={headerLogo} alt="header-logo" width={153} height={35} />
           </Link>
         </div>
         <div className="header__profile">
           <button>
-            <Image src={profileIcon} alt="profile-icon" />
+            <Image
+              src={profileIcon}
+              alt="profile-icon"
+              width={20}
+              height={20}
+            />
           </button>
         </div>
         <div className="header__cart">
           <Link href="/cart">
-            <Image src={cartIcon} alt="cart-icon" />
+            <Image src={cartIcon} alt="cart-icon" width={20} height={20} />
             <span>{1}</span>
           </Link>
         </div>

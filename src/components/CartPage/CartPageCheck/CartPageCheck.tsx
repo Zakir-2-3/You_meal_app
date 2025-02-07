@@ -1,4 +1,4 @@
-import TotalPriceItemListSkeleton from '../ui/skeletons/TotalPriceItemListSkeleton'
+import TotalPriceItemListSkeleton from "../../ui/skeletons/TotalPriceItemListSkeleton";
 
 import "./CartPageCheck.scss";
 

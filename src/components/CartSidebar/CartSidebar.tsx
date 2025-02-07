@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import CartSidebarItem from "../CartSidebarItem/CartSidebarItem";
+import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -23,14 +23,12 @@ interface CartSidebarProps {
   setCartItems: React.Dispatch<
     React.SetStateAction<CartSidebarProps["cartItems"]>
   >;
-  isClient: boolean;
   isLoading: boolean;
 }
 
 const CartSidebar: FC<CartSidebarProps> = ({
   cartItems,
   setCartItems,
-  isClient,
   isLoading,
 }) => {
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -67,7 +65,7 @@ const CartSidebar: FC<CartSidebarProps> = ({
       </div>
       <div className="cart-sidebar__description-orders">
         <ul className="cart-sidebar__list">
-          {isClient && isLoading ? (
+          {isLoading ? (
             [...new Array(3)].map((_, index) => (
               <CartSidebarItemSkeleton key={index} />
             ))
@@ -98,7 +96,7 @@ const CartSidebar: FC<CartSidebarProps> = ({
       </div>
       <div className="cart-sidebar__delivery">
         <Link href="/delivery" className="cart-sidebar__delivery-link">
-          <Image src={deliveryIcon} alt="delivery-icon" />
+          <Image src={deliveryIcon} alt="delivery-icon" width={24} height={24}/>
           Бесплатная доставка*
         </Link>
       </div>

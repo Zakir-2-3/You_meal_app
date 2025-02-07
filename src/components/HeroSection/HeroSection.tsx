@@ -5,7 +5,6 @@ import "./HeroSection.scss";
 
 import heroSectionImg_1 from "@/assets/images/hero-section-img-1.png";
 
-
 const HeroSection = () => {
   return (
     <section className="hero-section">
@@ -14,13 +13,18 @@ const HeroSection = () => {
           src={heroSectionImg_1}
           className="hero-section__img"
           alt="hero-section-img"
+          width={255}
+          height={291}
         />
         <div className="hero-section__text">
           <h1 className="hero-section__title">
             Только самые <br />
             <b>сочные бургеры!</b>
           </h1>
-          <Link href="/delivery" className="hero-section__delivery cart-sidebar__delivery-link">
+          <Link
+            href="/delivery"
+            className="hero-section__delivery cart-sidebar__delivery-link"
+          >
             Бесплатная доставка от 599₽*
           </Link>
         </div>

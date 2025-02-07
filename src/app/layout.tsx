@@ -1,6 +1,8 @@
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 
+import { ReduxProvider } from "@/redux/Providers";
+
 import { Nunito } from "next/font/google";
 
 const nunito = Nunito({
@@ -19,9 +21,11 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={nunito.className}>
-        <Header />
-        <main className="main">{children}</main>
-        <Footer />
+        <ReduxProvider>
+          <Header />
+          <main className="main">{children}</main>
+          <Footer />
+        </ReduxProvider>
       </body>
     </html>
   );
