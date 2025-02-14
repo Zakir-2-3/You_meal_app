@@ -9,7 +9,7 @@ import CartSidebarItemSkeleton from "../ui/skeletons/CartSidebarItemSkeleton";
 
 import "./CartSidebar.scss";
 
-import deliveryIcon from "@/assets/icons/delivery-icon.png";
+import deliveryIcon from "@/assets/icons/delivery-icon.svg";
 
 interface CartSidebarProps {
   cartItems: {

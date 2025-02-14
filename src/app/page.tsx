@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import axios from "axios";
+
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
 
 import HeroSection from "@/components/HeroSection/HeroSection";
 import FoodCategories from "@/components/FoodCategories/FoodCategories";
@@ -13,17 +17,14 @@ import FoodCardSkeleton from "@/components/ui/skeletons/FoodCardSkeleton";
 import "@/styles/home.scss";
 
 export default function Home() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [activeCategoryName, setActiveCategoryName] = useState("Бургеры");
   const [cartItems, setCartItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState([]);
 
-  const handleButtonClick = (index: number, title: string) => {
-    setActiveIndex(index);
-    setActiveCategoryName(title);
-  };
+  const activeCategoryName = useSelector(
+    (state: RootState) => state.category.activeCategoryName
+  );
 
   const handleAddToCart = (item) => {
     setCartItems((prev) => {
@@ -69,11 +70,7 @@ export default function Home() {
     <>
       <HeroSection />
       <div className="container main-content-wrapper">
-        <FoodCategories
-          activeIndex={activeIndex}
-          onButtonClick={handleButtonClick}
-          setSearchValue={setSearchValue}
-        />
+        <FoodCategories setSearchValue={setSearchValue} />
         <CartSidebar
           cartItems={cartItems}
           setCartItems={setCartItems}
@@ -103,7 +100,6 @@ export default function Home() {
               })
             ) : (
               <p className="food-section__empty">
-                {" "}
                 <b>¯\_(ツ)_/¯</b>
                 <br /> Ничего не найдено
               </p>

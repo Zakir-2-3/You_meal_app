@@ -1,7 +1,7 @@
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 
-import { ReduxProvider } from "@/redux/Providers";
+import { ReduxProvider } from "@/store/Providers";
 
 import { Nunito } from "next/font/google";
 
