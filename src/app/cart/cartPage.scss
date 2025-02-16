@@ -14,10 +14,41 @@
     font-size: 36px;
   }
   &__list-wrapper {
-    background: #fff;
-    padding: 30px;
     width: 100%;
     min-height: 481px;
+    position: relative;
+    padding: 30px;
+    background: #fff;
+    & .empty-cart-img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      -o-transform: translate(-50%, -50%);
+    }
+  }
+  &__clear-cart {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0 6px;
+    position: absolute;
+    right: 2px;
+    top: -30px;
+    font-size: 16px;
+    color: #b1b1b1;
+    transition: filter 0.3s ease;
+    -webkit-transition: filter 0.3s ease;
+    -moz-transition: filter 0.3s ease;
+    -ms-transition: filter 0.3s ease;
+    -o-transition: filter 0.3s ease;
+  }
+  &__clear-cart:hover {
+    filter: brightness(0);
   }
   &__list {
     display: flex;

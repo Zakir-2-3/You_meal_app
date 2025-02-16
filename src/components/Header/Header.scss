@@ -1,6 +1,6 @@
 .header {
   height: 70px;
-  background-color: #FFAB08;
+  background-color: #ffab08;
   &-container {
     display: flex;
     flex-flow: row nowrap;
@@ -15,6 +15,29 @@
   &__cart {
     width: 20px;
     height: 20px;
+  }
+  &__cart a {
+    position: relative;
+  }
+  &__total-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 18px;
+    height: 18px;
+    color: #fff;
+    background: red;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
   }
   & a,
   img,

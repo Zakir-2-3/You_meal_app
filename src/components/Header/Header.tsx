@@ -1,4 +1,7 @@
-import { FC } from "react";
+"use client";
+
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +13,9 @@ import profileIcon from "@/assets/icons/profile-icon.svg";
 import cartIcon from "@/assets/icons/cart-icon.svg";
 
 const Header = () => {
+  const { items } = useSelector((state: RootState) => state.cart);
+  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+
   return (
     <header className="header">
       <div className="header-container container">
@@ -31,7 +37,7 @@ const Header = () => {
         <div className="header__cart">
           <Link href="/cart">
             <Image src={cartIcon} alt="cart-icon" width={20} height={20} />
-            <span>{1}</span>
+            <span className="header__total-items">{totalCount}</span>
           </Link>
         </div>
       </div>

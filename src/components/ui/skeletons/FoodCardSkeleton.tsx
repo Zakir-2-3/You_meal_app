@@ -14,7 +14,7 @@ const FoodCardSkeleton = () => (
     <rect x="12" y="238" rx="3" ry="3" width="44" height="26" />
     <rect x="12" y="280" rx="3" ry="3" width="276" height="40" />
     <rect x="12" y="344" rx="3" ry="3" width="30" height="17" />
-    <rect x="12" y="376" rx="12" ry="12" width="276" height="38" />
+    <rect x="12" y="380" rx="12" ry="12" width="276" height="38" />
   </ContentLoader>
 );
 

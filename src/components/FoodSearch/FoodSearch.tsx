@@ -57,7 +57,7 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
   const updateSearchValue = useCallback(
     debounce((str) => {
       setSearchValue(str);
-    }, 350),
+    }, 450),
     []
   );
 

@@ -2,6 +2,9 @@ import { FC } from "react";
 
 import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
 
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,56 +15,21 @@ import "./CartSidebar.scss";
 import deliveryIcon from "@/assets/icons/delivery-icon.svg";
 
 interface CartSidebarProps {
-  cartItems: {
-    id: string;
-    image: string;
-    name: { ru: string };
-    price_rub: number;
-    size: number;
-    quantity: number;
-  }[];
-  setCartItems: React.Dispatch<
-    React.SetStateAction<CartSidebarProps["cartItems"]>
-  >;
   isLoading: boolean;
 }
 
-const CartSidebar: FC<CartSidebarProps> = ({
-  cartItems,
-  setCartItems,
-  isLoading,
-}) => {
-  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price_rub * item.quantity,
-    0
-  );
+const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
+  const { items, totalPrice } = useSelector((state: RootState) => state.cart);
+  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+
+  // Форматирует цену
   const formattedTotalPrice = new Intl.NumberFormat("ru-RU").format(totalPrice);
-
-  const handleIncrease = (id: string) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
-
-  const handleDecrease = (id: string) => {
-    setCartItems(
-      (prev) =>
-        prev
-          .map((item) =>
-            item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-          )
-          .filter((item) => item.quantity > 0) // Удаляем товар, если quantity становится 0
-    );
-  };
 
   return (
     <aside className="cart-sidebar">
       <div className="cart-sidebar__total-orders">
         <h2>Корзина</h2>
-        <span>{totalQuantity}</span>
+        <span>{totalCount}</span>
       </div>
       <div className="cart-sidebar__description-orders">
         <ul className="cart-sidebar__list">
@@ -69,34 +37,30 @@ const CartSidebar: FC<CartSidebarProps> = ({
             [...new Array(3)].map((_, index) => (
               <CartSidebarItemSkeleton key={index} />
             ))
-          ) : cartItems.length === 0 ? (
+          ) : items.length === 0 ? (
             <li className="cart-sidebar__item cart-sidebar__item--empty">
               Пустая корзина :(
             </li>
           ) : (
-            cartItems.map((item) => (
-              <CartSidebarItem
-                key={item.id}
-                {...item}
-                onIncrease={() => handleIncrease(item.id)}
-                onDecrease={() => handleDecrease(item.id)}
-              />
-            ))
+            items.map((item) => <CartSidebarItem key={item.id} {...item} />)
           )}
         </ul>
       </div>
       <div className="cart-sidebar__total-price">
         <p>Итого:</p>
-        <span>{formattedTotalPrice}₽</span>
+        <span>{formattedTotalPrice} ₽</span>
       </div>
       <div className="cart-sidebar__place-order">
-        <Link href='/cart'>
-        Оформить заказ
-        </Link>
+        <Link href="/cart">Оформить заказ</Link>
       </div>
       <div className="cart-sidebar__delivery">
         <Link href="/delivery" className="cart-sidebar__delivery-link">
-          <Image src={deliveryIcon} alt="delivery-icon" width={24} height={24}/>
+          <Image
+            src={deliveryIcon}
+            alt="delivery-icon"
+            width={24}
+            height={24}
+          />
           Бесплатная доставка*
         </Link>
       </div>

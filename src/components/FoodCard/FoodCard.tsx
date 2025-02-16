@@ -1,10 +1,16 @@
+"use client";
+
 import { FC } from "react";
+
+import { useSelector, useDispatch } from "react-redux";
+import { addItem } from "@/store/slices/cart.slice";
 
 import Image from "next/image";
 
 import "./FoodCard.scss";
 
 interface FoodCardProps {
+  id: number;
   image: string;
   name_ru: string;
   price_rub: number;
@@ -15,6 +21,7 @@ interface FoodCardProps {
 }
 
 const FoodCard: FC<FoodCardProps> = ({
+  id,
   image,
   name_ru,
   price_rub,
@@ -23,6 +30,19 @@ const FoodCard: FC<FoodCardProps> = ({
   onRemoveFromCart,
   isInCart,
 }) => {
+  const dispatch = useDispatch();
+
+  const onClickAdd = () => {
+    const item = {
+      id,
+      name_ru,
+      price_rub,
+      image,
+      size,
+    };
+    dispatch(addItem(item));
+  };
+
   return (
     <div className="food-section__card">
       <div className="food-section__card-img">
@@ -40,7 +60,8 @@ const FoodCard: FC<FoodCardProps> = ({
               ? "food-section__card-add-btn--delete"
               : "food-section__card-add-btn"
           }
-          onClick={isInCart ? onRemoveFromCart : onAddToCart}
+          // onClick={isInCart ? onRemoveFromCart : onAddToCart}
+          onClick={onClickAdd}
         >
           {isInCart ? "Удалить" : "Добавить"}
         </button>

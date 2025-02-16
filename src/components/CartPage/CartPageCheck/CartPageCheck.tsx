@@ -1,8 +1,15 @@
+"use client";
+
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+
 import TotalPriceItemListSkeleton from "../../ui/skeletons/TotalPriceItemListSkeleton";
 
 import "./CartPageCheck.scss";
 
 const CartPageCheck = () => {
+  const { totalPrice, items } = useSelector((state: RootState) => state.cart);
+
   return (
     <>
       <h3 className="total-price-title">YourMeal Check</h3>
@@ -10,16 +17,22 @@ const CartPageCheck = () => {
       <div className="total-price-item-list">
         <ul>
           {/* <TotalPriceItemListSkeleton/> */}
-          <li>
-            <span>1</span>
-            <span>Воппер в YourMeal</span>
-            <span>273</span>
-          </li>
+          {items.map((item) => (
+            <li key={item.id}>
+              <span>{item.count}</span>
+              <span>{item.name_ru}</span>
+              <span>
+                {new Intl.NumberFormat("ru-RU").format(
+                  item.price_rub * item.count
+                )}
+              </span>
+            </li>
+          ))}
         </ul>
       </div>
       <div className="total-price-wrapper">
         <p>
-          SUBTOTAL<span>46.00P</span>
+          SUBTOTAL<span>{totalPrice}</span>
         </p>
         <p>
           TAX<span>4.00P</span>
