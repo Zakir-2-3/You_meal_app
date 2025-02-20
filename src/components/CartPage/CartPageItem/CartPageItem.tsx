@@ -1,31 +1,45 @@
-import CartPageItemSkeleton from "../../ui/skeletons/CartPageItemSkeleton";
-
-import { useDispatch } from "react-redux";
-
-import { addItem, minusItem, removeItem } from "@/store/slices/cart.slice";
+import { FC } from "react";
 
 import Image from "next/image";
 
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { addItem, minusItem, removeItem } from "@/store/slices/cart.slice";
+
+import CartPageItemSkeleton from "../../ui/skeletons/CartPageItemSkeleton";
+
+import { Item } from "@/types/item";
+
 import "./CartPageItem.scss";
 
-const CartPageItem = ({ id, name_ru, image, price_rub, size, count }) => {
+const CartPageItem: FC<Item> = ({
+  id,
+  name_ru,
+  image,
+  price_rub,
+  size,
+  count,
+}) => {
   const formattedTotalPrice = new Intl.NumberFormat("ru-RU").format(
-    price_rub * count
+    price_rub * (count ?? 0)
   );
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
+  // Прибавить товар в корзине
   const onClickPlus = () => {
     dispatch(
       addItem({
         id,
-      })
+      } as Item)
     );
   };
 
+  // Убавить товар в корзине
   const onClickMinus = () => {
     dispatch(minusItem(id));
   };
 
+  // Удалить весь товар, не все товары
   const onClickRemove = () => {
     dispatch(removeItem(id));
   };

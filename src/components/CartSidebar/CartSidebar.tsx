@@ -1,26 +1,28 @@
 import { FC } from "react";
 
-import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
+import Image from "next/image";
+import Link from "next/link";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
-import Image from "next/image";
-import Link from "next/link";
-
 import CartSidebarItemSkeleton from "../ui/skeletons/CartSidebarItemSkeleton";
 
-import "./CartSidebar.scss";
+import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
 
 import deliveryIcon from "@/assets/icons/delivery-icon.svg";
+
+import "./CartSidebar.scss";
 
 interface CartSidebarProps {
   isLoading: boolean;
 }
 
 const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
+  // Получаем массив данных и общую сумму
   const { items, totalPrice } = useSelector((state: RootState) => state.cart);
-  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+  // Считаем кол-во товаров для ограничения в 99 штук
+  const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0);
 
   // Форматирует цену
   const formattedTotalPrice = new Intl.NumberFormat("ru-RU").format(totalPrice);
@@ -29,7 +31,9 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
     <aside className="cart-sidebar">
       <div className="cart-sidebar__total-orders">
         <h2>Корзина</h2>
-        <span>{totalCount}</span>
+        <span style={{ color: totalCount === 99 ? "red" : "inherit" }}>
+          {totalCount}
+        </span>
       </div>
       <div className="cart-sidebar__description-orders">
         <ul className="cart-sidebar__list">

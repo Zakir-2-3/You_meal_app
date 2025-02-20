@@ -1,23 +1,16 @@
 import { FC } from "react";
 
-import { useDispatch } from "react-redux";
+import Image from "next/image";
 
+import { AppDispatch } from "@/store/store";
+import { useDispatch } from "react-redux";
 import { addItem, minusItem } from "@/store/slices/cart.slice";
 
-import Image from "next/image";
+import { Item } from "@/types/item";
 
 import "./CartSidebarItem.scss";
 
-interface CartSidebarItemProps {
-  id: number;
-  image: string;
-  name_ru: string;
-  price_rub: number;
-  size: number;
-  count: number;
-}
-
-const CartSidebarItem: FC<CartSidebarItemProps> = ({
+const CartSidebarItem: FC<Item> = ({
   id,
   name_ru,
   image,
@@ -25,16 +18,18 @@ const CartSidebarItem: FC<CartSidebarItemProps> = ({
   size,
   count,
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
+  // Прибавить товар в корзине
   const onClickPlus = () => {
     dispatch(
       addItem({
         id,
-      })
+      } as Item)
     );
   };
 
+  // Убавить товар в корзине
   const onClickMinus = () => {
     dispatch(minusItem(id));
   };
@@ -51,7 +46,7 @@ const CartSidebarItem: FC<CartSidebarItemProps> = ({
       </div>
       <div className="cart-sidebar__item-quantity">
         <button onClick={onClickMinus}>-</button>
-        <span>{count}</span>
+        <span style={{ color: count === 99 ? "red" : "inherit" }}>{count}</span>
         <button onClick={onClickPlus}>+</button>
       </div>
     </li>

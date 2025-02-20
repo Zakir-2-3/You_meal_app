@@ -1,7 +1,7 @@
+import { FC } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
-
-import "./Footer.scss";
 
 import footerLogo from "@/assets/images/footer-logo.png";
 import phoneIcon from "@/assets/icons/phone-icon.svg";
@@ -9,20 +9,22 @@ import socialIcon_1 from "@/assets/icons/socialIcon_1.svg";
 import socialIcon_2 from "@/assets/icons/socialIcon_2.svg";
 import socialIcon_3 from "@/assets/icons/socialIcon_3.svg";
 
-const Footer = () => {
+import "./Footer.scss";
+
+const Footer: FC = () => {
   return (
     <footer className="footer">
       <div className="container footer-container">
         <div className="footer__logo">
           <Link href="/">
-            <Image src={footerLogo} alt="footer-logo" width={305} height={68}/>
+            <Image src={footerLogo} alt="footer-logo" width={305} height={68} />
           </Link>
         </div>
         <div className="footer__number">
           <p>Номер для заказа</p>
           <Link href="tel:+79308333811">
-            <Image src={phoneIcon} alt="phone-icon" width={24} height={24}/>
-            +7(930)833-38-11
+            <Image src={phoneIcon} alt="phone-icon" width={24} height={24} />
+            +7 (930) 833-38-11
           </Link>
         </div>
         <div className="footer__social">
@@ -33,8 +35,8 @@ const Footer = () => {
                 <Image
                   src={socialIcon_1}
                   alt="socialIcon_1"
-                  width={36}
-                  height={36}
+                  width={26}
+                  height={26}
                 />
               </Link>
             </li>
@@ -43,8 +45,8 @@ const Footer = () => {
                 <Image
                   src={socialIcon_2}
                   alt="socialIcon_2"
-                  width={36}
-                  height={36}
+                  width={26}
+                  height={26}
                 />
               </Link>
             </li>
@@ -53,8 +55,8 @@ const Footer = () => {
                 <Image
                   src={socialIcon_3}
                   alt="socialIcon_3"
-                  width={36}
-                  height={36}
+                  width={30}
+                  height={30}
                 />
               </Link>
             </li>

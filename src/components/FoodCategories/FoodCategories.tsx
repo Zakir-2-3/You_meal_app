@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setActiveCategory } from "@/store/slices/category.slice";
-import { RootState } from "@/store/store";
+import { AppDispatch, RootState } from "@/store/store";
 
 import FoodCategoriesSearch from "../FoodSearch/FoodSearch";
 
@@ -17,7 +17,8 @@ interface FoodCategoriesProps {
 }
 
 const FoodCategories: FC<FoodCategoriesProps> = ({ setSearchValue }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  // Активных индекс категории
   const activeIndex = useSelector(
     (state: RootState) => state.category.activeIndex
   );

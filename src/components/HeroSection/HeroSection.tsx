@@ -1,11 +1,13 @@
+import { FC } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 
-import "./HeroSection.scss";
-
 import heroSectionImg_1 from "@/assets/images/hero-section-img-1.png";
 
-const HeroSection = () => {
+import "./HeroSection.scss";
+
+const HeroSection: FC = () => {
   return (
     <section className="hero-section">
       <div className="hero-section__content">

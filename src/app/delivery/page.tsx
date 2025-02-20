@@ -1,8 +1,8 @@
 import Image from "next/image";
 
-import "./deliveryPage.scss";
-
 import deliveryPageImg from "@/assets/images/delivery-page-img.png";
+
+import "./deliveryPage.scss";
 
 export default function DeliveryPage() {
   return (
@@ -10,7 +10,12 @@ export default function DeliveryPage() {
       <div className="container">
         <h1 className="delivery-page-section__title">Доставка YourMeal</h1>
         <div className="delivery-page-section__img">
-          <Image src={deliveryPageImg} alt="delivery-page-img" width={500} height={562}/>
+          <Image
+            src={deliveryPageImg}
+            alt="delivery-page-img"
+            width={500}
+            height={562}
+          />
         </div>
         <div className="delivery-page-section__info">
           <h2>Как заказать YourMeal на дом</h2>

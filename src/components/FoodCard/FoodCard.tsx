@@ -2,23 +2,15 @@
 
 import { FC } from "react";
 
-import { useSelector, useDispatch } from "react-redux";
-import { addItem } from "@/store/slices/cart.slice";
-
 import Image from "next/image";
 
-import "./FoodCard.scss";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { addItem, removeItem } from "@/store/slices/cart.slice";
 
-interface FoodCardProps {
-  id: number;
-  image: string;
-  name_ru: string;
-  price_rub: number;
-  size: number;
-  onAddToCart: () => void;
-  onRemoveFromCart: () => void;
-  isInCart: boolean;
-}
+import { FoodCardProps } from "@/types/foodCard";
+
+import "./FoodCard.scss";
 
 const FoodCard: FC<FoodCardProps> = ({
   id,
@@ -26,21 +18,28 @@ const FoodCard: FC<FoodCardProps> = ({
   name_ru,
   price_rub,
   size,
-  onAddToCart,
-  onRemoveFromCart,
-  isInCart,
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
+  // Проверяем, есть ли этот товар в корзине
+  const itemInCart = cartItems.find((item) => item.id === id);
+  const isAdded = itemInCart && (itemInCart.count ?? 0) > 0;
+
+  // Кнопка добавить/удалить товар в main
   const onClickAdd = () => {
-    const item = {
-      id,
-      name_ru,
-      price_rub,
-      image,
-      size,
-    };
-    dispatch(addItem(item));
+    if (isAdded) {
+      dispatch(removeItem(id)); // Удаляем товар, если он уже в корзине
+    } else {
+      const item = {
+        id,
+        name_ru,
+        price_rub,
+        image,
+        size,
+      };
+      dispatch(addItem(item));
+    }
   };
 
   return (
@@ -55,15 +54,12 @@ const FoodCard: FC<FoodCardProps> = ({
       </div>
       <div className="food-section__card-add">
         <button
-          className={
-            isInCart
-              ? "food-section__card-add-btn--delete"
-              : "food-section__card-add-btn"
-          }
-          // onClick={isInCart ? onRemoveFromCart : onAddToCart}
+          className={`food-section__card-add-btn ${
+            isAdded ? "food-section__card-add-btn--delete" : ""
+          }`}
           onClick={onClickAdd}
         >
-          {isInCart ? "Удалить" : "Добавить"}
+          {isAdded ? "Удалить" : "Добавить"}
         </button>
       </div>
     </div>

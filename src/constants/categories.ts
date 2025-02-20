@@ -1,3 +1,5 @@
+import { Category } from "@/types/category";
+
 import categoryIcon1 from "@/assets/icons/category-icon-1.svg";
 import categoryIcon2 from "@/assets/icons/category-icon-2.svg";
 import categoryIcon3 from "@/assets/icons/category-icon-3.svg";
@@ -7,7 +9,7 @@ import categoryIcon6 from "@/assets/icons/category-icon-6.svg";
 import categoryIcon7 from "@/assets/icons/category-icon-7.svg";
 import categoryIcon8 from "@/assets/icons/category-icon-8.svg";
 
-export const categories = [
+export const categories: Category[] = [
   { id: 1, title: "Бургеры", image: categoryIcon1 },
   { id: 2, title: "Закуски", image: categoryIcon2 },
   { id: 3, title: "Комбо", image: categoryIcon3 },

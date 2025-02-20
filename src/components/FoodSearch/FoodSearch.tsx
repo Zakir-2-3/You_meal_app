@@ -1,13 +1,13 @@
 import { FC, useRef, useCallback, useState, useEffect } from "react";
 
-import debounce from "lodash.debounce";
-
 import Image from "next/image";
 
-import "./FoodSearch.scss";
+import debounce from "lodash.debounce";
 
 import searchIcon from "@/assets/icons/search-icon.svg";
 import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
+
+import "./FoodSearch.scss";
 
 interface FoodCategoriesSearchProps {
   setSearchValue: (value: string) => void;
@@ -17,8 +17,8 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
   setSearchValue,
 }) => {
   const [value, setValue] = useState(""); // Локальный state для input
-  const inputRef = useRef<HTMLInputElement>(null);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null); // input поиска
+  const searchRef = useRef<HTMLDivElement>(null); // div поиска
   const [searchClick, setSearchClick] = useState(false); // Флаг активности поиска
 
   // Фокус в инпуте при клике на поиск
@@ -53,7 +53,7 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
     inputRef.current?.focus(); // Фокус при очистки текста
   };
 
-  // Задержка поиска debounce в 350 мс
+  // Задержка поиска товаров через debounce в 350 мс
   const updateSearchValue = useCallback(
     debounce((str) => {
       setSearchValue(str);

@@ -1,20 +1,22 @@
 "use client";
 
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { FC } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
 
-import "./Header.scss";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 import headerLogo from "@/assets/images/header-logo.png";
 import profileIcon from "@/assets/icons/profile-icon.svg";
 import cartIcon from "@/assets/icons/cart-icon.svg";
 
-const Header = () => {
+import "./Header.scss";
+
+const Header: FC = () => {
   const { items } = useSelector((state: RootState) => state.cart);
-  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+  const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0); // Общее кол-во товаров в корзине
 
   return (
     <header className="header">

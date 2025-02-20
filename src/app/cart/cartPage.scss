@@ -81,7 +81,7 @@
     box-shadow: 2px 4px 6px rgba(49, 49, 49, 0.215);
   }
   &__pay-btn {
-    height: 30px;
+    height: 36px;
     margin-top: 20px;
     color: #fff;
     background-color: #ff7020;
@@ -92,5 +92,19 @@
     -moz-border-radius: 12px;
     -ms-border-radius: 12px;
     -o-border-radius: 12px;
+    transition: 0.1s ease-in-out;
+    -webkit-transition: 0.1s ease-in-out;
+    -moz-transition: 0.1s ease-in-out;
+    -ms-transition: 0.1s ease-in-out;
+    -o-transition: 0.1s ease-in-out;
+    &:hover {
+      font-weight: 600;
+      box-shadow: 0px 4px 0px 0px #e0621c;
+      transform: translate(0px, -5px);
+      -webkit-transform: translate(0px, -5px);
+      -moz-transform: translate(0px, -5px);
+      -ms-transform: translate(0px, -5px);
+      -o-transform: translate(0px, -5px);
+    }
   }
 }

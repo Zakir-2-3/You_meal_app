@@ -42,7 +42,7 @@
     background-color: #fff;
   }
   &::-webkit-scrollbar-thumb {
-    background-color:#c9c9c9;
+    background-color: #c9c9c9;
     border-radius: 20px;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -70,11 +70,19 @@
   & p > span {
     font-size: 16px;
   }
+  & p:nth-child(2) {
+    color: red;
+  }
+  & p:nth-child(3) {
+    font-weight: 600;
+
+    color: green;
+  }
 }
 
 .total-price-thank {
   margin: 16px 0 14px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .total-price-tips {
@@ -83,14 +91,14 @@
   justify-content: space-between;
   width: 100%;
   font-size: 13px;
-  & p:nth-child(1) {
+  & p {
     border: none;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-size: 12px;
     width: 100%;
     margin-right: auto;
   }
-  & p:not(:nth-child(1)) {
+  & .tip-option {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
@@ -98,5 +106,23 @@
     gap: 0 4px;
     padding-bottom: 2px;
     border-bottom: 1px dotted #000;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    transition: all 0.1s ease-in-out;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    &:hover,
+    &--active {
+      transform: translateY(-1px);
+      -webkit-transform: translateY(-1px);
+      -moz-transform: translateY(-1px);
+      -ms-transform: translateY(-1px);
+      -o-transform: translateY(-1px);
+      color: green;
+      border-bottom: 1px solid green;
+      cursor: pointer;
+    }
   }
 }

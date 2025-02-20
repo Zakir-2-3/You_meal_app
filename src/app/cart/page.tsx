@@ -1,11 +1,10 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
-
-import { clearItems } from "@/store/slices/cart.slice";
-
 import Image from "next/image";
+
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { clearItems } from "@/store/slices/cart.slice";
 
 import CartPageItem from "@/components/CartPage/CartPageItem/CartPageItem";
 import CartPageCheck from "@/components/CartPage/CartPageCheck/CartPageCheck";
@@ -17,8 +16,9 @@ import "./cartPage.scss";
 
 export default function CartPage() {
   const { items } = useSelector((state: RootState) => state.cart);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
+  // Очистка корзины
   const onClickClearCart = () => {
     if (items.length > 0) {
       window.confirm("Очистить корзину ?");

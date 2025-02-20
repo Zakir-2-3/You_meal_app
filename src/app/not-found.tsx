@@ -1,18 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import Image from "next/image";
 
-import "@/styles/NotFoundPage.scss";
+import { useRouter } from "next/navigation";
 
 import notFoundImg from "@/assets/images/not-found-img.png";
+
+import "@/styles/NotFoundPage.scss";
 
 export default function NotFoundPage() {
   const router = useRouter();
 
   const handleClick = () => {
-    router.replace("/"); // Перенаправление без возможности вернуться назад
+    router.replace("/"); // Запрещаем возвращение на страницу 404
   };
 
   return (
@@ -29,10 +29,7 @@ export default function NotFoundPage() {
         <b>4</b>
       </h1>
       <p className="not-found-wrapper__description">Страница не найдена</p>
-      <button
-        className="not-found-wrapper__btn"
-        onClick={handleClick}
-      >
+      <button className="not-found-wrapper__btn" onClick={handleClick}>
         Вернуться назад
       </button>
     </div>

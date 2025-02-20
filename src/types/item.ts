@@ -10,4 +10,5 @@ export interface Item {
 export interface CartState {
   items: Item[];
   totalPrice: number;
+  savedDate: null | string;
 }

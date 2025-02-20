@@ -1,9 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface CategoryState {
-  activeIndex: number;
-  activeCategoryName: string;
-}
+import { CategoryState } from "@/types/category";
 
 const initialState: CategoryState = {
   activeIndex: 0,

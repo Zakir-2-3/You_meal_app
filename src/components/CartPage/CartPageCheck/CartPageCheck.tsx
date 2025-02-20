@@ -1,5 +1,7 @@
 "use client";
 
+import { FC, useState } from "react";
+
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
@@ -7,23 +9,31 @@ import TotalPriceItemListSkeleton from "../../ui/skeletons/TotalPriceItemListSke
 
 import "./CartPageCheck.scss";
 
-const CartPageCheck = () => {
-  const { totalPrice, items } = useSelector((state: RootState) => state.cart);
+const CartPageCheck: FC = () => {
+  // Получаем общую сумму, массив добавленных, первую дату в товара
+  const { totalPrice, items, savedDate } = useSelector(
+    (state: RootState) => state.cart
+  );
+  const [selectedTip, setSelectedTip] = useState<number>(0); // Храним выбранные чаевые
+  const totalWithTips = totalPrice + totalPrice * 0.05 + selectedTip; // Подсчет общей суммы с чаевыми
+
+  const handleTipSelect = (tip: number) => {
+    setSelectedTip((prev) => (prev === tip ? 0 : tip)); // Сбрасываем при повторном клике
+  };
 
   return (
     <>
       <h3 className="total-price-title">YourMeal Check</h3>
-      <span className="total-price-date">Aug 14 06:40PM</span>
+      <span className="total-price-date">Дата: {savedDate}</span>
       <div className="total-price-item-list">
         <ul>
-          {/* <TotalPriceItemListSkeleton/> */}
           {items.map((item) => (
             <li key={item.id}>
               <span>{item.count}</span>
               <span>{item.name_ru}</span>
               <span>
                 {new Intl.NumberFormat("ru-RU").format(
-                  item.price_rub * item.count
+                  item.price_rub * (item.count ?? 0)
                 )}
               </span>
             </li>
@@ -32,27 +42,51 @@ const CartPageCheck = () => {
       </div>
       <div className="total-price-wrapper">
         <p>
-          SUBTOTAL<span>{totalPrice}</span>
+          СЧЕТ (БЕЗ НДС)
+          <span>
+            {new Intl.NumberFormat("ru-RU").format(
+              parseFloat(totalPrice.toFixed(2))
+            )}{" "}
+            ₽
+          </span>
         </p>
         <p>
-          TAX<span>4.00P</span>
+          НДС (5%)
+          <span>
+            {new Intl.NumberFormat("ru-RU")
+              .format(parseFloat((totalPrice * 0.05).toFixed(2)))
+              .replace(",", ".")}{" "}
+            ₽
+          </span>
         </p>
         <p>
-          TOTAL DUE<span>50.00P</span>
+          ВСЕГО
+          <span>
+            {new Intl.NumberFormat("ru-RU")
+              .format(parseFloat(totalWithTips.toFixed(2)))
+              .replace(",", ".")}{" "}
+            ₽
+          </span>
         </p>
       </div>
       <p className="total-price-thank">THANK YOU FOR VISITING!</p>
       <div className="total-price-tips">
         <p>ЧАЕВЫЕ</p>
-        <p>
-          5% is <span>$5</span>
-        </p>
-        <p>
-          10% is <span>$10</span>
-        </p>
-        <p>
-          15% is <span>$15</span>
-        </p>
+        {[0.05, 0.1, 0.15].map((tip) => (
+          <button
+            key={tip}
+            className={`tip-option ${
+              selectedTip === totalPrice * tip ? "tip-option--active" : ""
+            }`}
+            onClick={() => handleTipSelect(totalPrice * tip)}
+          >
+            {tip * 100}% ={" "}
+            {new Intl.NumberFormat("ru-RU")
+              .format(parseFloat((totalPrice * tip).toFixed(2)))
+              .replace(",", ".")}
+            ₽
+          </button>
+        ))}
       </div>
     </>
   );
