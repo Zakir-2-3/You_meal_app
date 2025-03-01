@@ -1,0 +1,141 @@
+.product-section {
+  color: #444444;
+  background-color: #fff;
+  min-height: 100%;
+  & > .container {
+    margin-bottom: 50px;
+  }
+  & .nav-buttons {
+    padding: 20px 0 8px;
+  }
+  & .content-wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 0px 100px;
+    align-items: start;
+  }
+  &__img {
+    grid-row: span 2;
+    & figcaption {
+      text-align: center;
+      padding: 10px;
+      font-style: italic;
+    }
+  }
+  &__title {
+    margin-bottom: 20px;
+    font-size: 36px;
+  }
+  &__info-price {
+    font-size: 22px;
+    font-weight: 700;
+    & span {
+      font-weight: 600;
+    }
+  }
+  &__add-cart {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0 20px;
+    margin: 30px 0;
+    & > .quantity-control {
+      margin: 0;
+      height: 40px;
+    }
+    &-btn,
+    &--delete {
+      width: 250px;
+      height: 40px;
+      color: #000;
+      font-size: 16px;
+      font-weight: 400;
+      color: #fff;
+      background-color: #ffab08;
+      border-radius: 12px;
+      -webkit-border-radius: 12px;
+      -moz-border-radius: 12px;
+      -ms-border-radius: 12px;
+      -o-border-radius: 12px;
+      transition: all 0.1s ease-in;
+      -webkit-transition: all 0.1s ease-in;
+      -moz-transition: all 0.1s ease-in;
+      -ms-transition: all 0.1s ease-in;
+      -o-transition: all 0.1s ease-in;
+      will-change: transform;
+      &:hover {
+        font-weight: 600;
+        box-shadow: 0 4px #e0621c;
+        transform: translate(0, -5px);
+        -webkit-transform: translate(0, -5px);
+        -moz-transform: translate(0, -5px);
+        -ms-transform: translate(0, -5px);
+        -o-transform: translate(0, -5px);
+        background-color: #f86310;
+      }
+      &--delete {
+        background-color: #f86310;
+        &:hover {
+          background-color: #ffab08;
+        }
+      }
+    }
+  }
+  &__info-description {
+    margin-bottom: 20px;
+    & p {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    & span {
+      font-size: 18px;
+      line-height: 26px;
+    }
+  }
+  &__info-size {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    & span {
+      font-weight: 600;
+    }
+  }
+  &__info-nutritional-values {
+    grid-column: 2;
+    & table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+  }
+  &__info-nutritional-values th {
+    font-weight: 700;
+    background: #9f9e9e1a;
+  }
+  &__info-nutritional-values td:first-child {
+    font-weight: 600;
+  }
+  &__info-nutritional-values td span {
+    font-weight: 500;
+  }
+  &__info-nutritional-values th,
+  &__info-nutritional-values td {
+    border: 1px solid #ddd;
+    color: #000;
+    padding: 8px;
+    text-align: left;
+    font-size: 17px;
+  }
+}
+
+td:hover {
+  background: #9f9e9e1a;
+  cursor: pointer;
+}
+
+.footer-product {
+  background: #fafafa;
+}

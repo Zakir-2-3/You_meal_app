@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cart.slice";
 
-import CartPageItemSkeleton from "../../ui/skeletons/CartPageItemSkeleton";
+import QuantityControl from "@/components/QuantityControl/QuantityControl";
 
 import { Item } from "@/types/item";
 
@@ -25,7 +25,7 @@ const CartPageItem: FC<Item> = ({
   );
   const dispatch = useDispatch<AppDispatch>();
 
-  // Прибавить товар в корзине
+  // Прибавить товар +1
   const onClickPlus = () => {
     dispatch(
       addItem({
@@ -34,21 +34,20 @@ const CartPageItem: FC<Item> = ({
     );
   };
 
-  // Убавить товар в корзине
+  // Убавить товар -1
   const onClickMinus = () => {
     dispatch(minusItem(id));
   };
 
-  // Удалить весь товар, не все товары
+  // Удалить весь товар
   const onClickRemove = () => {
     dispatch(removeItem(id));
   };
 
   return (
-    // <CartPageItemSkeleton/>
     <li className="cart-page-section__item">
       <div className="cart-page-section__img">
-        <Image src={image} alt="test" width={100} height={100} />
+        <Image src={image} alt={name_ru} width={100} height={100} />
       </div>
       <div className="cart-page-section__description">
         <h3>{name_ru}</h3>
@@ -57,11 +56,11 @@ const CartPageItem: FC<Item> = ({
           {price_rub}₽ <b>{size}г</b>
         </p>
       </div>
-      <div className="cart-page-section__item-quantity">
-        <button onClick={onClickMinus}>-</button>
-        <span>{count}</span>
-        <button onClick={onClickPlus}>+</button>
-      </div>
+      <QuantityControl
+        count={count}
+        onClickPlus={onClickPlus}
+        onClickMinus={onClickMinus}
+      />
       <div className="cart-page-section__remove-item">
         <button onClick={onClickRemove}>X</button>
       </div>

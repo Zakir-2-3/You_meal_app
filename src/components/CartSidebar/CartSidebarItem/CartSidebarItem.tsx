@@ -20,7 +20,7 @@ const CartSidebarItem: FC<Item> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Прибавить товар в корзине
+  // Прибавить товар +1
   const onClickPlus = () => {
     dispatch(
       addItem({
@@ -29,7 +29,7 @@ const CartSidebarItem: FC<Item> = ({
     );
   };
 
-  // Убавить товар в корзине
+  // Убавить товар -1
   const onClickMinus = () => {
     dispatch(minusItem(id));
   };

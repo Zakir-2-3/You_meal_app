@@ -7,7 +7,7 @@ import debounce from "lodash.debounce";
 import searchIcon from "@/assets/icons/search-icon.svg";
 import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
 
-import "./FoodSearch.scss";
+import "./FoodCategoriesSearch.scss";
 
 interface FoodCategoriesSearchProps {
   setSearchValue: (value: string) => void;
@@ -48,12 +48,14 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
 
   // Функция очистки поиска
   const onClickClear = () => {
-    setValue(""); // Очищаем input
-    setSearchValue(""); // Сбрасываем значение в родительском компоненте
-    inputRef.current?.focus(); // Фокус при очистки текста
+    if (value !== "") {
+      setValue(""); // Очищаем input
+      setSearchValue(""); // Сбрасываем значение в родительском компоненте
+      inputRef.current?.focus(); // Фокус при очистки текста
+    }
   };
 
-  // Задержка поиска товаров через debounce в 350 мс
+  // Задержка поиска товаров через debounce в 450 мс
   const updateSearchValue = useCallback(
     debounce((str) => {
       setSearchValue(str);

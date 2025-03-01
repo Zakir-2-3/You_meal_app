@@ -78,7 +78,7 @@
       justify-content: center;
       height: 40px;
       width: 100%;
-      color: #fff;
+      color: #fff !important;
       font-size: 16px;
       background-color: #ff7020;
       font-weight: 400;
@@ -87,11 +87,11 @@
       -moz-border-radius: 12px;
       -ms-border-radius: 12px;
       -o-border-radius: 12px;
-      transition: all 0.3s ease-in;
-      -webkit-transition: all 0.3s ease-in;
-      -moz-transition: all 0.3s ease-in;
-      -ms-transition: all 0.3s ease-in;
-      -o-transition: all 0.3s ease-in;
+      transition: all 0.2s ease-in;
+      -webkit-transition: all 0.2s ease-in;
+      -moz-transition: all 0.2s ease-in;
+      -ms-transition: all 0.2s ease-in;
+      -o-transition: all 0.2s ease-in;
     }
     & a:hover {
       background-color: #ffab08;

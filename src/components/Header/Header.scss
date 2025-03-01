@@ -1,6 +1,9 @@
 .header {
   height: 70px;
   background-color: #ffab08;
+  &-hidden {
+    display: none;
+  }
   &-container {
     display: flex;
     flex-flow: row nowrap;

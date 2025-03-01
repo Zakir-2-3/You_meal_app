@@ -11,12 +11,21 @@
   -moz-border-radius: 18px;
   -ms-border-radius: 18px;
   -o-border-radius: 18px;
+  transition: all 0.2s ease-in;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  -ms-transition: all 0.2s ease-in;
+  -o-transition: all 0.2s ease-in;
   &:hover {
     cursor: pointer;
+    box-shadow: rgb(0 0 0 / 16%) 1px 5px 16px -5px;
+    transform: translateY(-8px);
+    -webkit-transform: translateY(-8px);
+    -moz-transform: translateY(-8px);
+    -ms-transform: translateY(-8px);
+    -o-transform: translateY(-8px);
   }
   &-img {
-    width: 100%;
-    height: 212px;
     margin-bottom: 14px;
     border-radius: 12px;
     -webkit-border-radius: 12px;
@@ -58,15 +67,16 @@
       -moz-border-radius: 12px;
       -ms-border-radius: 12px;
       -o-border-radius: 12px;
-      transition: all 0.3s ease-in;
-      -webkit-transition: all 0.3s ease-in;
-      -moz-transition: all 0.3s ease-in;
-      -ms-transition: all 0.3s ease-in;
-      -o-transition: all 0.3s ease-in;
+      transition: all 0.2s ease-in;
+      -webkit-transition: all 0.2s ease-in;
+      -moz-transition: all 0.2s ease-in;
+      -ms-transition: all 0.2s ease-in;
+      -o-transition: all 0.2s ease-in;
       &--active {
         background-color: #f86310;
       }
       &:hover {
+        color: #fff;
         background-color: #ffab08;
       }
       &:active {

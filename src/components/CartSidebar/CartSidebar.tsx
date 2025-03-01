@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
-import CartSidebarItemSkeleton from "../ui/skeletons/CartSidebarItemSkeleton";
-
 import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
+
+import CartSidebarItemSkeleton from "../../ui/skeletons/CartSidebarItemSkeleton";
 
 import deliveryIcon from "@/assets/icons/delivery-icon.svg";
 

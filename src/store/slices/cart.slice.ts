@@ -3,10 +3,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CartState, Item } from "@/types/item";
 
 import { formatDate } from "@/utils/formatDate";
+import { getCartFromLS } from "@/utils/getCartFromLS";
+import { calcTotalPrice } from "@/utils/calcTotalPrice";
+
+const { items, totalPrice } = getCartFromLS();
 
 const initialState: CartState = {
-  items: [],
-  totalPrice: 0,
+  items,
+  totalPrice,
   savedDate: null,
 };
 
@@ -47,9 +51,7 @@ const cartSlice = createSlice({
       }
 
       // Пересчитываем общую сумму
-      state.totalPrice = state.items.reduce((sum, obj) => {
-        return obj.price_rub * (obj.count ?? 0) + sum;
-      }, 0);
+      state.totalPrice = calcTotalPrice(state.items);
     },
 
     minusItem(state, action: PayloadAction<number>) {
@@ -69,9 +71,7 @@ const cartSlice = createSlice({
       }
 
       // Пересчитываем общую сумму
-      state.totalPrice = state.items.reduce((sum, obj) => {
-        return obj.price_rub * (obj.count ?? 0) + sum;
-      }, 0);
+      state.totalPrice = state.totalPrice = calcTotalPrice(state.items);
     },
 
     removeItem(state, action: PayloadAction<number>) {
@@ -83,9 +83,7 @@ const cartSlice = createSlice({
       }
 
       // Пересчитываем общую сумму
-      state.totalPrice = state.items.reduce((sum, obj) => {
-        return obj.price_rub * (obj.count ?? 0) + sum;
-      }, 0);
+      state.totalPrice = state.totalPrice = calcTotalPrice(state.items);
     },
     clearItems(state) {
       state.items = []; // Очищаем всё

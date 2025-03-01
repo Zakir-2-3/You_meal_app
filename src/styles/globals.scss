@@ -3,6 +3,7 @@ body {
   flex-direction: column;
   overflow: hidden auto;
   background-color: #f9f9f9;
+  user-select: none;
 }
 
 html::-webkit-scrollbar {

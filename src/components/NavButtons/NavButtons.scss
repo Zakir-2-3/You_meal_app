@@ -1,0 +1,40 @@
+.nav-buttons {
+  margin-bottom: 20px;
+  padding: 8px 0;
+  & > ol {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    list-style: none;
+    color: #555 !important;
+    & > li {
+      position: relative;
+      padding: 0 7px;
+      font-size: 15px;
+      font-weight: 600;
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 50%;
+        right: -3px;
+        width: 6px;
+        height: 6px;
+        border-right: 1px solid #555;
+        border-bottom: 1px solid #555;
+        transform: rotate(-45deg) translateY(-50%);
+        -webkit-transform: rotate(-45deg) translateY(-50%);
+        -moz-transform: rotate(-45deg) translateY(-50%);
+        -ms-transform: rotate(-45deg) translateY(-50%);
+        -o-transform: rotate(-45deg) translateY(-50%);
+      }
+      &:hover {
+        cursor: pointer;
+        color: rgba(55, 91, 162, 0.716);
+      }
+    }
+    & li:nth-child(1) {
+      padding-left: 0;
+    }
+  }
+}

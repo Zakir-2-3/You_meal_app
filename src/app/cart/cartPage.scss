@@ -2,18 +2,25 @@
   height: 100%;
   & .cart-page-container {
     display: grid;
-    grid-template-rows: auto auto;
     grid-template-columns: 1fr auto;
+    grid-template-rows: repeat(3, auto);
     justify-content: space-between;
     gap: 0 70px;
     margin-bottom: 40px;
   }
   &__title {
     grid-column: span 2;
-    margin: 30px 0;
+    margin: 20px 0 0 0;
     font-size: 36px;
   }
+  & .nav-buttons {
+    grid-column-start: 1;
+    grid-row-start: 2;
+    margin-bottom: 10px;
+  }
   &__list-wrapper {
+    grid-column-start: 1;
+    grid-row-start: 3;
     width: 100%;
     min-height: 481px;
     position: relative;
@@ -57,10 +64,16 @@
     box-shadow:
       0 1px 0 0px #9a99993d,
       0 -1px 0 0px #9a99993d;
+    & svg {
+      box-shadow: 0 1px #9a99993d;
+    }
   }
   &__right-side {
     display: flex;
     flex-flow: column nowrap;
+    grid-row: span 3 / span 3;
+    grid-column-start: 2;
+    grid-row-start: 2;
     position: sticky;
     top: 10px;
     max-height: 531px;
@@ -97,6 +110,7 @@
     -moz-transition: 0.1s ease-in-out;
     -ms-transition: 0.1s ease-in-out;
     -o-transition: 0.1s ease-in-out;
+    will-change: transform;
     &:hover {
       font-weight: 600;
       box-shadow: 0px 4px 0px 0px #e0621c;

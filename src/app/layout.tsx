@@ -1,10 +1,10 @@
-import Head from "next/head";
-import Header from "@/components/Header/Header";
-import Footer from "@/components/Footer/Footer";
+import { Nunito } from "next/font/google";
+import { Metadata } from "next";
 
 import { ReduxProvider } from "@/store/Providers";
 
-import { Nunito } from "next/font/google";
+import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
 
 import "@/styles/reset.css";
 import "@/styles/globals.scss";
@@ -14,25 +14,19 @@ const nunito = Nunito({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "YourMeal",
-  icons: {
-    icon: "/favicon.png",
-  },
+  description: "Лучшие блюда в YourMeal!",
+  icons: "/favicon.svg",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ru">
-      <Head>
-        <title>YourMeal</title>
-        <link rel="icon" href="/favicon.png" type="image/png" />
-        <meta name="description" content="Лучшие блюда в YourMeal!" />
-      </Head>
       <body className={nunito.className}>
         <ReduxProvider>
           <Header />

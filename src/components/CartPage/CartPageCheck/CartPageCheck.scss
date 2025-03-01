@@ -75,7 +75,6 @@
   }
   & p:nth-child(3) {
     font-weight: 600;
-
     color: green;
   }
 }
@@ -124,5 +123,13 @@
       border-bottom: 1px solid green;
       cursor: pointer;
     }
+  }
+  & .tip-option:disabled {
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    pointer-events: none;
   }
 }

@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import NavButtons from "@/components/NavButtons/NavButtons";
+
 import deliveryPageImg from "@/assets/images/delivery-page-img.png";
 
 import "./deliveryPage.scss";
@@ -9,6 +11,7 @@ export default function DeliveryPage() {
     <section className="delivery-page-section">
       <div className="container">
         <h1 className="delivery-page-section__title">Доставка YourMeal</h1>
+        <NavButtons customTitle="Доставка" />
         <div className="delivery-page-section__img">
           <Image
             src={deliveryPageImg}

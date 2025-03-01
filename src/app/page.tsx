@@ -9,19 +9,19 @@ import { RootState } from "@/store/store";
 
 import { Item } from "@/types/item";
 
-import FoodCardSkeleton from "@/components/ui/skeletons/FoodCardSkeleton";
-
+import FoodCardSkeleton from "@/ui/skeletons/FoodCardSkeleton";
 import HeroSection from "@/components/HeroSection/HeroSection";
 import FoodCategories from "@/components/FoodCategories/FoodCategories";
+import FoodCategoriesSearch from "@/components/FoodCategoriesSearch/FoodCategoriesSearch";
 import CartSidebar from "@/components/CartSidebar/CartSidebar";
 import FoodCard from "@/components/FoodCard/FoodCard";
 
 import "@/styles/home.scss";
 
 export default function Home() {
-  const [searchValue, setSearchValue] = useState(""); // Состояние для поиска
-  const [isLoading, setIsLoading] = useState(true); // Статус загрузки для скелетонов
-  const [items, setItems] = useState<Item[]>([]); // Массив данных при добавлении в корзину
+  const [searchValue, setSearchValue] = useState(""); // Состояние поиска
+  const [isLoading, setIsLoading] = useState(true); // Флаг загрузки
+  const [items, setItems] = useState<Item[]>([]); // Данные
   const activeCategoryName = useSelector(
     (state: RootState) => state.category.activeCategoryName
   );
@@ -30,16 +30,21 @@ export default function Home() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        const categoryParam =
+          searchValue === "" && activeCategoryName
+            ? `category=${activeCategoryName}`
+            : "";
+        const searchParam = searchValue ? `search=${searchValue}` : "";
+        const queryParams = [categoryParam, searchParam]
+          .filter(Boolean)
+          .join("&");
+
         const res = await axios.get(
-          `https://6794c225aad755a134ea56b6.mockapi.io/items${
-            searchValue
-              ? `?search=${searchValue}`
-              : `?category=${activeCategoryName}`
-          }`
+          `https://6794c225aad755a134ea56b6.mockapi.io/items?${queryParams}`
         );
         setItems(res.data);
       } catch {
-        setItems([]); // Пустой массив при ошибке
+        setItems([]); // Если ошибка, пустой массив
       } finally {
         setIsLoading(false);
       }
@@ -52,7 +57,10 @@ export default function Home() {
     <>
       <HeroSection />
       <div className="container main-content-wrapper">
-        <FoodCategories setSearchValue={setSearchValue} />
+        <nav className="food-categories">
+          <FoodCategories />
+          <FoodCategoriesSearch setSearchValue={setSearchValue} />
+        </nav>
         <CartSidebar isLoading={isLoading} />
         <section className="food-section">
           <h2 className="food-section__title">{activeCategoryName}</h2>
@@ -62,9 +70,9 @@ export default function Home() {
                 <FoodCardSkeleton key={index} />
               ))
             ) : items.length > 0 ? (
-              items.map((obj) => {
-                return <FoodCard key={obj.id} {...obj} />;
-              })
+              items.map((obj) => (
+                <FoodCard key={Number(obj.id)} {...obj} id={Number(obj.id)} />
+              ))
             ) : (
               <p className="food-section__empty">
                 <b>¯\_(ツ)_/¯</b>
@@ -72,7 +80,9 @@ export default function Home() {
               </p>
             )}
           </div>
-          <button className="food-section__load-more">Загрузить еще</button>
+          {!isLoading && items.length > 0 && (
+            <button className="food-section__load-more">Загрузить еще</button>
+          )}
         </section>
       </div>
     </>

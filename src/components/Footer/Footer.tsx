@@ -1,7 +1,12 @@
+"use client";
+
 import { FC } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { validRoutes } from "@/constants/validRoutes";
 
 import footerLogo from "@/assets/images/footer-logo.png";
 import phoneIcon from "@/assets/icons/phone-icon.svg";
@@ -12,8 +17,13 @@ import socialIcon_3 from "@/assets/icons/socialIcon_3.svg";
 import "./Footer.scss";
 
 const Footer: FC = () => {
+  const pathname = usePathname();
+
+  // Если путь не найден в validRoutes, скрываем Footer
+  const isHidden = !validRoutes.includes(pathname);
+
   return (
-    <footer className="footer">
+    <footer className={`footer ${isHidden ? "footer-hidden" : ""}`}>
       <div className="container footer-container">
         <div className="footer__logo">
           <Link href="/">
@@ -31,7 +41,7 @@ const Footer: FC = () => {
           <p>Мы в соцсетях</p>
           <ul className="footer__social-list">
             <li className="footer__social-item">
-              <Link href={"https://vk.com/"} target="_blank">
+              <Link href={"https://x.com/"} target="_blank">
                 <Image
                   src={socialIcon_1}
                   alt="socialIcon_1"
@@ -41,17 +51,17 @@ const Footer: FC = () => {
               </Link>
             </li>
             <li className="footer__social-item">
-              <Link href={"https://web.telegram.org/"} target="_blank">
+              <Link href={"https://www.instagram.com/"} target="_blank">
                 <Image
                   src={socialIcon_2}
                   alt="socialIcon_2"
-                  width={26}
-                  height={26}
+                  width={24}
+                  height={24}
                 />
               </Link>
             </li>
             <li className="footer__social-item">
-              <Link href={"https://www.instagram.com/"} target="_blank">
+              <Link href={"https://www.facebook.com/"} target="_blank">
                 <Image
                   src={socialIcon_3}
                   alt="socialIcon_3"

@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/ui/skeletons/CartPageItemSkeleton.jsx", "src/components/ui/skeletons/TotalPriceItemListSkeleton.jsx", "src/components/ui/skeletons/FoodCardSkeleton.jsx", "src/components/ui/skeletons/CartSidebarItemSkeleton.jsx", "src/constants/categories.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/ui/skeletons/CartPageItemSkeleton.jsx", "src/ui/skeletons/TotalPriceItemListSkeleton.jsx", "src/ui/skeletons/FoodCardSkeleton.jsx", "src/ui/skeletons/CartSidebarItemSkeleton.jsx", "src/constants/categories.ts"],
   "exclude": ["node_modules"]
 }

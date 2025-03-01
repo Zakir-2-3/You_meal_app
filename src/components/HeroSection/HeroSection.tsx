@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React, { FC } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +7,8 @@ import heroSectionImg_1 from "@/assets/images/hero-section-img-1.png";
 
 import "./HeroSection.scss";
 
-const HeroSection: FC = () => {
+// Оптимизируем hero-section, чтобы не рендерилась много раз
+const HeroSection: FC = React.memo(() => {
   return (
     <section className="hero-section">
       <div className="hero-section__content">
@@ -34,6 +35,6 @@ const HeroSection: FC = () => {
       <div></div>
     </section>
   );
-};
+});
 
 export default HeroSection;
