@@ -22,10 +22,10 @@ const CartPageCheck: FC = () => {
 
   useEffect(() => {
     if (items.length > 0) {
-      setIsLoading(true);
+      // setIsLoading(true);
       setTimeout(() => setIsLoading(false), 1000); // Задержка загрузки в 1 секунду
     }
-  }, [items]);
+  }, []);
 
   // Очищаем выбранные чаевые при пустой корзине
   useEffect(() => {

@@ -7,7 +7,6 @@ import heroSectionImg_1 from "@/assets/images/hero-section-img-1.png";
 
 import "./HeroSection.scss";
 
-// Оптимизируем hero-section, чтобы не рендерилась много раз
 const HeroSection: FC = React.memo(() => {
   return (
     <section className="hero-section">

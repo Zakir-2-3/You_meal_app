@@ -1,14 +1,15 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import axios from "axios";
+
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import { addItem, minusItem, removeItem } from "@/store/slices/cart.slice";
-
-import { useEffect, useState } from "react";
+import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
 
 import NavButtons from "@/components/NavButtons/NavButtons";
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
@@ -21,11 +22,13 @@ import "./productPage.scss";
 
 export default function ProductClient() {
   const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
 
   const { id } = useParams(); // Получаем текущий id товара из url
   const parsedId = Number(id); // Преобразуем в число т.к api требует строку
-
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
   const { activeIndex } = useSelector((state: RootState) => state.category);
   const { items } = useSelector((state: RootState) => state.cart);
 
@@ -76,22 +79,25 @@ export default function ProductClient() {
   // Получаем данные товара
   useEffect(() => {
     async function fetchProduct() {
+      setIsLoading(true);
       try {
         const { data } = await axios.get<Product>(
           `https://6794c225aad755a134ea56b6.mockapi.io/items/${parsedId}`
         );
         setProduct(data);
-      } catch (error) {
+      } catch (error: any) {
         console.log("Ошибка загрузки товара", error);
+
+        // Если сервер вернул 404, отправляем пользователя на not-found
+        if (error.response?.status === 404) {
+          router.replace("/not-found");
+        }
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchProduct();
-  }, [parsedId]);
-
-  // // Если товар не найден, отображаем NotFoundPage
-  // if (!product) {
-  //   return <NotFoundPage />;
-  // }
+  }, [parsedId, router]);
 
   return (
     <section className="product-section">

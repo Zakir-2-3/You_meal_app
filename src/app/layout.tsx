@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import { ReduxProvider } from "@/store/Providers";
 
 import Header from "@/components/Header/Header";
+import RegistrationForm from "@/components/RegistrationForm/RegistrationForm";
 import Footer from "@/components/Footer/Footer";
 
 import "@/styles/reset.css";
@@ -32,6 +33,7 @@ export default function RootLayout({
           <Header />
           <main className="main">{children}</main>
           <Footer />
+          <RegistrationForm />
         </ReduxProvider>
       </body>
     </html>

@@ -1,0 +1,176 @@
+.registration-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #fff;
+  z-index: 1000;
+  box-shadow: 1px 5px 16px -5px #00000029;
+
+  &__image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__content {
+    flex: 1;
+    padding: 20px;
+  }
+
+  &__title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__field {
+    margin-bottom: 15px;
+    position: relative;
+    &:nth-child(1) p {
+      left: 40px;
+    }
+    &:nth-child(2) p {
+      left: 54px;
+      top: 2px;
+    }
+    &:nth-child(3) p {
+      left: 63px;
+      top: 2px;
+    }
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #555;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    &--error {
+      position: absolute;
+      top: 1px;
+      color: red;
+    }
+  }
+
+  & #password {
+    padding: 10px 35px 10px 10px;
+  }
+
+  &__button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &--primary {
+      background-color: #28a745;
+      color: #fff;
+
+      &:hover {
+        background-color: #218838;
+      }
+    }
+
+    &--secondary {
+      background-color: #007bff;
+      color: #fff;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+
+  &__password-container {
+    position: relative;
+  }
+
+  &__toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translate(0px, -50%);
+    -webkit-transform: translate(0px, -50%);
+    -moz-transform: translate(0px, -50%);
+    -ms-transform: translate(0px, -50%);
+    -o-transform: translate(0px, -50%);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    .registration-form__button {
+      flex: 1;
+      margin-right: 10px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  &__close-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 20px;
+    font-family: cursive;
+    color: #333;
+    opacity: 0.8;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+  &--visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}

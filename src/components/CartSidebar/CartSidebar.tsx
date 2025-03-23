@@ -21,9 +21,9 @@ interface CartSidebarProps {
 const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
   // Получаем массив данных и общую сумму
   const { items, totalPrice } = useSelector((state: RootState) => state.cart);
+
   // Считаем кол-во товаров для ограничения в 99 штук
   const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0);
-
   // Форматирует цену
   const formattedTotalPrice = new Intl.NumberFormat("ru-RU").format(totalPrice);
 

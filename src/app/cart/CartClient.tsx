@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import { clearItems } from "@/store/slices/cart.slice";
+import { clearItems } from "@/store/slices/cartSlice";
 
 import CartPageItem from "@/components/CartPage/CartPageItem/CartPageItem";
 import CartPageCheck from "@/components/CartPage/CartPageCheck/CartPageCheck";
@@ -24,9 +24,9 @@ export default function CartClient() {
   const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
 
   useEffect(() => {
-    setIsLoading(true);
+    // setIsLoading(true);
     setTimeout(() => setIsLoading(false), 1000); // Задержка загрузки в 1 секунду
-  }, [items]);
+  }, []);
 
   const onClickClearCart = () => {
     if (items.length > 0) {

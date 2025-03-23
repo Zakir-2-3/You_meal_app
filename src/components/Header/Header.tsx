@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { activeRegForm } from "@/store/slices/registrationSlice";
 
 import { validRoutes } from "@/constants/validRoutes";
 
@@ -18,22 +19,29 @@ import cartIcon from "@/assets/icons/cart-icon.svg";
 import "./Header.scss";
 
 const Header: FC = () => {
-  const { items } = useSelector((state: RootState) => state.cart);
-  const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0); // Общее кол-во товаров в корзине
   const isMounted = useRef(false); // Не сохранять данные в localStorage при первом рендере
   const pathname = usePathname();
+  const { items } = useSelector((state: RootState) => state.cart);
+  const dispatch = useDispatch();
 
-  // Если путь не найден в validRoutes, скрываем Header
-  const isHidden = !validRoutes.includes(pathname);
+  const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0); // Общее кол-во товаров в корзине
+
+  const handleOpenForm = () => {
+    dispatch(activeRegForm(true)); // Открываем форму
+  };
 
   useEffect(() => {
     // Создать localStorage если isMounted true
     if (isMounted.current) {
-      const json = JSON.stringify(items);
-      localStorage.setItem("cart", json);
+      localStorage.setItem("cart", JSON.stringify(items));
     }
     isMounted.current = true; // isMounted true после первого рендера
   }, [items]);
+
+  // Проверяем, есть ли текущий путь в validRoutes или начинается ли он с динамического пути
+  const isHidden = !validRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
 
   return (
     <header className={`header ${isHidden ? "header-hidden" : ""}`}>
@@ -44,7 +52,7 @@ const Header: FC = () => {
           </Link>
         </div>
         <div className="header__profile">
-          <button>
+          <button onClick={handleOpenForm}>
             <Image
               src={profileIcon}
               alt="profile-icon"

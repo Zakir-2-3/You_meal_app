@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
-import { addItem, removeItem } from "@/store/slices/cart.slice";
+import { addItem, removeItem } from "@/store/slices/cartSlice";
 
 import { FoodCardProps } from "@/types/foodCard";
 

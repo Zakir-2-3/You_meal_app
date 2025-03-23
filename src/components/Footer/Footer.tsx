@@ -19,11 +19,20 @@ import "./Footer.scss";
 const Footer: FC = () => {
   const pathname = usePathname();
 
-  // Если путь не найден в validRoutes, скрываем Footer
-  const isHidden = !validRoutes.includes(pathname);
+  // Проверяем, есть ли текущий путь в validRoutes или начинается ли он с динамического пути
+  const isHidden = !validRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // Проверяем, если на стр product (для стилизации footer)
+  const isProductPage = pathname.startsWith("/product/");
 
   return (
-    <footer className={`footer ${isHidden ? "footer-hidden" : ""}`}>
+    <footer
+      className={`footer ${isHidden ? "footer-hidden" : ""} ${
+        isProductPage ? "footer-product" : ""
+      }`}
+    >
       <div className="container footer-container">
         <div className="footer__logo">
           <Link href="/">
