@@ -1,0 +1,165 @@
+.personal-account > .container {
+  display: grid;
+  gap: 60px 20px;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto auto;
+}
+
+.personal-account__title {
+  font-size: 30px;
+  grid-column: 1 / -1;
+}
+.personal-account__left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  max-width: 400px;
+  min-width: 300px;
+  width: 100%;
+}
+.personal-account__avatar {
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+}
+
+.personal-account__avatar-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.personal-account__right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Увеличиваем отступ между блоками */
+}
+
+/* Блок с информацией о пользователе */
+.personal-account__user-info {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.personal-account__field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.personal-account__label {
+  font-weight: bold;
+  min-width: 100px;
+}
+
+.personal-account__value {
+  color: #333;
+}
+
+.personal-account__input {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.personal-account__controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Блок с балансом */
+.personal-account__balance {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.personal-account__balance-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Блок с промокодом */
+.personal-account__promo {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Общие стили для кнопок */
+.personal-account__button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.personal-account__left button {
+  background-color: #007bff;
+  color: white;
+}
+
+.personal-account__user-info button {
+  background-color: #007bff;
+  color: white;
+}
+
+.personal-account__controls button:nth-child(1) {
+  background-color: #28a745;
+}
+
+.personal-account__controls button:nth-child(2) {
+  background-color: #dc3545;
+}
+
+.personal-account__balance-controls button:nth-child(1) {
+  background-color: #28a745;
+  color: white;
+}
+
+.personal-account__avatar-controls button:nth-child(1) {
+  background-color: #28a745;
+}
+
+.personal-account__avatar-controls button:nth-child(2) {
+  background-color: #dc3545;
+}
+
+.personal-account__promo button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.personal-account__button--secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.personal-account__button--save {
+  background-color: #28a745;
+  color: white;
+}
+
+.personal-account__button--cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+.personal-account__button--edit {
+  background-color: #ffc107;
+  color: black;
+}

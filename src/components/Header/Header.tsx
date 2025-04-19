@@ -6,28 +6,39 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { activeRegForm } from "@/store/slices/registrationSlice";
+import { activeRegForm } from "@/store/slices/userSlice";
 
 import { validRoutes } from "@/constants/validRoutes";
 
 import headerLogo from "@/assets/images/header-logo.png";
-import profileIcon from "@/assets/icons/profile-icon.svg";
+import profileLoginIcon from "@/assets/icons/login-profile-icon.svg";
+import profileLogoutIcon from "@/assets/icons/logout-profile-icon.svg";
 import cartIcon from "@/assets/icons/cart-icon.svg";
 
 import "./Header.scss";
 
 const Header: FC = () => {
   const isMounted = useRef(false); // Не сохранять данные в localStorage при первом рендере
+
   const pathname = usePathname();
+
   const { items } = useSelector((state: RootState) => state.cart);
+  const { isAuth } = useSelector((state: RootState) => state.user);
+  const isFormOpen = useSelector(
+    (state: RootState) => state.user.isRegFormOpen
+  );
   const dispatch = useDispatch();
 
   const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0); // Общее кол-во товаров в корзине
 
   const handleOpenForm = () => {
-    dispatch(activeRegForm(true)); // Открываем форму
+    if (!isFormOpen) {
+      dispatch(activeRegForm(true)); // Открываем форму
+    }
   };
 
   useEffect(() => {
@@ -52,14 +63,32 @@ const Header: FC = () => {
           </Link>
         </div>
         <div className="header__profile">
-          <button onClick={handleOpenForm}>
-            <Image
-              src={profileIcon}
-              alt="profile-icon"
-              width={20}
-              height={20}
-            />
-          </button>
+          {isAuth ? (
+            <Link
+              href="/user"
+              style={{
+                pointerEvents: pathname === "/user" ? "none" : "auto",
+                opacity: pathname === "/user" ? 0.7 : 1,
+              }}
+            >
+              <Image
+                src={profileLogoutIcon}
+                alt="profile-icon"
+                width={20}
+                height={20}
+              />
+            </Link>
+          ) : (
+            <button onClick={handleOpenForm}>
+              <Image
+                src={profileLoginIcon}
+                alt="profile-icon"
+                width={20}
+                height={20}
+              />
+            </button>
+          )}
+          <UserDropdownMenu />
         </div>
         <div className="header__cart">
           <Link href="/cart">

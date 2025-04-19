@@ -3,14 +3,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CartState, Item } from "@/types/item";
 
 import { formatDate } from "@/utils/formatDate";
-import { getCartFromLS } from "@/utils/getCartFromLS";
 import { calcTotalPrice } from "@/utils/calcTotalPrice";
 
-const { items, totalPrice } = getCartFromLS();
-
 const initialState: CartState = {
-  items,
-  totalPrice,
+  items: [],
+  totalPrice: 0,
   savedDate: null,
 };
 

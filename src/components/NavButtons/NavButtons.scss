@@ -6,10 +6,10 @@
     flex-flow: row nowrap;
     align-items: center;
     list-style: none;
+    gap: 16px;
     color: #555 !important;
     & > li {
       position: relative;
-      padding: 0 7px;
       font-size: 15px;
       font-weight: 600;
       &::after {
@@ -17,7 +17,7 @@
         display: block;
         position: absolute;
         top: 50%;
-        right: -3px;
+        right: -12px;
         width: 6px;
         height: 6px;
         border-right: 1px solid #555;

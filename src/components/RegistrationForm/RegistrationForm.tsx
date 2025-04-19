@@ -1,16 +1,27 @@
 "use client";
 
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
-
-import { SubmitHandler, useForm } from "react-hook-form";
+import Link from "next/link";
 
 import { useEffect, useRef, useState } from "react";
 
+import { toast } from "react-toastify";
+
+import { SubmitHandler, useForm } from "react-hook-form";
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { activeRegForm } from "@/store/slices/registrationSlice";
+import {
+  activeRegForm,
+  setAuthStatus,
+  setEmail,
+  setName,
+  setPassword,
+} from "@/store/slices/userSlice";
 
 import { RegForm } from "@/types/regForm";
+
 import { FORM_ERRORS } from "@/constants/formErrors";
 
 import dd from "@/assets/images/not-found-img.png";
@@ -21,10 +32,14 @@ import "./RegistrationForm.scss";
 
 const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false); // Состояние для видимости пароля
+
   const isFormOpen = useSelector(
-    (state: RootState) => state.registration.openRegForm
+    (state: RootState) => state.user.isRegFormOpen
   );
   const dispatch = useDispatch();
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   const formRef = useRef<HTMLDivElement>(null);
   const {
@@ -36,7 +51,16 @@ const RegistrationForm = () => {
   });
 
   const onSubmit: SubmitHandler<RegForm> = (data) => {
+    // Сохраняем данные в Redux
+    dispatch(setName(data.name));
+    dispatch(setEmail(data.email));
+    dispatch(setPassword(data.password));
+    dispatch(setAuthStatus(true));
+
+    toast.success("Аккаунт успешно создан!");
     console.log(data);
+
+    router.push("/user");
   };
 
   const handleCloseForm = () => dispatch(activeRegForm(false));
@@ -48,9 +72,18 @@ const RegistrationForm = () => {
     }
   };
 
-  // Запрещаем пробелы в полях "Почта" и "Пароль"
+  // Запрещаем пробелы и цифры в начале поля "Почта" и "Пароль"
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const input = event.target as HTMLInputElement;
+    const cursorPosition = input.selectionStart;
+
+    // Запрещаем пробелы
     if (event.key === " ") {
+      event.preventDefault();
+    }
+
+    // Запрещаем цифры в начале поля
+    if (/\d/.test(event.key) && cursorPosition === 0) {
       event.preventDefault();
     }
   };
@@ -67,6 +100,11 @@ const RegistrationForm = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isFormOpen]);
+
+  // Закрываем форму при загрузке и переходах
+  useEffect(() => {
+    dispatch(activeRegForm(false));
+  }, [pathname]);
 
   // Если форма закрыта, не рендерим её
   if (!isFormOpen) return null;
@@ -97,6 +135,11 @@ const RegistrationForm = () => {
                 <label htmlFor="name" className="registration-form__label">
                   Имя:
                 </label>
+                {errors.name && (
+                  <p className="registration-form__input--error">
+                    {errors.name.message}
+                  </p>
+                )}
                 <input
                   type="text"
                   id="name"
@@ -111,11 +154,6 @@ const RegistrationForm = () => {
                   className="registration-form__input"
                   placeholder="Введите ваше имя"
                 />
-                {errors.name && (
-                  <p className="registration-form__input--error">
-                    {errors.name.message}
-                  </p>
-                )}
               </div>
 
               {/* Поле для почты */}
@@ -123,35 +161,50 @@ const RegistrationForm = () => {
                 <label htmlFor="email" className="registration-form__label">
                   Почта:
                 </label>
+                {errors.email && (
+                  <p className="registration-form__input--error">
+                    {errors.email.message}
+                  </p>
+                )}
                 <input
                   type="email"
                   id="email"
-                  onKeyDown={handleKeyDown} // Запрещаем пробелы
+                  onKeyDown={handleKeyDown} // Запрещаем пробелы и цифры в начале
                   {...register("email", {
                     required: FORM_ERRORS.EMAIL_REQUIRED,
                     validate: (value) => {
-                      const email = String(value); // Преобразуем value в строку
-                      if (/^\d/.test(email)) {
-                        return FORM_ERRORS.EMAIL_STARTS_WITH_NUMBER; // Проверка на цифру в начале
+                      const email = String(value).trim();
+
+                      // 1. Если поле пустое
+                      if (!email) {
+                        return FORM_ERRORS.EMAIL_REQUIRED;
                       }
+
+                      // 2. Если начинается с цифры
+                      if (/^\d/.test(email)) {
+                        return FORM_ERRORS.EMAIL_STARTS_WITH_NUMBER;
+                      }
+
+                      // 3. Если есть кириллица
+                      if (/[а-яА-ЯЁё]/.test(email)) {
+                        return FORM_ERRORS.EMAIL_CYRILLIC;
+                      }
+
+                      // 4. Если email некорректен
                       if (
                         !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,4}$/i.test(
                           email
                         )
                       ) {
-                        return FORM_ERRORS.EMAIL_INVALID; // Проверка на корректность email
+                        return FORM_ERRORS.EMAIL_INVALID;
                       }
+
                       return true; // Если всё в порядке
                     },
                   })}
                   className="registration-form__input"
                   placeholder="Введите вашу почту"
                 />
-                {errors.email && (
-                  <p className="registration-form__input--error">
-                    {errors.email.message}
-                  </p>
-                )}
               </div>
 
               {/* Поле для пароля */}
@@ -159,23 +212,47 @@ const RegistrationForm = () => {
                 <label htmlFor="password" className="registration-form__label">
                   Пароль:
                 </label>
+                {errors.password && (
+                  <p className="registration-form__input--error">
+                    {errors.password.message}
+                  </p>
+                )}
                 <div className="registration-form__password-container">
                   <input
                     type={showPassword ? "text" : "password"} // Меняем тип поля
                     id="password"
+                    onKeyDown={handleKeyDown} // Запрещаем пробелы и цифры в начале
                     {...register("password", {
                       required: FORM_ERRORS.PASSWORD_REQUIRED,
                       minLength: {
                         value: 5,
                         message: FORM_ERRORS.PASSWORD_MIN_LENGTH,
                       },
-                      pattern: {
-                        value: /^[^0-9][A-Za-z0-9]*$/, // Первый символ не цифра, остальные — буквы и цифры
-                        message: FORM_ERRORS.PASSWORD_INVALID,
+                      validate: (value) => {
+                        const password = String(value).trim();
+
+                        // 1. Если поле пустое
+                        if (!password) {
+                          return FORM_ERRORS.PASSWORD_REQUIRED;
+                        }
+
+                        // 2. Если начинается с цифры
+                        if (/^\d/.test(password)) {
+                          return FORM_ERRORS.PASSWORD_STARTS_WITH_NUMBER;
+                        }
+
+                        // 3. Если есть кириллица
+                        if (/[а-яА-ЯЁё]/.test(password)) {
+                          return FORM_ERRORS.PASSWORD_CYRILLIC;
+                        }
+
+                        // 4. Если пароль содержит недопустимые символы
+                        if (!/^[A-Za-z0-9]+$/.test(password)) {
+                          return FORM_ERRORS.PASSWORD_INVALID;
+                        }
+
+                        return true; // Если всё в порядке
                       },
-                      validate: (value) =>
-                        !/\s/.test(String(value)) ||
-                        "Пароль не должен содержать пробелов",
                     })}
                     className="registration-form__input"
                     placeholder="Введите пароль"
@@ -202,11 +279,6 @@ const RegistrationForm = () => {
                     )}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="registration-form__input--error">
-                    {errors.password.message}
-                  </p>
-                )}
               </div>
 
               {/* Кнопка отправки формы */}

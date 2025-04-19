@@ -3,12 +3,18 @@ import { Metadata } from "next";
 
 import { ReduxProvider } from "@/store/Providers";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import PersistGateWrapper from "@/components/PersistGateWrapper/PersistGateWrapper";
+
 import Header from "@/components/Header/Header";
 import RegistrationForm from "@/components/RegistrationForm/RegistrationForm";
 import Footer from "@/components/Footer/Footer";
 
 import "@/styles/reset.css";
 import "@/styles/globals.scss";
+import "@/styles/toastify.scss";
 
 const nunito = Nunito({
   weight: ["400", "600", "800"],
@@ -30,10 +36,23 @@ export default function RootLayout({
     <html lang="ru">
       <body className={nunito.className}>
         <ReduxProvider>
-          <Header />
-          <main className="main">{children}</main>
-          <Footer />
-          <RegistrationForm />
+          <PersistGateWrapper>
+            <Header />
+            <main className="main">{children}</main>
+            <Footer />
+            <RegistrationForm />
+            <ToastContainer
+              position="top-right" // Позиция тостов
+              autoClose={3500} // Автозакрытие через 3 секунды
+              hideProgressBar={false} // Показывать прогресс-бар
+              newestOnTop={false} // Новые тосты снизу
+              closeOnClick // Закрывать по клику
+              rtl={false} // Направление текста (слева направо)
+              pauseOnFocusLoss // Пауза при потере фокуса
+              draggable // Возможность перетаскивать тосты
+              pauseOnHover // Пауза при наведении
+            />
+          </PersistGateWrapper>
         </ReduxProvider>
       </body>
     </html>

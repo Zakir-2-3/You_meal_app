@@ -39,26 +39,26 @@
   }
 
   &__field {
-    margin-bottom: 15px;
+    margin-bottom: 18px;
     position: relative;
     &:nth-child(1) p {
       left: 40px;
     }
     &:nth-child(2) p {
-      left: 54px;
+      left: 55px;
       top: 2px;
     }
     &:nth-child(3) p {
-      left: 63px;
+      left: 65px;
       top: 2px;
     }
   }
 
   &__label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 15px;
     color: #555;
   }
 
@@ -72,6 +72,7 @@
       position: absolute;
       top: 1px;
       color: red;
+      font-size: 14px;
     }
   }
 
@@ -125,12 +126,10 @@
   &__actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
-
+    margin-top: 18px;
     .registration-form__button {
       flex: 1;
       margin-right: 10px;
-
       &:last-child {
         margin-right: 0;
       }
@@ -148,11 +147,6 @@
     &:hover {
       opacity: 1;
     }
-  }
-  &::before {
-    content: "";
-    width: 10px;
-    height: 10px;
   }
 }
 
@@ -173,4 +167,10 @@
     opacity: 1;
     visibility: visible;
   }
+}
+
+/* Скрыть иконку переключения видимости пароля в Edge и IE */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
 }
