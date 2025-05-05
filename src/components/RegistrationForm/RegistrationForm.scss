@@ -57,6 +57,7 @@
   &__label {
     display: block;
     margin-bottom: 2px;
+    margin-left: 3px;
     font-weight: bold;
     font-size: 15px;
     color: #555;
@@ -95,16 +96,30 @@
 
       &:hover {
         background-color: #218838;
+        filter: brightness(0.95);
+        -webkit-filter: brightness(0.95);
       }
     }
 
     &--secondary {
-      background-color: #007bff;
-      color: #fff;
+      color: #007bff;
+      text-decoration: underline;
 
       &:hover {
-        background-color: #0056b3;
+        color: #02468f;
       }
+    }
+  }
+
+  &__forgot {
+    color: #007bff;
+    margin-top: 10px;
+    display: flex;
+    margin-left: 3px;
+    text-decoration: underline;
+
+    &:hover {
+      color: #02468f;
     }
   }
 
@@ -125,8 +140,10 @@
 
   &__actions {
     display: flex;
-    justify-content: space-between;
-    margin-top: 18px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
     .registration-form__button {
       flex: 1;
       margin-right: 10px;
@@ -138,12 +155,11 @@
 
   &__close-btn {
     position: absolute;
-    right: 15px;
-    top: 10px;
-    font-size: 20px;
-    font-family: cursive;
-    color: #333;
+    right: 13px;
+    top: 13px;
     opacity: 0.8;
+    width: 30px;
+    height: 30px;
     &:hover {
       opacity: 1;
     }

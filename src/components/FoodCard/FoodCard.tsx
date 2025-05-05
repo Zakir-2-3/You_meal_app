@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, removeItem } from "@/store/slices/cartSlice";
 
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
 import { FoodCardProps } from "@/types/foodCard";
 
 import "./FoodCard.scss";
@@ -22,6 +24,12 @@ const FoodCard: FC<FoodCardProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const cartItems = useSelector((state: RootState) => state.cart.items);
+
+  const activated = useSelector((state: RootState) => state.promo.activated);
+
+  const { discount } = getDiscountedPrice(activated, price_rub);
+  const hasFirstOrderDiscount = activated.includes("PromoFirst10");
+  const discountedPrice = Math.round(price_rub * (1 - discount / 100));
 
   // Проверяем, есть ли этот товар в корзине
   const itemInCart = cartItems.find((item) => item.id === id);
@@ -50,7 +58,16 @@ const FoodCard: FC<FoodCardProps> = ({
           <Image src={image} alt={name_ru} width={220} height={212} />
         </div>
         <div className="food-section__card-description">
-          <h3>{price_rub}₽</h3>
+          <h3>
+            {hasFirstOrderDiscount ? (
+              <>
+                <span className="old-price">{price_rub}₽</span>
+                <span className="discounted-price">{discountedPrice}₽</span>
+              </>
+            ) : (
+              `${price_rub}₽`
+            )}
+          </h3>
           <p>{name_ru}</p>
           <p>{size} г</p>
         </div>

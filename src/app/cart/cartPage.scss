@@ -10,13 +10,14 @@
   }
   &__title {
     grid-column: span 2;
-    margin: 20px 0 0 0;
+    margin: 20px 0 20px 0;
     font-size: 36px;
   }
   & .nav-buttons {
     grid-column-start: 1;
     grid-row-start: 2;
     margin-bottom: 10px;
+    padding-top: 0px;
   }
   &__list-wrapper {
     grid-column-start: 1;
@@ -94,17 +95,17 @@
     box-shadow: 2px 4px 6px rgba(49, 49, 49, 0.215);
   }
   &__pay-btn {
-    height: 36px;
+    min-height: 36px;
     margin-top: 20px;
     color: #fff;
     background-color: #ff7020;
     font-size: 16px;
     font-weight: 400;
-    border-radius: 12px;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    -ms-border-radius: 12px;
-    -o-border-radius: 12px;
+    border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
     transition: 0.1s ease-in-out;
     -webkit-transition: 0.1s ease-in-out;
     -moz-transition: 0.1s ease-in-out;

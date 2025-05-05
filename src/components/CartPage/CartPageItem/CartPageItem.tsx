@@ -1,15 +1,11 @@
 import { FC } from "react";
-
 import Image from "next/image";
-
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
-
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
-
 import { Item } from "@/types/item";
-
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 import "./CartPageItem.scss";
 
 const CartPageItem: FC<Item> = ({
@@ -20,26 +16,40 @@ const CartPageItem: FC<Item> = ({
   size,
   count,
 }) => {
-  const formattedTotalPrice = new Intl.NumberFormat("ru-RU").format(
-    price_rub * (count ?? 0)
-  );
   const dispatch = useDispatch<AppDispatch>();
+  const { activated } = useSelector((state: RootState) => state.promo);
+  const { items } = useSelector((state: RootState) => state.cart);
 
-  // Прибавить товар +1
+  // Считаем общую сумму корзины (до скидок)
+  const totalCartPrice = items.reduce(
+    (sum, item) => sum + item.price_rub * (item.count ?? 0),
+    0
+  );
+
+  // Общая сумма за позицию
+  const itemTotal = price_rub * (count ?? 0);
+
+  // Применяем скидку ко всей сумме позиции
+  const { discount, hasDiscount } = getDiscountedPrice(
+    activated,
+    totalCartPrice
+  );
+
+  const discountedItemTotal = Math.round(itemTotal * (1 - discount / 100));
+
+  const formattedPrice = new Intl.NumberFormat("ru-RU").format(itemTotal);
+  const formattedDiscountedPrice = new Intl.NumberFormat("ru-RU").format(
+    discountedItemTotal
+  );
+
   const onClickPlus = () => {
-    dispatch(
-      addItem({
-        id,
-      } as Item)
-    );
+    dispatch(addItem({ id } as Item));
   };
 
-  // Убавить товар -1
   const onClickMinus = () => {
     dispatch(minusItem(id));
   };
 
-  // Удалить весь товар
   const onClickRemove = () => {
     dispatch(removeItem(id));
   };
@@ -51,10 +61,19 @@ const CartPageItem: FC<Item> = ({
       </div>
       <div className="cart-page-section__description">
         <h3>{name_ru}</h3>
-        <p>{formattedTotalPrice} ₽</p>
         <p>
-          {price_rub}₽ <b>{size}г</b>
+          {hasDiscount ? (
+            <>
+              <span className="old-price">{formattedPrice} ₽</span>
+              <span className="discounted-price">
+                {formattedDiscountedPrice} ₽
+              </span>
+            </>
+          ) : (
+            `${formattedPrice} ₽`
+          )}
         </p>
+        <p>{size}г</p>
       </div>
       <QuantityControl
         count={count}

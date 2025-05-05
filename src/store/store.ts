@@ -6,17 +6,19 @@ import { persistReducer, persistStore } from "redux-persist";
 import categoryReducer from "./slices/categorySlice";
 import cartReducer from "./slices/cartSlice";
 import userReducer from "./slices/userSlice";
+import promoReducer from "./slices/promoSlice";
 
 const rootReducer = combineReducers({
   category: categoryReducer,
   cart: cartReducer,
   user: userReducer,
+  promo: promoReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "cart"],
+  whitelist: ["user", "cart", "promo"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

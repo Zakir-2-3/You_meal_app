@@ -28,6 +28,9 @@
     font-size: 36px;
   }
   &__info-price {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
     font-size: 22px;
     font-weight: 700;
     & span {
@@ -54,11 +57,11 @@
       font-weight: 400;
       color: #fff;
       background-color: #ffab08;
-      border-radius: 12px;
-      -webkit-border-radius: 12px;
-      -moz-border-radius: 12px;
-      -ms-border-radius: 12px;
-      -o-border-radius: 12px;
+      border-radius: 6px;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      -ms-border-radius: 6px;
+      -o-border-radius: 6px;
       transition: all 0.1s ease-in;
       -webkit-transition: all 0.1s ease-in;
       -moz-transition: all 0.1s ease-in;

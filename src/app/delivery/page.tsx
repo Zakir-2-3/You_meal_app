@@ -15,9 +15,10 @@ export default function DeliveryPage() {
         <div className="delivery-page-section__img">
           <Image
             src={deliveryPageImg}
+            priority
             alt="delivery-page-img"
             width={500}
-            height={562}
+            height={560}
           />
         </div>
         <div className="delivery-page-section__info">

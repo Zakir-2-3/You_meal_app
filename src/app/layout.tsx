@@ -43,7 +43,7 @@ export default function RootLayout({
             <RegistrationForm />
             <ToastContainer
               position="top-right" // Позиция тостов
-              autoClose={3500} // Автозакрытие через 3 секунды
+              autoClose={2500} // Автозакрытие через 2.5 секунды
               hideProgressBar={false} // Показывать прогресс-бар
               newestOnTop={false} // Новые тосты снизу
               closeOnClick // Закрывать по клику

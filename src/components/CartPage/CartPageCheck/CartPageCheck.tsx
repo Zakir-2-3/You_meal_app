@@ -1,38 +1,62 @@
 "use client";
 
 import { FC, useEffect, useState } from "react";
-
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
-import TotalPriceItemListSkeleton from "@/ui/skeletons/TotalPriceItemListSkeleton";
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
+import TotalPriceItemListSkeleton from "@/ui/skeletons/TotalPriceItemListSkeleton";
 import "./CartPageCheck.scss";
 
 const CartPageCheck: FC = () => {
-  const { totalPrice, items, savedDate } = useSelector(
-    (state: RootState) => state.cart
-  );
+  const { items, savedDate } = useSelector((state: RootState) => state.cart);
+  const activated = useSelector((state: RootState) => state.promo.activated);
 
-  const [selectedTipPercentage, setSelectedTipPercentage] = useState<number>(0); // Состояние чаевых
+  const [selectedTipPercentage, setSelectedTipPercentage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(() => items.length > 0);
 
-  const selectedTip = totalPrice * selectedTipPercentage; // Общая сумма + выбранные чаевые
-  const totalWithTips = totalPrice + totalPrice * 0.05 + selectedTip; // + НДС 5% :(
+  const roundUp = (num: number) => Math.round(num);
+
+  // Общая сумма без скидок
+  const rawTotal = items.reduce((sum, item) => {
+    return sum + item.price_rub * (item.count ?? 0);
+  }, 0);
+
+  // Получаем скидку в процентах
+  const { discount } = getDiscountedPrice(activated, rawTotal);
+
+  // Применяем скидку
+  const discountedTotal = roundUp(rawTotal * (1 - discount / 100));
+
+  // НДС
+  const vat = roundUp(discountedTotal * 0.05);
+
+  // Чаевые
+  const baseTotalWithVat = discountedTotal + vat;
+  const discountedSelectedTip = roundUp(
+    baseTotalWithVat * selectedTipPercentage
+  );
+
+  // Общая сумма со скидкой, НДС и чаевыми
+  const discountedTotalWithTips = baseTotalWithVat + discountedSelectedTip;
+
+  // Альтернативная сумма (если без скидки)
+  const totalWithTips = roundUp(
+    rawTotal * 1.05 + rawTotal * selectedTipPercentage
+  );
 
   useEffect(() => {
     if (items.length > 0) {
-      // setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 1000); // Задержка загрузки в 1 секунду
+      setTimeout(() => setIsLoading(false), 1000);
     }
   }, []);
 
-  // Очищаем выбранные чаевые при пустой корзине
   useEffect(() => {
-    if (totalPrice === 0) {
+    if (rawTotal === 0) {
       setSelectedTipPercentage(0);
     }
-  }, [totalPrice]);
+  }, [rawTotal]);
 
   return (
     <>
@@ -43,65 +67,70 @@ const CartPageCheck: FC = () => {
           <TotalPriceItemListSkeleton />
         ) : (
           <ul>
-            {items.map((item) => (
-              <li key={item.id}>
-                <span>{item.count}</span>
-                <span>{item.name_ru}</span>
-                <span>
-                  {new Intl.NumberFormat("ru-RU").format(
-                    item.price_rub * (item.count ?? 0)
-                  )}
-                </span>
-              </li>
-            ))}
+            {items.map((item) => {
+              const totalPrice = item.price_rub * (item.count ?? 0);
+              return (
+                <li key={item.id}>
+                  <span>{item.count}</span>
+                  <span>{item.name_ru}</span>
+                  <span>{roundUp(totalPrice)}₽</span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
       <div className="total-price-wrapper">
         <p>
-          СЧЕТ (БЕЗ НДС)
-          <span>{new Intl.NumberFormat("ru-RU").format(totalPrice)}₽</span>
+          ЧИСТЫЙ СЧЕТ
+          <span>{discountedTotal}₽</span>
         </p>
         <p>
           НДС (5%)
-          <span>
-            {new Intl.NumberFormat("ru-RU")
-              .format(parseFloat((totalPrice * 0.05).toFixed(2)))
-              .replace(",", ".")}
-            ₽
-          </span>
+          <span>{vat}₽</span>
         </p>
         <p>
           ВСЕГО
           <span>
-            {new Intl.NumberFormat("ru-RU")
-              .format(parseFloat(totalWithTips.toFixed(2)))
-              .replace(",", ".")}
-            ₽
+            {activated ? (
+              <>
+                {items.length > 0 && (
+                  <span className="old-price">{totalWithTips}₽</span>
+                )}
+                <span className="discounted-price">
+                  {discountedTotalWithTips}₽
+                </span>
+              </>
+            ) : (
+              `${totalWithTips}₽`
+            )}
           </span>
         </p>
       </div>
       <p className="total-price-thank">THANK YOU FOR VISITING!</p>
       <div className="total-price-tips">
         <p>ЧАЕВЫЕ</p>
-        {[0.05, 0.1, 0.15].map((tip) => (
-          <button
-            key={tip}
-            className={`tip-option ${
-              selectedTipPercentage === tip ? "tip-option--active" : ""
-            }`}
-            onClick={() =>
-              setSelectedTipPercentage((prev) => (prev === tip ? 0 : tip))
-            }
-            disabled={totalPrice === 0}
-          >
-            {tip * 100}% ={" "}
-            {new Intl.NumberFormat("ru-RU")
-              .format(parseFloat((totalPrice * tip).toFixed(2)))
-              .replace(",", ".")}
-            ₽
-          </button>
-        ))}
+        {[0.05, 0.1, 0.15].map((tip) => {
+          const tipBase = activated
+            ? baseTotalWithVat
+            : roundUp(rawTotal * 1.05);
+          const tipAmount = roundUp(tipBase * tip);
+
+          return (
+            <button
+              key={tip}
+              className={`tip-option ${
+                selectedTipPercentage === tip ? "tip-option--active" : ""
+              }`}
+              onClick={() =>
+                setSelectedTipPercentage((prev) => (prev === tip ? 0 : tip))
+              }
+              disabled={rawTotal === 0}
+            >
+              {tip * 100}% = {tipAmount}₽
+            </button>
+          );
+        })}
       </div>
     </>
   );

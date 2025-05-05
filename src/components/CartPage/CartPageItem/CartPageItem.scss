@@ -9,6 +9,9 @@
   &:last-child {
     box-shadow: none;
   }
+  & .quantity-control {
+    height: 48px;
+  }
 }
 
 .cart-page-section__description {
@@ -24,22 +27,21 @@
     font-size: 20px;
   }
   & p:nth-child(2) {
-    margin-left: 80%;
+    margin-left: auto;
     font-weight: 600;
     font-size: 22px;
+    & .old-price {
+      margin-right: 12px;
+      font-size: 21px;
+    }
+    & .discounted-price {
+      font-size: 23px;
+    }
   }
   & p:nth-child(3) {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: baseline;
-    justify-content: flex-start;
-    gap: 0 10px;
-    font-size: 18px;
-    & b {
-      font-weight: normal;
-      font-size: 15px;
-      color: #b1b1b1;
-    }
+    font-weight: normal;
+    font-size: 15px;
+    color: #b1b1b1;
   }
 }
 

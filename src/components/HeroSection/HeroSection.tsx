@@ -17,6 +17,7 @@ const HeroSection: FC = React.memo(() => {
           alt="hero-section-img"
           width={255}
           height={291}
+          priority
         />
         <div className="hero-section__text">
           <h1 className="hero-section__title">
@@ -27,7 +28,7 @@ const HeroSection: FC = React.memo(() => {
             href="/delivery"
             className="hero-section__delivery cart-sidebar__delivery-link"
           >
-            Бесплатная доставка от 599₽*
+            Бесплатная доставка от 1499₽*
           </Link>
         </div>
       </div>

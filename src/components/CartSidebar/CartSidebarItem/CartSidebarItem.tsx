@@ -2,9 +2,11 @@ import { FC } from "react";
 
 import Image from "next/image";
 
-import { AppDispatch } from "@/store/store";
-import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
 import { addItem, minusItem } from "@/store/slices/cartSlice";
+
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
 import { Item } from "@/types/item";
 
@@ -19,6 +21,11 @@ const CartSidebarItem: FC<Item> = ({
   count,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+
+  const activated = useSelector((state: RootState) => state.promo.activated);
+
+  const { discount, hasDiscount } = getDiscountedPrice(activated, price_rub);
+  const discountedPrice = Math.round(price_rub * (1 - discount / 100));
 
   // Прибавить товар +1
   const onClickPlus = () => {
@@ -41,8 +48,19 @@ const CartSidebarItem: FC<Item> = ({
       </div>
       <div className="cart-sidebar__item-description">
         <h3>{name_ru}</h3>
-        <p>{size}г</p>
-        <p>{price_rub}₽</p>
+        {/* <p>{size}г</p> */}
+        <p>
+          {hasDiscount ? (
+            <>
+              <span className="old-price">{price_rub}₽</span>
+              <span className="discounted-price">
+                {discountedPrice.toFixed(0)}₽
+              </span>
+            </>
+          ) : (
+            `${price_rub}₽`
+          )}
+        </p>
       </div>
       <div className="cart-sidebar__item-quantity">
         <button onClick={onClickMinus}>-</button>

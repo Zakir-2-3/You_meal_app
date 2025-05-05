@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -21,9 +21,10 @@ import cartIcon from "@/assets/icons/cart-icon.svg";
 
 import "./Header.scss";
 
-const Header: FC = () => {
-  const isMounted = useRef(false); // Не сохранять данные в localStorage при первом рендере
-
+const Header = () => {
+  const [showDropdown, setShowDropdown] = useState(false); // Dropdown menu при клике на user
+  const dropdownRef = useRef<HTMLDivElement>(null); // Ref для меню
+  const profileButtonRef = useRef<HTMLButtonElement>(null); // Ref для кнопки профиля
   const pathname = usePathname();
 
   const { items } = useSelector((state: RootState) => state.cart);
@@ -41,21 +42,40 @@ const Header: FC = () => {
     }
   };
 
-  useEffect(() => {
-    // Создать localStorage если isMounted true
-    if (isMounted.current) {
-      localStorage.setItem("cart", JSON.stringify(items));
-    }
-    isMounted.current = true; // isMounted true после первого рендера
-  }, [items]);
+  // Проверяем, нужно ли скрывать header
+  const isHidden =
+    !validRoutes.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`)
+    ) ||
+    (pathname === "/user" && !isAuth);
 
-  // Проверяем, есть ли текущий путь в validRoutes или начинается ли он с динамического пути
-  const isHidden = !validRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
+  // Закрытие dropdown при клике вне его области
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Закрываем дропдаун меню при переходе на другие стр
+  useEffect(() => {
+    setShowDropdown(false);
+  }, [pathname]);
+
+  // Если isHidden = true, возвращаем null (полностью убираем header из DOM)
+  if (isHidden) return null;
 
   return (
-    <header className={`header ${isHidden ? "header-hidden" : ""}`}>
+    <header className="header">
       <div className="header-container container">
         <div className="header__logo">
           <Link href="/">
@@ -64,20 +84,21 @@ const Header: FC = () => {
         </div>
         <div className="header__profile">
           {isAuth ? (
-            <Link
-              href="/user"
-              style={{
-                pointerEvents: pathname === "/user" ? "none" : "auto",
-                opacity: pathname === "/user" ? 0.7 : 1,
-              }}
-            >
-              <Image
-                src={profileLogoutIcon}
-                alt="profile-icon"
-                width={20}
-                height={20}
-              />
-            </Link>
+            <div className="header__profile-auth">
+              <button
+                ref={profileButtonRef}
+                type="button"
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="header__profile-button"
+              >
+                <Image
+                  src={profileLogoutIcon}
+                  alt="profile-icon"
+                  width={20}
+                  height={20}
+                />
+              </button>
+            </div>
           ) : (
             <button onClick={handleOpenForm}>
               <Image
@@ -88,7 +109,10 @@ const Header: FC = () => {
               />
             </button>
           )}
-          <UserDropdownMenu />
+          <UserDropdownMenu
+            showDropdown={showDropdown}
+            dropdownRef={dropdownRef}
+          />
         </div>
         <div className="header__cart">
           <Link href="/cart">

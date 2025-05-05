@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/ui/skeletons/CartPageItemSkeleton.jsx", "src/ui/skeletons/TotalPriceItemListSkeleton.jsx", "src/ui/skeletons/FoodCardSkeleton.jsx", "src/ui/skeletons/CartSidebarItemSkeleton.jsx", "src/constants/categories.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next", "build", "dist"]
 }

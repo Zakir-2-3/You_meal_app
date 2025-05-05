@@ -24,7 +24,6 @@ export default function CartClient() {
   const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
 
   useEffect(() => {
-    // setIsLoading(true);
     setTimeout(() => setIsLoading(false), 1000); // Задержка загрузки в 1 секунду
   }, []);
 
@@ -61,6 +60,7 @@ export default function CartClient() {
           <Image
             src={emptyCartImg}
             className="empty-cart-img"
+            priority
             alt="empty-cart-img"
             width={495}
             height={351}

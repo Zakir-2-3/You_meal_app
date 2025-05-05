@@ -1,9 +1,6 @@
 .header {
   height: 70px;
   background-color: #ffab08;
-  &-hidden {
-    display: none;
-  }
   &-container {
     display: flex;
     flex-flow: row nowrap;
@@ -13,6 +10,7 @@
   }
   &__profile {
     margin: 0 25px 0 auto;
+    position: relative;
   }
   &__profile,
   &__cart {
@@ -43,7 +41,6 @@
     -o-border-radius: 50%;
   }
   & a,
-  img,
   button {
     width: 100%;
     height: 100%;

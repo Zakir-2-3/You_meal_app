@@ -3,7 +3,6 @@ body {
   flex-direction: column;
   overflow: hidden auto;
   background-color: #f9f9f9;
-  user-select: none;
 }
 
 html::-webkit-scrollbar {
@@ -31,4 +30,20 @@ html::-webkit-scrollbar-thumb {
   max-width: 1310px;
   padding: 0 10px;
   margin: 0 auto;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-right: 10px;
+}
+
+.discounted-price {
+  color: #e53935;
+  font-weight: bold !important;
+}
+
+.no-discount {
+  color: black;
+  font-weight: 600 !important;
 }

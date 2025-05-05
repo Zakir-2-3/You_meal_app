@@ -1,6 +1,7 @@
 "use client";
 
-import { FC } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -16,23 +17,24 @@ import socialIcon_3 from "@/assets/icons/socialIcon_3.svg";
 
 import "./Footer.scss";
 
-const Footer: FC = () => {
+const Footer = () => {
   const pathname = usePathname();
+  const { isAuth } = useSelector((state: RootState) => state.user);
 
-  // Проверяем, есть ли текущий путь в validRoutes или начинается ли он с динамического пути
-  const isHidden = !validRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
+  // Проверяем, нужно ли скрывать footer
+  const isHidden =
+    !validRoutes.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`)
+    ) ||
+    (pathname === "/user" && !isAuth);
+
+  if (isHidden) return null;
 
   // Проверяем, если на стр product (для стилизации footer)
   const isProductPage = pathname.startsWith("/product/");
 
   return (
-    <footer
-      className={`footer ${isHidden ? "footer-hidden" : ""} ${
-        isProductPage ? "footer-product" : ""
-      }`}
-    >
+    <footer className={`footer ${isProductPage ? "footer-product" : ""}`}>
       <div className="container footer-container">
         <div className="footer__logo">
           <Link href="/">

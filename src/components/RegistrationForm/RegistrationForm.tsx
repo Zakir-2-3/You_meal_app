@@ -20,6 +20,12 @@ import {
   setPassword,
 } from "@/store/slices/userSlice";
 
+import {
+  nameValidation,
+  emailValidation,
+  passwordValidation,
+} from "@/utils/validationRules";
+
 import { RegForm } from "@/types/regForm";
 
 import { FORM_ERRORS } from "@/constants/formErrors";
@@ -27,11 +33,13 @@ import { FORM_ERRORS } from "@/constants/formErrors";
 import dd from "@/assets/images/not-found-img.png";
 import hidePasswordIcon from "@/assets/icons/hide-password-icon.svg";
 import showPasswordIcon from "@/assets/icons/show-password-icon.svg";
+import registrationFormCloseBtnIcon from "@/assets/icons/registration-form-close-btn-icon.svg";
 
 import "./RegistrationForm.scss";
 
 const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false); // Состояние для видимости пароля
+  const [signupOn, setSignupOn] = useState(true); // Текс Зарегистрироваться или Войти
 
   const isFormOpen = useSelector(
     (state: RootState) => state.user.isRegFormOpen
@@ -45,6 +53,7 @@ const RegistrationForm = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<RegForm>({
     mode: "onChange",
@@ -58,8 +67,6 @@ const RegistrationForm = () => {
     dispatch(setAuthStatus(true));
 
     toast.success("Аккаунт успешно создан!");
-    console.log(data);
-
     router.push("/user");
   };
 
@@ -106,6 +113,13 @@ const RegistrationForm = () => {
     dispatch(activeRegForm(false));
   }, [pathname]);
 
+  // Очищаем поля инпут
+  useEffect(() => {
+    if (isFormOpen) {
+      reset(); // очищает все поля формы
+    }
+  }, [isFormOpen, reset]);
+
   // Если форма закрыта, не рендерим её
   if (!isFormOpen) return null;
 
@@ -125,13 +139,20 @@ const RegistrationForm = () => {
             />
           </div>
           <div className="registration-form__content">
-            <h2 className="registration-form__title">Регистрация</h2>
+            <h2 className="registration-form__title">
+              {signupOn ? "Регистрация" : "Войти в аккаунт"}
+            </h2>
             <form
               className="registration-form__form"
               onSubmit={handleSubmit(onSubmit)}
             >
               {/* Поле для имени */}
-              <div className="registration-form__field">
+              <div
+                className="registration-form__field"
+                style={{
+                  display: signupOn ? "block" : "none",
+                }}
+              >
                 <label htmlFor="name" className="registration-form__label">
                   Имя:
                 </label>
@@ -144,13 +165,7 @@ const RegistrationForm = () => {
                   type="text"
                   id="name"
                   onKeyDown={handleNameKeyDown} // Запрещаем пробелы и цифры
-                  {...register("name", {
-                    required: FORM_ERRORS.NAME_REQUIRED,
-                    pattern: {
-                      value: /^[A-Za-zА-Яа-яЁё]+$/, // Только буквы, без пробелов и цифр
-                      message: FORM_ERRORS.NAME_INVALID,
-                    },
-                  })}
+                  {...register("name", nameValidation)}
                   className="registration-form__input"
                   placeholder="Введите ваше имя"
                 />
@@ -170,38 +185,7 @@ const RegistrationForm = () => {
                   type="email"
                   id="email"
                   onKeyDown={handleKeyDown} // Запрещаем пробелы и цифры в начале
-                  {...register("email", {
-                    required: FORM_ERRORS.EMAIL_REQUIRED,
-                    validate: (value) => {
-                      const email = String(value).trim();
-
-                      // 1. Если поле пустое
-                      if (!email) {
-                        return FORM_ERRORS.EMAIL_REQUIRED;
-                      }
-
-                      // 2. Если начинается с цифры
-                      if (/^\d/.test(email)) {
-                        return FORM_ERRORS.EMAIL_STARTS_WITH_NUMBER;
-                      }
-
-                      // 3. Если есть кириллица
-                      if (/[а-яА-ЯЁё]/.test(email)) {
-                        return FORM_ERRORS.EMAIL_CYRILLIC;
-                      }
-
-                      // 4. Если email некорректен
-                      if (
-                        !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,4}$/i.test(
-                          email
-                        )
-                      ) {
-                        return FORM_ERRORS.EMAIL_INVALID;
-                      }
-
-                      return true; // Если всё в порядке
-                    },
-                  })}
+                  {...register("email", emailValidation)}
                   className="registration-form__input"
                   placeholder="Введите вашу почту"
                 />
@@ -222,38 +206,7 @@ const RegistrationForm = () => {
                     type={showPassword ? "text" : "password"} // Меняем тип поля
                     id="password"
                     onKeyDown={handleKeyDown} // Запрещаем пробелы и цифры в начале
-                    {...register("password", {
-                      required: FORM_ERRORS.PASSWORD_REQUIRED,
-                      minLength: {
-                        value: 5,
-                        message: FORM_ERRORS.PASSWORD_MIN_LENGTH,
-                      },
-                      validate: (value) => {
-                        const password = String(value).trim();
-
-                        // 1. Если поле пустое
-                        if (!password) {
-                          return FORM_ERRORS.PASSWORD_REQUIRED;
-                        }
-
-                        // 2. Если начинается с цифры
-                        if (/^\d/.test(password)) {
-                          return FORM_ERRORS.PASSWORD_STARTS_WITH_NUMBER;
-                        }
-
-                        // 3. Если есть кириллица
-                        if (/[а-яА-ЯЁё]/.test(password)) {
-                          return FORM_ERRORS.PASSWORD_CYRILLIC;
-                        }
-
-                        // 4. Если пароль содержит недопустимые символы
-                        if (!/^[A-Za-z0-9]+$/.test(password)) {
-                          return FORM_ERRORS.PASSWORD_INVALID;
-                        }
-
-                        return true; // Если всё в порядке
-                      },
-                    })}
+                    {...register("password", passwordValidation)}
                     className="registration-form__input"
                     placeholder="Введите пароль"
                   />
@@ -279,31 +232,52 @@ const RegistrationForm = () => {
                     )}
                   </button>
                 </div>
+
+                {/* Кнопка "Забыли пароль?" */}
+                <button
+                  type="button"
+                  className="registration-form__forgot"
+                  style={{ display: signupOn ? "none" : "block" }}
+                >
+                  Забыли пароль?
+                </button>
               </div>
 
               {/* Кнопка отправки формы */}
               <button
                 type="submit"
                 className="registration-form__button registration-form__button--primary"
+                style={{ background: signupOn ? "#28a745" : "#007bff" }}
               >
-                Зарегистрироваться
+                {signupOn ? "Зарегистрироваться" : "Войти"}
               </button>
+
+              {/* Переключение на Вход */}
+              <div className="registration-form__actions">
+                <span className="registration-form__text-switch">
+                  {signupOn ? "Уже есть аккаунт?" : "Еще нет аккаунта?"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSignupOn((prev) => !prev)}
+                  className="registration-form__button--secondary"
+                >
+                  {signupOn ? "Войти" : "Зарегистрироваться"}
+                </button>
+              </div>
             </form>
-            <div className="registration-form__actions">
-              <button
-                type="button"
-                className="registration-form__button registration-form__button--secondary"
-              >
-                Уже есть аккаунт? Войти
-              </button>
-            </div>
           </div>
           <button
             onClick={handleCloseForm}
             className="registration-form__close-btn"
             aria-label="Закрыть форму"
           >
-            X
+            <Image
+              src={registrationFormCloseBtnIcon}
+              alt="registration-form-close-btn-icon"
+              width={30}
+              height={30}
+            />
           </button>
         </div>
       </>

@@ -13,9 +13,13 @@ import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
 
 import NavButtons from "@/components/NavButtons/NavButtons";
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
+
 import ProductPageSkeleton from "@/ui/skeletons/ProductPageSkeleton";
 
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
 import { categories } from "@/constants/categories";
+
 import { Product } from "@/types/product";
 
 import "./productPage.scss";
@@ -31,6 +35,9 @@ export default function ProductClient() {
 
   const { activeIndex } = useSelector((state: RootState) => state.category);
   const { items } = useSelector((state: RootState) => state.cart);
+  const activatedPromos = useSelector(
+    (state: RootState) => state.promo.activated
+  );
 
   // Получаем текущую категорию для NavButtons
   const categoryTitle = categories[activeIndex]?.title || "Неизвестно";
@@ -72,7 +79,7 @@ export default function ProductClient() {
           price_rub: product?.price_rub ?? 0,
           size: product?.size ?? 0,
         })
-      ); // Добавляем товар в корзину
+      );
     }
   };
 
@@ -99,6 +106,14 @@ export default function ProductClient() {
     fetchProduct();
   }, [parsedId, router]);
 
+  // Логика расчёта цены с учётом скидки
+  const { discount, hasDiscount } = product
+    ? getDiscountedPrice(activatedPromos, product.price_rub)
+    : { discount: 0, hasDiscount: false };
+  const discountedPrice = product?.price_rub
+    ? Math.round(product.price_rub * (1 - discount / 100))
+    : 0;
+
   return (
     <section className="product-section">
       <div className="container">
@@ -110,6 +125,7 @@ export default function ProductClient() {
                 <figure>
                   <Image
                     src={product.image}
+                    priority
                     alt={product.name_ru}
                     width={500}
                     height={500}
@@ -122,8 +138,18 @@ export default function ProductClient() {
               <div className="product-section__info">
                 <h1 className="product-section__title">{product?.name_ru}</h1>
                 <div className="product-section__info-price">
+                  <p>Цена:</p>
                   <p>
-                    Цена: <span>{product?.price_rub} ₽</span>
+                    {hasDiscount ? (
+                      <>
+                        <span className="old-price">{product.price_rub}₽</span>
+                        <span className="discounted-price">
+                          {discountedPrice}₽
+                        </span>
+                      </>
+                    ) : (
+                      `${product.price_rub}₽`
+                    )}
                   </p>
                 </div>
                 <div className="product-section__add-cart">
