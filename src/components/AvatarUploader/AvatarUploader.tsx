@@ -1,13 +1,22 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 
 import Cropper from "react-easy-crop";
 import { useDropzone } from "react-dropzone";
+import { toast } from "react-toastify";
+
+import { useDispatch } from "react-redux";
+import { store, useAppSelector } from "@/store/store";
+import { setAvatarUrl } from "@/store/slices/userSlice";
 
 import { getCroppedImg } from "@/utils/cropImage";
 
-import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
 
-import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
+import { DEFAULT_AVATAR } from "@/constants/defaults";
+
+import CloseButton from "@/ui/buttons/CloseButton";
+
 import uploadFileIcon from "@/assets/icons/upload-file-icon.svg";
 
 import "./AvatarUploader.scss";
@@ -24,6 +33,10 @@ function AvatarUploader({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [closing, setClosing] = useState(false);
+
+  const email = useAppSelector((state) => state.user.email);
+
+  const dispatch = useDispatch();
 
   const modalRef = useRef<HTMLDivElement | null>(null);
 
@@ -49,13 +62,95 @@ function AvatarUploader({
   const showCroppedImage = useCallback(async () => {
     try {
       if (!imageSrc || !croppedAreaPixels) return;
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      onSave(croppedImage);
+      if (!email) throw new Error("Не найден email пользователя");
+
+      const previousAvatarUrl = store.getState().user.avatarUrl;
+      const isDefaultBefore = previousAvatarUrl === DEFAULT_AVATAR;
+
+      // Создаем временный Blob URL для мгновенного отображения
+      const croppedBlob = (await getCroppedImg(
+        imageSrc,
+        croppedAreaPixels,
+        "blob"
+      )) as Blob;
+      const tempUrl = URL.createObjectURL(croppedBlob);
+
+      const currentTempUrl = tempUrl;
+
+      // Немедленно обновляем аватарку (временная версия)
+      onSave(tempUrl);
+
+      // Фоновая обработка серверных операций
+      const fileName = `${email}_${Date.now()}.jpg`;
+
       onClose();
+
+      // Удаление старой аватарки
+      if (
+        previousAvatarUrl &&
+        !isDefaultBefore &&
+        previousAvatarUrl.includes("/avatars/")
+      ) {
+        const match = previousAvatarUrl.match(/avatars\/(.+\.jpg)/);
+        const previousFileName = match?.[1];
+        if (previousFileName) {
+          await fetch("/api/avatar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fileName: previousFileName }),
+          });
+        }
+      }
+
+      // Загрузка новой аватарки
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, croppedBlob, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: "image/jpeg",
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Получение постоянного URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+      // Обновляем на постоянный URL (без анимации)
+      if (store.getState().user.avatarUrl === currentTempUrl) {
+        dispatch(setAvatarUrl(publicUrl));
+      }
+
+      toast.success(
+        isDefaultBefore ? "Аватарка добавлена" : "Аватарка обновлена"
+      );
+
+      // Обновляем в базе данных
+      const state = store.getState();
+      await fetch("/api/user/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          avatar: publicUrl,
+          cart: state.cart.items,
+          promoCodes: {
+            activated: state.promo.activated,
+            available: state.promo.available,
+          },
+          balance: state.user.balance,
+        }),
+      });
+
+      // Освобождаем временный Blob URL
+      URL.revokeObjectURL(tempUrl);
     } catch (e) {
-      console.error(e);
+      console.error("Ошибка сохранения аватарки:", e);
+      toast.error("Не удалось сохранить аватарку");
     }
-  }, [imageSrc, croppedAreaPixels, onSave, onClose]);
+  }, [imageSrc, croppedAreaPixels, onSave, onClose, email, dispatch]);
 
   const handleResetImage = () => {
     setImageSrc(null);
@@ -115,14 +210,7 @@ function AvatarUploader({
         className={`modal-content ${closing ? "modal-close-anim" : ""}`}
         ref={modalRef}
       >
-        <button className="modal-close" onClick={handleRequestClose}>
-          <Image
-            src={searchCloseIcon}
-            width={25}
-            height={25}
-            alt="close-btn-icon"
-          />
-        </button>
+        <CloseButton onClick={handleRequestClose} className="modal-close" />
 
         <div className="crop-wrapper">
           {!imageSrc ? (
@@ -137,7 +225,7 @@ function AvatarUploader({
                   alt="upload-file-icon"
                 />
                 <p className="crop__text">
-                  Перетащите файлы сюда или кликните для загрузки.
+                  Перетащите файл сюда или кликните для загрузки.
                 </p>
               </div>
             </div>

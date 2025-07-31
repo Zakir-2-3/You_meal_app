@@ -1,15 +1,13 @@
 import { Nunito } from "next/font/google";
 import { Metadata } from "next";
 
-import { ReduxProvider } from "@/store/Providers";
+import AppProvider from "./AppProvider";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import PersistGateWrapper from "@/components/PersistGateWrapper/PersistGateWrapper";
-
 import Header from "@/components/Header/Header";
-import RegistrationForm from "@/components/RegistrationForm/RegistrationForm";
+import RegistrationForm from "@/components/auth/RegistrationForm/RegistrationForm";
 import Footer from "@/components/Footer/Footer";
 
 import "@/styles/reset.css";
@@ -35,25 +33,23 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={nunito.className}>
-        <ReduxProvider>
-          <PersistGateWrapper>
-            <Header />
-            <main className="main">{children}</main>
-            <Footer />
-            <RegistrationForm />
-            <ToastContainer
-              position="top-right" // Позиция тостов
-              autoClose={2500} // Автозакрытие через 2.5 секунды
-              hideProgressBar={false} // Показывать прогресс-бар
-              newestOnTop={false} // Новые тосты снизу
-              closeOnClick // Закрывать по клику
-              rtl={false} // Направление текста (слева направо)
-              pauseOnFocusLoss // Пауза при потере фокуса
-              draggable // Возможность перетаскивать тосты
-              pauseOnHover // Пауза при наведении
-            />
-          </PersistGateWrapper>
-        </ReduxProvider>
+        <AppProvider>
+          <Header />
+          <main className="main">{children}</main>
+          <Footer />
+          <RegistrationForm />
+          <ToastContainer
+            position="top-right" // Позиция тостов
+            autoClose={2500} // Автозакрытие через 2.5 секунды
+            hideProgressBar={false} // Показывать прогресс-бар
+            newestOnTop={false} // Новые тосты снизу
+            closeOnClick // Закрывать по клику
+            rtl={false} // Направление текста (слева направо)
+            pauseOnFocusLoss // Пауза при потере фокуса
+            draggable // Возможность перетаскивать тосты
+            pauseOnHover // Пауза при наведении
+          />
+        </AppProvider>
       </body>
     </html>
   );

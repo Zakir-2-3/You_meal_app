@@ -1,19 +1,19 @@
 "use client";
 
 import { FC } from "react";
-
 import Link from "next/link";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
 import { categories } from "@/constants/categories";
+
 import { NavButtonsProps } from "@/types/navButtons";
 
 import "./NavButtons.scss";
 
 const NavButtons: FC<NavButtonsProps> = ({ customTitle }) => {
-  // Получаем активную категорию из Redux
+  // Получаем активную категорию
   const activeCategory = useSelector(
     (state: RootState) => state.category.activeIndex
   );

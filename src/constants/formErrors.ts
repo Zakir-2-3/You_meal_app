@@ -8,6 +8,6 @@ export const FORM_ERRORS = {
   PASSWORD_REQUIRED: "Заполните поле",
   PASSWORD_MIN_LENGTH: "Не менее 5 символов",
   PASSWORD_STARTS_WITH_NUMBER: "Пароль не должен начинаться с цифр",
-  PASSWORD_CYRILLIC: "Пароль не должен содержать кириллицу",
+  PASSWORD_CYRILLIC: "Только латинские буквы",
   PASSWORD_INVALID: "Пароль не должен содержать символы",
 };

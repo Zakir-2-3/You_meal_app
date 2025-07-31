@@ -1,16 +1,18 @@
 export const getCroppedImg = async (
   imageSrc: string,
-  crop: any
-): Promise<string> => {
+  pixelCrop: { x: number; y: number; width: number; height: number },
+  type: "blob" | "base64" = "blob"
+): Promise<Blob | string> => {
   const image = await createImage(imageSrc);
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
 
-  const AVATAR_SIZE = 330; // Размер итогового аватара
+  const AVATAR_SIZE = 330;
   canvas.width = AVATAR_SIZE;
   canvas.height = AVATAR_SIZE;
 
+  // Обрезка круглого аватара
   ctx.beginPath();
   ctx.arc(AVATAR_SIZE / 2, AVATAR_SIZE / 2, AVATAR_SIZE / 2, 0, 2 * Math.PI);
   ctx.closePath();
@@ -18,15 +20,21 @@ export const getCroppedImg = async (
 
   ctx.drawImage(
     image,
-    crop.x,
-    crop.y,
-    crop.width,
-    crop.height,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
     0,
     0,
     AVATAR_SIZE,
     AVATAR_SIZE
   );
+
+  if (type === "blob") {
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob!), "image/jpeg");
+    });
+  }
 
   return canvas.toDataURL("image/jpeg");
 };
@@ -34,9 +42,9 @@ export const getCroppedImg = async (
 const createImage = (url: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
-    image.setAttribute("crossOrigin", "anonymous");
+    image.onload = () => resolve(image);
+    image.onerror = (err) => reject(err);
+    image.crossOrigin = "anonymous";
     image.src = url;
   });
 };

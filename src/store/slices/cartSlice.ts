@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { CartState, Item } from "@/types/item";
-
 import { formatDate } from "@/utils/formatDate";
 import { calcTotalPrice } from "@/utils/calcTotalPrice";
+
+import { CartState, Item } from "@/types/item";
 
 const initialState: CartState = {
   items: [],
@@ -43,7 +43,7 @@ const cartSlice = createSlice({
         });
 
         if (!state.savedDate) {
-          state.savedDate = formatDate(); // Функцию для даты
+          state.savedDate = formatDate();
         }
       }
 
@@ -87,8 +87,23 @@ const cartSlice = createSlice({
       state.totalPrice = 0; // Очищаем общую сумму
       state.savedDate = null; // Очищаем дату при очистке корзины
     },
+    setItems(state, action: PayloadAction<Item[]>) {
+      state.items = action.payload;
+      state.totalPrice = calcTotalPrice(state.items);
+      state.savedDate = state.items.length > 0 ? formatDate() : null;
+    },
+    resetCart: (state) => {
+      state.items = [];
+    },
   },
 });
 
-export const { addItem, removeItem, clearItems, minusItem } = cartSlice.actions;
+export const {
+  addItem,
+  removeItem,
+  clearItems,
+  minusItem,
+  setItems,
+  resetCart,
+} = cartSlice.actions;
 export default cartSlice.reducer;

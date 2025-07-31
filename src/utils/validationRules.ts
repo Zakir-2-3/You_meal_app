@@ -54,8 +54,7 @@ export const optionalPasswordValidation = {
 export const repeatPasswordValidation = (watchFn: () => string) => ({
   validate: (val: string) => {
     const newPassword = watchFn();
-    if (!newPassword && !val) return true; // оба пустые — валидно
-    if (val !== newPassword) return "Пароли не совпадают";
-    return true;
+    if (!val) return true; // Если пустое — валидно
+    return val === newPassword || "Пароли не совпадают";
   },
 });

@@ -15,7 +15,7 @@ export const getDiscountedPrice = (
   }
 
   return {
-    discount, // процент скидки
+    discount,
     hasDiscount: discount > 0,
   };
 };

@@ -1,11 +1,10 @@
 import { RefObject } from "react";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-
-import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
 
 import { logout } from "@/utils/logout";
 
@@ -25,14 +24,25 @@ interface UserDropdownMenuProps {
 const UserDropdownMenu = ({
   showDropdown,
   dropdownRef,
-}: UserDropdownMenuProps) => {
-  const { avatar, name, email } = useSelector((state: RootState) => state.user);
+  setShowDropdown,
+}: UserDropdownMenuProps & { setShowDropdown: (val: boolean) => void }) => {
+  const { avatarUrl, name, email } = useSelector(
+    (state: RootState) => state.user
+  );
   const dispatch = useDispatch();
-
   const pathname = usePathname();
 
   const handleLogout = () => {
-    logout(dispatch, (url) => window.location.replace(url));
+    // Сначала закрываем дропдаун
+    setShowDropdown(false);
+
+    logout(dispatch, () => {
+      if (pathname === "/") {
+        window.location.reload(); // если уже на главной — перезагрузить
+      } else {
+        window.location.replace("/"); // иначе перейти на главную
+      }
+    });
   };
 
   return (
@@ -48,13 +58,13 @@ const UserDropdownMenu = ({
     >
       <div className="user-dropdown__header">
         <Image
-          src={avatar || DEFAULT_AVATAR}
+          src={avatarUrl || DEFAULT_AVATAR}
           alt="Аватар"
           width={24}
           height={24}
           className="user-dropdown__avatar"
         />
-        <div>
+        <div className="user-dropdown__info">
           <p className="user-dropdown__name">{name}</p>
           <p className="user-dropdown__email">{email}</p>
         </div>

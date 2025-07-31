@@ -29,7 +29,7 @@ export default function ProductClient() {
   const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
 
   const { id } = useParams(); // Получаем текущий id товара из url
-  const parsedId = Number(id); // Преобразуем в число т.к api требует строку
+  const parsedId = Number(id);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 

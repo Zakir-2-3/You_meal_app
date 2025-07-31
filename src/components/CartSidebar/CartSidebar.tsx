@@ -1,5 +1,4 @@
 import { FC } from "react";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -31,7 +30,7 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
     return sum + item.price_rub * (item.count ?? 0);
   }, 0);
 
-  // Фильтрация промокодов с учётом условий (пример: PromoFrom2020 действует только от 2000₽)
+  // Фильтрация промокодов
   const effectivePromos = [...activated];
   if (effectivePromos.includes("PromoFrom2020") && rawTotal < 2000) {
     const index = effectivePromos.indexOf("PromoFrom2020");

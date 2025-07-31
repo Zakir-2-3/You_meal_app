@@ -1,9 +1,8 @@
 import { FC } from "react";
-
 import Image from "next/image";
 
-import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem } from "@/store/slices/cartSlice";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
@@ -48,7 +47,6 @@ const CartSidebarItem: FC<Item> = ({
       </div>
       <div className="cart-sidebar__item-description">
         <h3>{name_ru}</h3>
-        {/* <p>{size}г</p> */}
         <p>
           {hasDiscount ? (
             <>

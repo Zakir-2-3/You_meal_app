@@ -8,10 +8,9 @@ const initialState: UserState = {
   isRegFormOpen: false,
   isAuth: false,
   name: "",
-  password: "",
   email: "",
   balance: 0,
-  avatar: DEFAULT_AVATAR,
+  avatarUrl: DEFAULT_AVATAR,
 };
 
 const userSlice = createSlice({
@@ -24,26 +23,32 @@ const userSlice = createSlice({
     setName(state, action: PayloadAction<string>) {
       state.name = action.payload;
     },
-    setPassword(state, action: PayloadAction<string>) {
-      state.password = action.payload;
-    },
     setEmail(state, action: PayloadAction<string>) {
       state.email = action.payload;
     },
     setAuthStatus(state, action: PayloadAction<boolean>) {
       state.isAuth = action.payload;
     },
-    setAvatar(state, action: PayloadAction<string>) {
-      state.avatar = action.payload || DEFAULT_AVATAR;
+    setAvatarUrl(state, action: PayloadAction<string>) {
+      state.avatarUrl = action.payload || DEFAULT_AVATAR;
+    },
+    setBalance(state, action: PayloadAction<number>) {
+      state.balance = action.payload;
     },
     logoutUser(state) {
       state.isRegFormOpen = false;
       state.isAuth = false;
       state.name = "";
-      state.password = "";
       state.email = "";
       state.balance = 0;
-      state.avatar = DEFAULT_AVATAR;
+      state.avatarUrl = DEFAULT_AVATAR;
+    },
+    resetUser: (state) => {
+      state.name = "";
+      state.email = "";
+      state.avatarUrl = DEFAULT_AVATAR;
+      state.isAuth = false;
+      state.balance = 0;
     },
   },
 });
@@ -51,10 +56,12 @@ const userSlice = createSlice({
 export const {
   activeRegForm,
   setName,
-  setPassword,
   setEmail,
   setAuthStatus,
-  setAvatar,
+  setAvatarUrl,
   logoutUser,
+  setBalance,
+  resetUser,
 } = userSlice.actions;
+
 export default userSlice.reducer;

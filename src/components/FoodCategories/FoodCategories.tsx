@@ -1,10 +1,9 @@
 import React, { FC } from "react";
-
 import Image from "next/image";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setActiveCategory } from "@/store/slices/categorySlice";
 import { AppDispatch, RootState } from "@/store/store";
+import { setActiveCategory } from "@/store/slices/categorySlice";
 
 import { categories } from "@/constants/categories";
 

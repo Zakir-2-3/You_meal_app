@@ -22,7 +22,9 @@
   }
 
   &__content {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 370px;
     padding: 20px;
   }
 
@@ -33,9 +35,33 @@
     color: #333;
   }
 
-  &__form {
+  &__signup {
     display: flex;
     flex-direction: column;
+    & div:nth-child(3) {
+      margin-bottom: 3px;
+    }
+  }
+
+  &__login {
+    position: relative;
+    & .registration-form__field:nth-of-type(1) .registration-form__input--error {
+      left: 55px;
+      top: 1px;
+    }
+
+    & .registration-form__field:nth-of-type(2) {
+      margin-bottom: 3px;
+    }
+
+    & .registration-form__field:nth-of-type(2) .registration-form__input--error {
+      left: 65px;
+    }
+
+    & .registration-form__input--error {
+      top: 88px;
+      left: 64px;
+    }
   }
 
   &__field {
@@ -57,7 +83,7 @@
   &__label {
     display: block;
     margin-bottom: 2px;
-    margin-left: 3px;
+    padding-left: 2px;
     font-weight: bold;
     font-size: 15px;
     color: #555;
@@ -66,9 +92,13 @@
   &__input {
     width: 100%;
     padding: 10px;
-    font-size: 16px;
+    font-size: 17px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
     &--error {
       position: absolute;
       top: 1px;
@@ -82,20 +112,26 @@
   }
 
   &__button {
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
     width: 100%;
     padding: 10px;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 
     &--primary {
+      margin: 24px auto 8px;
+      width: 100%;
       background-color: #28a745;
+      border: solid 1px rgb(48 149 71);
       color: #fff;
 
       &:hover {
-        background-color: #218838;
         filter: brightness(0.95);
         -webkit-filter: brightness(0.95);
       }
@@ -104,22 +140,13 @@
     &--secondary {
       color: #007bff;
       text-decoration: underline;
+      font-weight: 600;
+      font-size: 15px;
 
       &:hover {
-        color: #02468f;
+        filter: brightness(0.75);
+        -webkit-filter: brightness(0.75);
       }
-    }
-  }
-
-  &__forgot {
-    color: #007bff;
-    margin-top: 10px;
-    display: flex;
-    margin-left: 3px;
-    text-decoration: underline;
-
-    &:hover {
-      color: #02468f;
     }
   }
 
@@ -140,10 +167,10 @@
 
   &__actions {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-top: 14px;
+    padding: 0 3px;
+    margin: 0;
     .registration-form__button {
       flex: 1;
       margin-right: 10px;
@@ -158,10 +185,20 @@
     right: 13px;
     top: 13px;
     opacity: 0.8;
-    width: 30px;
-    height: 30px;
-    &:hover {
-      opacity: 1;
+    width: 20px;
+    height: 20px;
+    & > img {
+      filter: saturate(0.8);
+      -webkit-filter: saturate(0.8);
+      transition: filter 0.2s ease;
+      -webkit-transition: filter 0.2s ease;
+      -moz-transition: filter 0.2s ease;
+      -ms-transition: filter 0.2s ease;
+      -o-transition: filter 0.2s ease;
+      &:hover {
+        filter: saturate(1);
+        -webkit-filter: saturate(1);
+      }
     }
   }
 }
@@ -189,4 +226,61 @@
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none !important;
+}
+
+.registration-form__verify {
+  position: relative;
+  & > .registration-form__label {
+    padding-left: 1px;
+  }
+  & > .registration-form__input {
+    margin-bottom: 8px;
+  }
+  & > .registration-form__input--error {
+    top: 1px;
+    left: 104px;
+  }
+  & > .registration-form__button--secondary {
+    text-align: left;
+    padding: 0;
+    padding-left: 1px;
+    text-decoration: none;
+    width: auto;
+  }
+  & > .registration-form__button--primary {
+    color: #fff;
+    background-color: #28a745;
+    border: 1px solid #309547;
+    width: 100%;
+    margin: 10px auto 12px;
+  }
+  > .registration-form__buttons-group > .registration-form__button--primary {
+    margin-top: 10px;
+  }
+  & > .registration-form__buttons-group > .registration-form__button--secondary {
+    background: #da3036;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #be2d32;
+  }
+}
+
+.registration-form__divider {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.registration-form__line {
+  flex-grow: 1;
+  height: 1px;
+  background: #73737378;
+  margin: 0 !important;
+}
+
+.registration-form__or {
+  margin: 0 10px;
+  color: #737373ab;
+  font-size: 13px;
 }

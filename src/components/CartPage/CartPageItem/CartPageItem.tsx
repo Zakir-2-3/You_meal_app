@@ -1,11 +1,15 @@
 import { FC } from "react";
 import Image from "next/image";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
+
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
-import { Item } from "@/types/item";
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { Item } from "@/types/item";
+
 import "./CartPageItem.scss";
 
 const CartPageItem: FC<Item> = ({

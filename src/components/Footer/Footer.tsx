@@ -1,11 +1,11 @@
 "use client";
 
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 import { validRoutes } from "@/constants/validRoutes";
 
@@ -30,7 +30,7 @@ const Footer = () => {
 
   if (isHidden) return null;
 
-  // Проверяем, если на стр product (для стилизации footer)
+  // Проверяем, если мы на странице product (для стилизации footer)
   const isProductPage = pathname.startsWith("/product/");
 
   return (

@@ -1,3 +1,4 @@
+// Валидные url, для not-found-page
 export const validRoutes: readonly string[] = [
   "/",
   "/cart",

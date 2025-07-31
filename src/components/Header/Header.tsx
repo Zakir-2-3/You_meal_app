@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
-
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { activeRegForm } from "@/store/slices/userSlice";
+
+import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
 
 import { validRoutes } from "@/constants/validRoutes";
 
@@ -66,7 +65,7 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Закрываем дропдаун меню при переходе на другие стр
+  // Закрываем дропдаун меню при переходе на другие страницы
   useEffect(() => {
     setShowDropdown(false);
   }, [pathname]);
@@ -111,6 +110,7 @@ const Header = () => {
           )}
           <UserDropdownMenu
             showDropdown={showDropdown}
+            setShowDropdown={setShowDropdown}
             dropdownRef={dropdownRef}
           />
         </div>

@@ -37,6 +37,7 @@
 
 .crop__text {
   color: #8a8a8a;
+  font-size: 18px;
 }
 
 .modal-overlay {
@@ -95,18 +96,25 @@
 
 .modal-close {
   position: absolute;
-  top: 9px;
-  right: 8px;
-  width: 25px;
-  height: 25px;
+  top: 10px;
+  right: 10px;
+  width: auto;
+  height: auto;
   background: transparent;
   border: none;
-  font-size: 20px;
   cursor: pointer;
-  color: red !important;
-
   & > img {
-    filter: contrast(0.5);
+    filter: saturate(0.8);
+    -webkit-filter: saturate(0.8);
+    transition: filter 0.2s ease;
+    -webkit-transition: filter 0.2s ease;
+    -moz-transition: filter 0.2s ease;
+    -ms-transition: filter 0.2s ease;
+    -o-transition: filter 0.2s ease;
+    &:hover {
+      filter: saturate(1);
+      -webkit-filter: saturate(1);
+    }
   }
 }
 

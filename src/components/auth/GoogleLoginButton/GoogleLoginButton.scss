@@ -1,0 +1,29 @@
+.login-btn-google {
+  border: 1px solid red;
+}
+
+.login-btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  font-weight: 500;
+  font-size: 16px;
+  border-radius: 4px;
+  color: #444;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f7f7f7;
+  }
+
+  .google-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
