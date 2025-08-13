@@ -8,6 +8,14 @@
     justify-content: space-between;
     height: inherit;
   }
+  &__geo {
+    width: 154px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 30px;
+  }
   &__profile {
     margin: 0 25px 0 auto;
     position: relative;
@@ -40,9 +48,9 @@
     -ms-border-radius: 50%;
     -o-border-radius: 50%;
   }
-  & a,
-  button {
-    width: 100%;
-    height: 100%;
-  }
+  // & a,
+  // button {
+  //   width: 100%;
+  //   height: 100%;
+  // }
 }

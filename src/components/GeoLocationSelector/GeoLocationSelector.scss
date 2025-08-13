@@ -1,0 +1,146 @@
+.geo-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  height: 24px;
+
+  &__label {
+    font-size: 14px;
+    color: #fff;
+    transition:
+      opacity 0.8s,
+      width 0s 0.8s,
+      margin-left 0.8s;
+    flex-shrink: 0;
+    opacity: 1;
+    width: auto;
+    font-weight: 600;
+    border-bottom: 1px solid;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+  }
+
+  &__container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: filter 0.2s ease;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    order: -1;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    &--error {
+      filter: brightness(0) saturate(100%) invert(27%) sepia(86%) saturate(7483%) hue-rotate(356deg) brightness(91%)
+        contrast(127%);
+    }
+
+    &--success {
+      filter: brightness(0) saturate(100%) invert(52%) sepia(98%) saturate(356%) hue-rotate(81deg) brightness(93%)
+        contrast(86%);
+    }
+  }
+
+  &__input-wrapper {
+    position: absolute;
+    left: 22px;
+    width: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    transition:
+      width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+      opacity 0.3s ease;
+    transform-origin: left center;
+
+    &--visible {
+      width: 130px;
+      overflow: visible;
+    }
+  }
+
+  &__input {
+    flex-grow: 1;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 13px;
+    min-width: 0;
+    outline: none;
+    transition:
+      transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+      opacity 0.3s ease;
+    transform: scaleX(0);
+    transform-origin: left center;
+    opacity: 0;
+
+    .geo-selector__input-wrapper--visible & {
+      transform: scaleX(1);
+      opacity: 1;
+      z-index: 1000;
+    }
+  }
+
+  &__suggestions {
+    position: absolute;
+    top: 30px;
+    left: -19px;
+    width: 150px;
+    background: #fff;
+    border: 1px solid #ccc;
+    max-height: 160px;
+    overflow-y: auto;
+    z-index: 1000;
+    border-radius: 6px;
+    scrollbar-width: none;
+
+    .geo-selector__input-wrapper--visible {
+      display: block;
+    }
+  }
+
+  &__suggestion {
+    padding: 8px;
+    cursor: pointer;
+    font-size: 13px;
+
+    &:not(:last-child) {
+      box-shadow: inset 0px -1px 0px 0px #cccccc80;
+    }
+
+    &:hover {
+      background-color: #f2f2f2;
+    }
+  }
+
+  &.input-visible {
+    .geo-selector__label {
+      opacity: 0;
+      transition:
+        opacity 0.6s,
+        width 0s 0.6s,
+        margin-left 0.6s;
+    }
+  }
+}

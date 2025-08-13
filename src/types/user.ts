@@ -5,4 +5,5 @@ export interface UserState {
   email: string;
   balance: number;
   avatarUrl: string;
+  geoCity?: string;
 }

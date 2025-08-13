@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { activeRegForm } from "@/store/slices/userSlice";
 
+import GeoLocationSelector from "../GeoLocationSelector/GeoLocationSelector";
 import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
 
 import { validRoutes } from "@/constants/validRoutes";
@@ -80,6 +82,9 @@ const Header = () => {
           <Link href="/">
             <Image src={headerLogo} alt="header-logo" width={153} height={35} />
           </Link>
+        </div>
+        <div className="header__geo">
+          <GeoLocationSelector />
         </div>
         <div className="header__profile">
           {isAuth ? (

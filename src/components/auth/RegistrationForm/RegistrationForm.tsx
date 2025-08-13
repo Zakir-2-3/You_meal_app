@@ -11,7 +11,7 @@ import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { setItems } from "@/store/slices/cartSlice";
 import { setPromoCodes } from "@/store/slices/promoSlice";
-import { setBalance } from "@/store/slices/userSlice";
+import { setBalance, setGeoCity } from "@/store/slices/userSlice";
 import {
   setAuthStatus,
   setEmail,
@@ -58,6 +58,8 @@ const RegistrationForm = () => {
   const { canResend, startTimer, formatTime } = useResendTimer();
 
   const isFormOpen = useSelector((state: any) => state.user.isRegFormOpen);
+  const geoCity = useSelector((state: any) => state.user.geoCity);
+
   const dispatch = useDispatch();
   const pathname = usePathname();
   const formRef = useRef<HTMLDivElement>(null);
@@ -89,7 +91,7 @@ const RegistrationForm = () => {
       body: JSON.stringify({ email }),
     });
     const data = await res.json();
-    return !!data?.email; // если вернулся объект с email — значит пользователь есть
+    return !!data?.email;
   };
 
   const onSubmit: SubmitHandler<RegForm> = async (data) => {
@@ -145,7 +147,10 @@ const RegistrationForm = () => {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
+          body: JSON.stringify({
+            ...data,
+            city: geoCity || localStorage.getItem("city") || "",
+          }),
         });
 
         const result = await res.json();
@@ -222,7 +227,11 @@ const RegistrationForm = () => {
       const res = await fetch("/api/auth/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: localEmail, code: String(code) }),
+        body: JSON.stringify({
+          email: localEmail,
+          code: String(code),
+          city: geoCity || localStorage.getItem("city") || "",
+        }),
       });
 
       if (!res.ok) {
@@ -267,6 +276,12 @@ const RegistrationForm = () => {
       dispatch(setPromoCodes(data.promoCodes || []));
       dispatch(setBalance(data.balance || 0));
       dispatch(setAvatarUrl(data.avatar || DEFAULT_AVATAR));
+
+      if (data.city) {
+        dispatch(setGeoCity(data.city));
+        localStorage.setItem("city", data.city);
+        console.log("Город из базы:", data.city);
+      }
     } catch (err) {
       console.error("Ошибка загрузки данных:", err);
     }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req: NextRequest) {
@@ -9,20 +10,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    const { data: user, error } = await supabase
+    const { data: user } = await supabase
       .from("users")
-      .select("email, cart, balance, promoCodes, avatar")
+      .select("email, cart, balance, promoCodes, avatar, city")
       .eq("email", email)
       .maybeSingle();
 
     if (!user) {
-      // Если пользователя нет, то вернём пустые значения
+      // Если пользователя нет — вернём пустые значения
       return NextResponse.json({
         email: null,
         cart: [],
         balance: 0,
         promoCodes: [],
         avatar: "",
+        city: "",
       });
     }
 

@@ -11,6 +11,7 @@ const initialState: UserState = {
   email: "",
   balance: 0,
   avatarUrl: DEFAULT_AVATAR,
+  geoCity: "",
 };
 
 const userSlice = createSlice({
@@ -19,6 +20,9 @@ const userSlice = createSlice({
   reducers: {
     activeRegForm(state, action: PayloadAction<boolean>) {
       state.isRegFormOpen = action.payload;
+    },
+    setGeoCity(state, action: PayloadAction<string>) {
+      state.geoCity = action.payload;
     },
     setName(state, action: PayloadAction<string>) {
       state.name = action.payload;
@@ -50,11 +54,20 @@ const userSlice = createSlice({
       state.isAuth = false;
       state.balance = 0;
     },
+    resetUserExceptGeoCity: (state) => {
+      state.isRegFormOpen = false;
+      state.isAuth = false;
+      state.name = "";
+      state.email = "";
+      state.balance = 0;
+      state.avatarUrl = DEFAULT_AVATAR;
+    },
   },
 });
 
 export const {
   activeRegForm,
+  setGeoCity,
   setName,
   setEmail,
   setAuthStatus,
@@ -62,6 +75,7 @@ export const {
   logoutUser,
   setBalance,
   resetUser,
+  resetUserExceptGeoCity,
 } = userSlice.actions;
 
 export default userSlice.reducer;

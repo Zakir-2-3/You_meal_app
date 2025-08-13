@@ -1,15 +1,16 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-
 import { toast } from "react-toastify";
 
 import { AppDispatch, RootState, store, persistor } from "@/store/store";
 import { resetCart } from "@/store/slices/cartSlice";
 import { resetPromos } from "@/store/slices/promoSlice";
-import { resetUser } from "@/store/slices/userSlice";
+import { resetUser, setGeoCity } from "@/store/slices/userSlice";
 
 import { DEFAULT_AVATAR, DEFAULT_PROMOS } from "@/constants/defaults";
+
+import { detectGeoCity } from "@/utils/geo";
 
 export const logout = async (
   dispatch: AppDispatch,
@@ -49,6 +50,7 @@ export const logout = async (
     // Приостанавливаем persist перед сбросом redux
     await persistor.pause();
 
+    // Сбрасываем redux состояния
     dispatch(resetCart());
     dispatch(resetPromos());
     dispatch(resetUser());
@@ -56,6 +58,22 @@ export const logout = async (
     // Убеждаемся, что всё очищено
     await persistor.flush();
     await persistor.purge();
+
+    // Определяем гео
+    const detectedCity = await detectGeoCity();
+
+    if (detectedCity && detectedCity !== "Геолокация отключена") {
+      dispatch(setGeoCity(detectedCity));
+      localStorage.setItem("city", detectedCity);
+    } else {
+      const cityFromStorage = localStorage.getItem("city");
+      if (cityFromStorage) {
+        dispatch(setGeoCity(cityFromStorage));
+      } else {
+        dispatch(setGeoCity(""));
+        localStorage.removeItem("city");
+      }
+    }
 
     toast.error("Вы вышли из аккаунта");
 

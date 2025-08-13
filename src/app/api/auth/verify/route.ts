@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { email, code } = body;
+    const { email, code, city } = body;
 
     if (!email || !code) {
       console.log("Нет email или кода в запросе");
@@ -57,6 +57,7 @@ export async function POST(req: Request) {
       cart: [],
       promoCodes: [],
       avatar: "",
+      city: city || "",
     });
 
     if (insertError) {
