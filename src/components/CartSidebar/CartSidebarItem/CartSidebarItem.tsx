@@ -1,18 +1,16 @@
 import { FC } from "react";
 import Image from "next/image";
-
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem } from "@/store/slices/cartSlice";
-
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
-
 import { Item } from "@/types/item";
 
 import "./CartSidebarItem.scss";
 
 const CartSidebarItem: FC<Item> = ({
   id,
+  instanceId,
   name_ru,
   image,
   price_rub,
@@ -20,24 +18,18 @@ const CartSidebarItem: FC<Item> = ({
   count,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-
   const activated = useSelector((state: RootState) => state.promo.activated);
 
   const { discount, hasDiscount } = getDiscountedPrice(activated, price_rub);
   const discountedPrice = Math.round(price_rub * (1 - discount / 100));
+  const iid = instanceId ?? String(id);
 
-  // Прибавить товар +1
   const onClickPlus = () => {
-    dispatch(
-      addItem({
-        id,
-      } as Item)
-    );
+    dispatch(addItem({ id, instanceId: iid } as Item));
   };
 
-  // Убавить товар -1
   const onClickMinus = () => {
-    dispatch(minusItem(id));
+    dispatch(minusItem(iid));
   };
 
   return (

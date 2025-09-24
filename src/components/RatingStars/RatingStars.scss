@@ -1,0 +1,20 @@
+.rating-stars {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.star-btn {
+  border: none;
+  background: transparent;
+  padding: 0px;
+  line-height: 1;
+  font-size: 22px;
+  color: #ffab08;
+}
+
+.star-count {
+  font-size: 13px;
+  color: #666;
+  margin-left: 4px;
+}

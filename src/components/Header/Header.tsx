@@ -23,9 +23,9 @@ import cartIcon from "@/assets/icons/cart-icon.svg";
 import "./Header.scss";
 
 const Header = () => {
-  const [showDropdown, setShowDropdown] = useState(false); // Dropdown menu при клике на user
-  const dropdownRef = useRef<HTMLDivElement>(null); // Ref для меню
-  const profileButtonRef = useRef<HTMLButtonElement>(null); // Ref для кнопки профиля
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
   const { items } = useSelector((state: RootState) => state.cart);

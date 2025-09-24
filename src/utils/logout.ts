@@ -7,6 +7,7 @@ import { AppDispatch, RootState, store, persistor } from "@/store/store";
 import { resetCart } from "@/store/slices/cartSlice";
 import { resetPromos } from "@/store/slices/promoSlice";
 import { resetUser, setGeoCity } from "@/store/slices/userSlice";
+import { resetMeta } from "@/store/slices/productMetaSlice";
 
 import { DEFAULT_AVATAR, DEFAULT_PROMOS } from "@/constants/defaults";
 
@@ -54,6 +55,7 @@ export const logout = async (
     dispatch(resetCart());
     dispatch(resetPromos());
     dispatch(resetUser());
+    dispatch(resetMeta());
 
     // Убеждаемся, что всё очищено
     await persistor.flush();

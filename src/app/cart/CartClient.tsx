@@ -1,3 +1,5 @@
+//app/cart/CartClient.tsx -
+
 "use client";
 
 import Image from "next/image";
@@ -21,7 +23,7 @@ import "./cartPage.scss";
 export default function CartClient() {
   const { items } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch<AppDispatch>();
-  const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1000); // Задержка загрузки в 1 секунду
@@ -54,7 +56,9 @@ export default function CartClient() {
               ? [...new Array(3)].map((_, index) => (
                   <CartPageItemSkeleton key={index} />
                 ))
-              : items.map((item) => <CartPageItem key={item.id} {...item} />)}
+              : items.map((item) => (
+                  <CartPageItem key={item.instanceId} {...item} />
+                ))}
           </ul>
         ) : (
           <Image

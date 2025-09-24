@@ -4,4 +4,5 @@ export interface FoodCardProps {
   name_ru: string;
   price_rub: number;
   size: number;
+  instanceId?: string;
 }

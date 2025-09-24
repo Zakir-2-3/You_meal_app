@@ -1,0 +1,130 @@
+.sort-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0px 0 16px;
+  flex-wrap: wrap;
+
+  &__label {
+    font-size: 14px;
+    color: #444;
+  }
+
+  &__dropdown {
+    position: relative;
+    min-width: 180px;
+  }
+
+  &__toggle {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    background: #fff;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__arrow {
+    transition: transform 0.3s ease;
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    z-index: 1000;
+    transform-origin: top;
+    max-height: 0;
+    transform: scaleY(0);
+    opacity: 0;
+    transition:
+      max-height 0.35s ease,
+      transform 0.35s ease,
+      opacity 0.25s ease 0.1s;
+    -webkit-transition:
+      max-height 0.35s ease,
+      transform 0.35s ease,
+      opacity 0.25s ease 0.1s;
+    -moz-transition:
+      max-height 0.35s ease,
+      transform 0.35s ease,
+      opacity 0.25s ease 0.1s;
+    -ms-transition:
+      max-height 0.35s ease,
+      transform 0.35s ease,
+      opacity 0.25s ease 0.1s;
+    -o-transition:
+      max-height 0.35s ease,
+      transform 0.35s ease,
+      opacity 0.25s ease 0.1s;
+    pointer-events: none;
+    &--open {
+      max-height: 500px;
+      transform: scaleY(1);
+      opacity: 1;
+      transition:
+        max-height 0.35s ease,
+        transform 0.35s ease,
+        opacity 0.2s ease;
+      pointer-events: auto;
+    }
+  }
+
+  &__option {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #fafafa;
+    }
+
+    &--active {
+      font-weight: 600;
+      background: #f5f5f5;
+      &:hover {
+        background: #f5f5f5;
+      }
+    }
+
+    &:not(:last-child) {
+      box-shadow: inset 0px -1px 0px 0px #dddddd;
+    }
+  }
+
+  &__dir {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  &__dir-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    background: #fff;
+    transition: background 0.2s;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    &--active {
+      background: #f2f2f2;
+    }
+  }
+}

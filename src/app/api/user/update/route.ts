@@ -3,7 +3,16 @@ import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, cart, balance, promoCodes, avatar, city } = await req.json();
+    const {
+      email,
+      cart,
+      balance,
+      promoCodes,
+      avatar,
+      city,
+      ratings,
+      favorites,
+    } = await req.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -11,6 +20,7 @@ export async function POST(req: NextRequest) {
 
     const updateData: Record<string, any> = {};
 
+    // Основные данные
     if (Array.isArray(cart)) updateData.cart = cart;
     if (typeof balance === "number") updateData.balance = balance;
     if (promoCodes && typeof promoCodes === "object")
@@ -18,6 +28,22 @@ export async function POST(req: NextRequest) {
     if (typeof avatar === "string" && avatar.length > 0)
       updateData.avatar = avatar;
     if (typeof city === "string" && city.length > 0) updateData.city = city;
+
+    // Метаданные продуктов
+    if (ratings && typeof ratings === "object") {
+      updateData.ratings = ratings;
+    }
+    if (Array.isArray(favorites)) {
+      updateData.favorites = favorites;
+    }
+
+    // Проверка, есть ли что обновлять
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: "No valid data provided for update" },
+        { status: 400 }
+      );
+    }
 
     const { error } = await supabase
       .from("users")

@@ -16,84 +16,84 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addItem(state, action: PayloadAction<Item>) {
-      // Подсчитываем общее количество всех товаров в корзине
+      const payload = action.payload;
+      const iid = payload.instanceId ?? String(payload.id);
+
       const totalCount = state.items.reduce(
         (sum, obj) => sum + (obj.count ?? 0),
         0
       );
+      if (totalCount >= 99) return;
 
-      // Если общее количество уже 99, не даём добавить новый товар
-      if (totalCount >= 99) {
-        return;
-      }
-
-      // Ищем похожий товар в items по Id при клике на него.
-      const findItem = state.items.find((obj) => obj.id === action.payload.id);
+      const findItem = state.items.find(
+        (obj) => (obj.instanceId ?? String(obj.id)) === iid
+      );
 
       if (findItem) {
-        // Если count у этого товара < 99, увеличиваем
         if (findItem.count === 99) return;
-        // Если count уже существует — увеличиваем
         findItem.count = (findItem.count ?? 1) + 1;
       } else {
-        // Если товара нет, но общее количество позволяет, создаём его
         state.items.push({
-          ...action.payload,
+          ...payload,
+          instanceId: iid,
           count: 1,
         });
-
-        if (!state.savedDate) {
-          state.savedDate = formatDate();
-        }
+        if (!state.savedDate) state.savedDate = formatDate();
       }
 
-      // Пересчитываем общую сумму
       state.totalPrice = calcTotalPrice(state.items);
     },
 
-    minusItem(state, action: PayloadAction<number>) {
-      const findItem = state.items.find((obj) => obj.id === action.payload);
+    minusItem(state, action: PayloadAction<string>) {
+      const iid = action.payload;
+      const findItem = state.items.find(
+        (obj) => (obj.instanceId ?? String(obj.id)) === iid
+      );
 
       if (findItem) {
         if ((findItem.count ?? 0) > 1) {
           findItem.count = (findItem.count ?? 1) - 1;
         } else {
-          state.items = state.items.filter((obj) => obj.id !== action.payload);
+          state.items = state.items.filter(
+            (obj) => (obj.instanceId ?? String(obj.id)) !== iid
+          );
         }
       }
 
-      // Если корзина пуста, сбрасываем дату
       if (state.items.length === 0) {
         state.savedDate = null;
       }
-
-      // Пересчитываем общую сумму
-      state.totalPrice = state.totalPrice = calcTotalPrice(state.items);
+      state.totalPrice = calcTotalPrice(state.items);
     },
 
-    removeItem(state, action: PayloadAction<number>) {
-      state.items = state.items.filter((obj) => obj.id !== action.payload);
+    removeItem(state, action: PayloadAction<string>) {
+      const iid = action.payload;
+      state.items = state.items.filter(
+        (obj) => (obj.instanceId ?? String(obj.id)) !== iid
+      );
 
-      // Если корзина пуста, сбрасываем дату
       if (state.items.length === 0) {
         state.savedDate = null;
       }
-
-      // Пересчитываем общую сумму
-      state.totalPrice = state.totalPrice = calcTotalPrice(state.items);
+      state.totalPrice = calcTotalPrice(state.items);
     },
+
     clearItems(state) {
-      state.items = []; // Очищаем всё
-      state.totalPrice = 0; // Очищаем общую сумму
-      state.savedDate = null; // Очищаем дату при очистке корзины
+      state.items = [];
+      state.totalPrice = 0;
+      state.savedDate = null;
     },
+
     setItems(state, action: PayloadAction<Item[]>) {
       state.items = action.payload;
       state.totalPrice = calcTotalPrice(state.items);
       state.savedDate = state.items.length > 0 ? formatDate() : null;
     },
-    resetCart: (state) => {
+
+    resetCart(state) {
       state.items = [];
+      state.totalPrice = 0;
+      state.savedDate = null;
     },
   },
 });

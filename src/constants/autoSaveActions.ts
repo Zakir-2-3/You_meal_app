@@ -1,5 +1,4 @@
 // Список экшенов для автосохранения -
-
 export const AUTO_SAVE_ACTIONS = [
   "cart/addItem",
   "promo/deletePromo",
@@ -10,4 +9,6 @@ export const AUTO_SAVE_ACTIONS = [
   "promo/removePromo",
   "user/setBalance",
   "user/setAvatarUrl",
+  "productMeta/setRating",
+  "productMeta/toggleFavorite",
 ];

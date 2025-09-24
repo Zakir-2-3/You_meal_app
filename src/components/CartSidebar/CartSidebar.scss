@@ -83,19 +83,16 @@
       font-size: 16px;
       background-color: #ff7020;
       font-weight: 400;
-      border-radius: 12px;
-      -webkit-border-radius: 12px;
-      -moz-border-radius: 12px;
-      -ms-border-radius: 12px;
-      -o-border-radius: 12px;
+      border-radius: 10px;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      -ms-border-radius: 10px;
+      -o-border-radius: 10px;
       transition: all 0.2s ease-in;
       -webkit-transition: all 0.2s ease-in;
       -moz-transition: all 0.2s ease-in;
       -ms-transition: all 0.2s ease-in;
       -o-transition: all 0.2s ease-in;
-    }
-    & a:hover {
-      background-color: #ffab08;
     }
   }
   &__delivery {

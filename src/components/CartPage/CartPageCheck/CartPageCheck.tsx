@@ -72,7 +72,7 @@ const CartPageCheck: FC = () => {
             {items.map((item) => {
               const totalPrice = item.price_rub * (item.count ?? 0);
               return (
-                <li key={item.id}>
+                <li key={item.instanceId}>
                   <span>{item.count}</span>
                   <span>{item.name_ru}</span>
                   <span>{roundUp(totalPrice)}₽</span>

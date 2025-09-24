@@ -1,19 +1,17 @@
 import { FC } from "react";
 import Image from "next/image";
-
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
-
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
-
 import { Item } from "@/types/item";
 
 import "./CartPageItem.scss";
 
 const CartPageItem: FC<Item> = ({
   id,
+  instanceId,
   name_ru,
   image,
   price_rub,
@@ -24,21 +22,18 @@ const CartPageItem: FC<Item> = ({
   const { activated } = useSelector((state: RootState) => state.promo);
   const { items } = useSelector((state: RootState) => state.cart);
 
-  // Считаем общую сумму корзины (до скидок)
+  const iid = instanceId ?? String(id);
+
   const totalCartPrice = items.reduce(
     (sum, item) => sum + item.price_rub * (item.count ?? 0),
     0
   );
-
-  // Общая сумма за позицию
   const itemTotal = price_rub * (count ?? 0);
 
-  // Применяем скидку ко всей сумме позиции
   const { discount, hasDiscount } = getDiscountedPrice(
     activated,
     totalCartPrice
   );
-
   const discountedItemTotal = Math.round(itemTotal * (1 - discount / 100));
 
   const formattedPrice = new Intl.NumberFormat("ru-RU").format(itemTotal);
@@ -47,15 +42,15 @@ const CartPageItem: FC<Item> = ({
   );
 
   const onClickPlus = () => {
-    dispatch(addItem({ id } as Item));
+    dispatch(addItem({ id, instanceId: iid } as Item));
   };
 
   const onClickMinus = () => {
-    dispatch(minusItem(id));
+    dispatch(minusItem(iid));
   };
 
   const onClickRemove = () => {
-    dispatch(removeItem(id));
+    dispatch(removeItem(iid));
   };
 
   return (

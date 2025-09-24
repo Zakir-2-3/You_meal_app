@@ -67,7 +67,9 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
               Пустая корзина :(
             </li>
           ) : (
-            items.map((item) => <CartSidebarItem key={item.id} {...item} />)
+            items.map((item) => (
+              <CartSidebarItem key={item.instanceId} {...item} />
+            ))
           )}
         </ul>
       </div>

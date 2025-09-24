@@ -24,14 +24,6 @@
     flex-flow: row wrap;
     gap: 30px;
     margin-bottom: 60px;
-    & svg {
-      border: 3px solid #f3f3f3;
-      border-radius: 18px;
-      -webkit-border-radius: 18px;
-      -moz-border-radius: 18px;
-      -ms-border-radius: 18px;
-      -o-border-radius: 18px;
-    }
   }
   &__empty {
     display: flex;
@@ -54,17 +46,22 @@
     background-color: #ff7020;
     font-size: 16px;
     font-weight: 400;
-    border-radius: 12px;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    -ms-border-radius: 12px;
-    -o-border-radius: 12px;
-    transition: 0.1s ease-in-out;
-    -webkit-transition: 0.1s ease-in-out;
-    -moz-transition: 0.1s ease-in-out;
-    -ms-transition: 0.1s ease-in-out;
-    -o-transition: 0.1s ease-in-out;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
     will-change: transform;
+    transition:
+      transform 0.15s ease,
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &--nudge {
+      animation:
+        nudge-shake 220ms ease,
+        nudge-flash 320ms ease;
+    }
     &:hover {
       font-weight: 600;
       box-shadow: 0px 4px 0px 0px #e0621c;
@@ -79,8 +76,13 @@
 
 .food-card-animated-wrapper {
   opacity: 0;
-  transform: translateY(20px);
   animation: fadeInUp 0.4s ease forwards;
+  -webkit-animation: fadeInUp 0.4s ease forwards;
+  transform: translateY(20px);
+  -webkit-transform: translateY(20px);
+  -moz-transform: translateY(20px);
+  -ms-transform: translateY(20px);
+  -o-transform: translateY(20px);
 }
 
 @keyframes fadeInUp {
@@ -88,4 +90,52 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes nudge-shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes nudge-flash {
+  0% {
+    background-color: #ff7020;
+    box-shadow: none;
+  }
+  50% {
+    background-color: #ff3b3b;
+    box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3) inset;
+  }
+  100% {
+    background-color: #ff7020;
+    box-shadow: none;
+  }
+}
+
+.food-card-just-added {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.food-card-just-added-fast {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.35s ease forwards;
 }

@@ -12,7 +12,6 @@ import "./FoodCategories.scss";
 // Оптимизируем категории, чтобы не рендерилась много раз
 const FoodCategories: FC = React.memo(() => {
   const dispatch = useDispatch<AppDispatch>();
-  // Активных индекс категории
   const activeIndex = useSelector(
     (state: RootState) => state.category.activeIndex
   );

@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import type { AuthOptions } from "next-auth";
 import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
 
-// Создаём Supabase client с SERVER ключами
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!

@@ -1,5 +1,6 @@
 export interface Item {
   id: number;
+  instanceId?: string;
   image: string;
   name_ru: string;
   price_rub: number;

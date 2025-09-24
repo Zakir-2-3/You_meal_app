@@ -41,7 +41,7 @@ export const passwordValidation = {
 
 export const optionalPasswordValidation = {
   validate: (value: string) => {
-    if (!value) return true; // если пусто — валидно
+    if (!value) return true;
     const password = String(value).trim();
     if (password.length < 5) return FORM_ERRORS.PASSWORD_MIN_LENGTH;
     if (/^\d/.test(password)) return FORM_ERRORS.PASSWORD_STARTS_WITH_NUMBER;
@@ -54,7 +54,7 @@ export const optionalPasswordValidation = {
 export const repeatPasswordValidation = (watchFn: () => string) => ({
   validate: (val: string) => {
     const newPassword = watchFn();
-    if (!val) return true; // Если пустое — валидно
+    if (!val) return true;
     return val === newPassword || "Пароли не совпадают";
   },
 });

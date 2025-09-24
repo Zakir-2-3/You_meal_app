@@ -43,9 +43,9 @@ const Footer = () => {
         </div>
         <div className="footer__number">
           <p>Номер для заказа</p>
-          <Link href="tel:+79308333811">
+          <Link href="tel:+79333333911">
             <Image src={phoneIcon} alt="phone-icon" width={24} height={24} />
-            +7 (930) 833-38-11
+            +7 (933) 333-39-11
           </Link>
         </div>
         <div className="footer__social">

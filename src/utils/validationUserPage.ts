@@ -5,7 +5,7 @@ export const nameEditValidation = {
     const trimmed = value.trim();
 
     if (!value) return true;
-    if (trimmed.length === 0) return FORM_ERRORS.NAME_INVALID; // только пробелы
+    if (trimmed.length === 0) return FORM_ERRORS.NAME_INVALID;
     if (trimmed.length < 2) return "Имя должно быть не менее 2 символов";
     if (!/^[A-Za-zА-Яа-яЁё\s-]+$/.test(trimmed))
       return FORM_ERRORS.NAME_INVALID;

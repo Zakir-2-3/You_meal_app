@@ -2,44 +2,70 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  try {
+    const { email } = await req.json();
+    console.log("Sync request for email:", email);
 
-  if (body.type === "load") {
-    const { data, error } = await supabase
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Проверяем, есть ли user
+    const { data: userRow, error: findErr } = await supabase
       .from("users")
-      .select("cart, promoCodes, balance, avatar")
-      .eq("email", body.email)
-      .single();
+      .select("id, favorites, ratings, email")
+      .eq("email", email)
+      .maybeSingle();
 
-    if (error || !data) {
-      console.warn(
-        "Пользователь не найден или ошибка при загрузке:",
-        error?.message
-      );
+    if (findErr) {
+      console.error("fetch user error:", findErr);
       return NextResponse.json(
-        { cart: [], promoCodes: [], balance: 0, avatar: null },
-        { status: 200 }
+        { error: "Failed to fetch user" },
+        { status: 500 }
       );
     }
 
-    return NextResponse.json(data);
-  }
+    console.log("User found in sync:", userRow);
 
-  if (body.type === "save") {
-    const { email, cart, promoCodes, balance, avatar } = body;
+    // Если тет строки, то создаём новую с пустыми данными
+    if (!userRow) {
+      console.log("Creating new user record for sync");
+      const { error: insertErr } = await supabase.from("users").insert({
+        email,
+        favorites: [],
+        ratings: {},
+      });
 
-    const { error } = await supabase
-      .from("users")
-      .update({ cart, promoCodes, balance, avatar })
-      .eq("email", email);
+      if (insertErr) {
+        console.error("insert user error:", insertErr);
+        return NextResponse.json(
+          { error: "Failed to create user" },
+          { status: 500 }
+        );
+      }
 
-    if (error) {
-      console.error("Ошибка сохранения данных:", error);
-      return NextResponse.json({ error: "Ошибка сохранения" }, { status: 500 });
+      return NextResponse.json({
+        favorites: [],
+        ratings: {},
+      });
     }
 
-    return NextResponse.json({ success: true });
-  }
+    // Если есть строка, то возвращаем то, что в базе (канон)
+    const responseData = {
+      favorites: Array.isArray(userRow.favorites) ? userRow.favorites : [],
+      ratings:
+        userRow.ratings && typeof userRow.ratings === "object"
+          ? userRow.ratings
+          : {},
+    };
 
-  return NextResponse.json({ error: "Неверный тип запроса" }, { status: 400 });
+    console.log("Returning sync data:", responseData);
+    return NextResponse.json(responseData);
+  } catch (e) {
+    console.error("sync route error:", e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

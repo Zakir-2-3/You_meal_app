@@ -15,10 +15,10 @@ interface FoodCategoriesSearchProps {
 const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
   setSearchValue,
 }) => {
-  const [value, setValue] = useState(""); // Локальный state для input
-  const inputRef = useRef<HTMLInputElement>(null); // input поиска
-  const searchRef = useRef<HTMLDivElement>(null); // div поиска
-  const [searchClick, setSearchClick] = useState(false); // Флаг активности поиска
+  const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [searchClick, setSearchClick] = useState(false);
 
   // Фокус в инпуте при клике на поиск
   useEffect(() => {

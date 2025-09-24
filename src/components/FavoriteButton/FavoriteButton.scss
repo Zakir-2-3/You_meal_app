@@ -1,0 +1,25 @@
+.product-section__favorite-icon path {
+  transition:
+    fill 0.3s ease,
+    d 0.3s ease;
+}
+
+.product-section__favorite-icon:hover path {
+  fill: rgba(255, 68, 68, 0.3);
+  d: path(
+    "M12 23.2l-.6-.5C8.7 20.7 0 13.5 0 7.3 0 3.8 2.9 1 6.5 1c2.2 0 4.3 1.1 5.5 2.9C13.2 2.1 15.3 1 17.5 1 21.1 1 24 3.8 24 7.3c0 6.3-8.7 13.4-11.4 15.5l-.6.4z"
+  );
+}
+
+.product-section__favorite-icon--active path {
+  fill: #ff4444;
+}
+
+.product-section__favorite-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}

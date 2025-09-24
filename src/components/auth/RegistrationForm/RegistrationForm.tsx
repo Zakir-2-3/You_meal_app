@@ -28,6 +28,8 @@ import SetNewPasswordForm from "../SetNewPasswordForm/SetNewPasswordForm";
 
 import { useResendTimer } from "@/hooks/useResendTimer";
 
+import { syncUserMetaIfAuth } from "@/utils/syncUserMeta";
+
 import { DEFAULT_AVATAR } from "@/constants/defaults";
 
 import { RegForm } from "@/types/regForm";
@@ -37,6 +39,7 @@ import CloseButton from "@/ui/buttons/CloseButton";
 import notFoundImg from "@/assets/images/not-found-img.png";
 
 import "./RegistrationForm.scss";
+import { RootState, store } from "@/store/store";
 
 const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -239,13 +242,17 @@ const RegistrationForm = () => {
         throw new Error("Код неверен");
       }
 
-      toast.success("Регистрация успешна!");
+      toast.success("Успешная регистрация");
       dispatch(setAuthStatus(true));
 
       localStorage.removeItem("hasLoggedOut");
 
       // Загружаем актуальные данные пользователя из Supabase
       await loadUserData(localEmail);
+
+      // Загружаем рейтинг и избранные
+      await dispatch(syncUserMetaIfAuth());
+
       dispatch(activeRegForm(false));
     } catch {
       toast.error("Неверный код или ошибка сервера");
@@ -272,9 +279,33 @@ const RegistrationForm = () => {
         return;
       }
 
-      dispatch(setItems(data.cart || []));
+      const localCart = (store.getState() as RootState).cart.items;
+
+      if (!data.cart || data.cart.length === 0) {
+        if (localCart.length > 0) {
+          // Заливаем локальные данные в Supabase
+          await fetch("/api/user/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              cart: localCart,
+            }),
+          });
+
+          dispatch(setItems(localCart));
+          console.log("Локальная корзина перенесена в Supabase:", localCart);
+        } else {
+          dispatch(setItems([]));
+        }
+      } else {
+        dispatch(setItems(data.cart));
+      }
+
       dispatch(setPromoCodes(data.promoCodes || []));
+
       dispatch(setBalance(data.balance || 0));
+
       dispatch(setAvatarUrl(data.avatar || DEFAULT_AVATAR));
 
       if (data.city) {
