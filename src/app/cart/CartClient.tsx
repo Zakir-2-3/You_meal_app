@@ -1,17 +1,15 @@
-//app/cart/CartClient.tsx -
-
 "use client";
 
 import Image from "next/image";
-
 import { useEffect, useState } from "react";
-
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { clearItems } from "@/store/slices/cartSlice";
+import { clearTips } from "@/store/slices/tipsSlice";
 
 import CartPageItem from "@/components/CartPage/CartPageItem/CartPageItem";
 import CartPageCheck from "@/components/CartPage/CartPageCheck/CartPageCheck";
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
 import CartPageItemSkeleton from "@/ui/skeletons/CartPageItemSkeleton";
 
@@ -21,17 +19,86 @@ import emptyCartImg from "@/assets/images/empty-cart-img.png";
 import "./cartPage.scss";
 
 export default function CartClient() {
-  const { items } = useSelector((state: RootState) => state.cart);
-  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(true);
+  const [popup, setPopup] = useState<null | {
+    type: "auth" | "success";
+    orderNumber?: number;
+  }>(null);
+
+  const { items, totalPrice } = useSelector((state: RootState) => state.cart);
+  const activated = useSelector((state: RootState) => state.promo.activated);
+  const { percentage: tipsPercent } = useSelector((s: RootState) => s.tips);
+  const { isAuth, email } = useSelector((s: RootState) => s.user);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 1000); // Задержка загрузки в 1 секунду
+    setTimeout(() => setIsLoading(false), 1000);
   }, []);
 
   const onClickClearCart = () => {
     if (items.length > 0) {
       window.confirm("Очистить корзину ?") && dispatch(clearItems());
+      dispatch(clearTips());
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (!isAuth || !email) {
+      setPopup({ type: "auth" });
+      return;
+    }
+
+    try {
+      // Чистый счёт (без скидок)
+      const rawTotal = items.reduce(
+        (sum, item) => sum + item.price_rub * (item.count ?? 0),
+        0
+      );
+
+      // Считаем скидку
+      const { discount } = getDiscountedPrice(activated, rawTotal);
+      const discountedTotal = Math.round(rawTotal * (1 - discount / 100));
+
+      // Сколько сэкономили
+      const savedMoney = rawTotal - discountedTotal;
+
+      // НДС и чаевые
+      const vat = Math.round(discountedTotal * 0.05);
+      const tips = Math.round((discountedTotal + vat) * tipsPercent);
+
+      // Итог
+      const finalTotal = discountedTotal + vat + tips;
+
+      // Отправляем в API все данные
+      const res = await fetch("/api/user/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          items,
+          rawTotal, // чистый счёт
+          discount,
+          savedMoney, // сколько сэкономили
+          vat,
+          tips,
+          tipsPercent: tipsPercent * 100,
+          finalTotal,
+          activated,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        dispatch(clearItems());
+        dispatch(clearTips());
+        setPopup({ type: "success", orderNumber: data.orderNumber });
+      } else {
+        console.error("Ошибка заказа:", data.error);
+      }
+    } catch (err) {
+      console.error("Ошибка:", err);
     }
   };
 
@@ -75,7 +142,42 @@ export default function CartClient() {
         <div className="cart-page-section__total-price">
           <CartPageCheck />
         </div>
-        <button className="cart-page-section__pay-btn">Оформить заказ</button>
+        <button onClick={handleCheckout} className="cart-page-section__pay-btn">
+          Оформить заказ
+        </button>
+
+        {popup?.type === "auth" && (
+          <div className="popup">
+            <div className="popup__content">
+              <p>
+                Чтобы оформить заказ, пожалуйста, войдите или зарегистрируйтесь.
+              </p>
+              <button
+                className="popup__content-button"
+                onClick={() => setPopup(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
+        {popup?.type === "success" && (
+          <div className="popup">
+            <div className="popup__content">
+              <p>
+                Ваш заказ №{popup.orderNumber} оформлен 🎉
+                <br />
+                Подтверждение отправлено на почту.
+              </p>
+              <button
+                className="popup__content-button"
+                onClick={() => setPopup(null)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

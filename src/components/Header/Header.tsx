@@ -10,15 +10,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { activeRegForm } from "@/store/slices/userSlice";
 
-import GeoLocationSelector from "../GeoLocationSelector/GeoLocationSelector";
 import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
+import GeoLocationSelector from "../GeoLocationSelector/GeoLocationSelector";
 
 import { validRoutes } from "@/constants/validRoutes";
 
+import cartIcon from "@/assets/icons/cart-icon.svg";
 import headerLogo from "@/assets/images/header-logo.png";
 import profileLoginIcon from "@/assets/icons/login-profile-icon.svg";
 import profileLogoutIcon from "@/assets/icons/logout-profile-icon.svg";
-import cartIcon from "@/assets/icons/cart-icon.svg";
 
 import "./Header.scss";
 

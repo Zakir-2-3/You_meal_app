@@ -1,4 +1,5 @@
 import { FC } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -50,7 +51,7 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
   return (
     <aside className="cart-sidebar">
       <div className="cart-sidebar__total-orders">
-        <h2>Корзина</h2>
+        <h2 className="cart-sidebar__title">Корзина</h2>
         <span style={{ color: totalCount === 99 ? "red" : "inherit" }}>
           {totalCount}
         </span>
@@ -76,16 +77,26 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
 
       <div className="cart-sidebar__total-price">
         <p>Итого:</p>
+
         <div className="cart-sidebar__total-price-wrapper">
           {items.length > 0 && rawTotal !== discountedTotal && (
-            <span className="old-price">{formattedRawTotalPrice} ₽</span>
+            <span
+              className="old-price"
+              title={`Скидка: ${activated.join(", ")}`}
+            >
+              {formattedRawTotalPrice}₽
+            </span>
           )}
           <span
-            className={`discounted-price ${
-              activated.length === 0 || items.length === 0 ? "no-discount" : ""
-            }`}
+            className={
+              activated.length > 0 &&
+              items.length > 0 &&
+              rawTotal !== discountedTotal
+                ? "discounted-price"
+                : "no-discount"
+            }
           >
-            {formattedDiscountedTotalPrice} ₽
+            {formattedDiscountedTotalPrice}₽
           </span>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
 
 import { useDispatch, useSelector } from "react-redux";
+import { RootState, store } from "@/store/store";
 import { setItems } from "@/store/slices/cartSlice";
 import { setPromoCodes } from "@/store/slices/promoSlice";
 import { setBalance, setGeoCity } from "@/store/slices/userSlice";
@@ -39,7 +40,6 @@ import CloseButton from "@/ui/buttons/CloseButton";
 import notFoundImg from "@/assets/images/not-found-img.png";
 
 import "./RegistrationForm.scss";
-import { RootState, store } from "@/store/store";
 
 const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);

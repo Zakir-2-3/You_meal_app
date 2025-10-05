@@ -559,7 +559,7 @@ export default function UserPage() {
               </button>
               {isGoogleUser && (
                 <p className="personal-account__hint">
-                  Редактирование недоступно в Google-аккаунте
+                  Редактирование данных недоступно в Google-аккаунте
                 </p>
               )}
             </div>
@@ -608,7 +608,7 @@ export default function UserPage() {
                     const value = e.target.value;
                     setPromoInput(value);
 
-                    if (value.length > 17) {
+                    if (value.length > 10) {
                       setPromoError("Слишком длинный промокод.");
                     } else {
                       setPromoError("");

@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "@/components/Header/Header";
 import RegistrationForm from "@/components/auth/RegistrationForm/RegistrationForm";
 import Footer from "@/components/Footer/Footer";
+import ScrollToTop from "@/components/ScrollToTop/ScrollToTop";
 
 import "@/styles/reset.css";
 import "@/styles/globals.scss";
@@ -49,6 +50,7 @@ export default function RootLayout({
             draggable // Возможность перетаскивать тосты
             pauseOnHover // Пауза при наведении
           />
+          <ScrollToTop />
         </AppProvider>
       </body>
     </html>

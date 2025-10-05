@@ -1,6 +1,6 @@
 import { AppThunk } from "@/store/store";
-import { hydrateMeta, setMetaSynced } from "@/store/slices/productMetaSlice";
 import { persistor } from "@/store/store";
+import { hydrateMeta, setMetaSynced } from "@/store/slices/productMetaSlice";
 
 export const syncUserMetaIfAuth = (): AppThunk<
   Promise<{ favorites: string[]; ratings: Record<string, number> } | null>

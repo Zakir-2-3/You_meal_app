@@ -31,10 +31,17 @@
     justify-content: flex-start;
     gap: 0 8px;
     font-size: 18px;
+    & span:nth-child(2) {
+      display: block;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     & span:nth-child(3) {
       margin-left: auto;
-      color: #e53935;
-      font-weight: bold;
+      font-weight: 500;
     }
   }
   &::-webkit-scrollbar {
@@ -73,9 +80,12 @@
     font-size: 16px;
   }
   & p:nth-child(2) {
-    color: red;
+    color: #ff8000;
   }
   & p:nth-child(3) {
+    color: red;
+  }
+  & p:nth-child(4) {
     font-weight: 600;
     color: green;
   }
@@ -88,7 +98,7 @@
 }
 
 .total-price-thank {
-  margin: 16px 0 14px;
+  margin: 16px 0 12px;
   font-size: 13px;
 }
 
@@ -122,11 +132,6 @@
     -o-transition: all 0.1s ease-in-out;
     &:hover,
     &--active {
-      transform: translateY(-1px);
-      -webkit-transform: translateY(-1px);
-      -moz-transform: translateY(-1px);
-      -ms-transform: translateY(-1px);
-      -o-transform: translateY(-1px);
       color: green;
       border-bottom: 1px solid green;
       cursor: pointer;

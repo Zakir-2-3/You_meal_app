@@ -1,5 +1,6 @@
-import { Item } from "@/types/item";
 import { SortBy, SortDir } from "@/store/slices/productMetaSlice";
+
+import { Item } from "@/types/item";
 
 const cmpNumber = (a: number, b: number) => (a === b ? 0 : a < b ? -1 : 1);
 

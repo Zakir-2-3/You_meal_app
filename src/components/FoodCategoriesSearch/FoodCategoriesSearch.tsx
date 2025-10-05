@@ -1,4 +1,5 @@
 import { FC, useRef, useCallback, useState, useEffect } from "react";
+
 import Image from "next/image";
 
 import debounce from "lodash.debounce";

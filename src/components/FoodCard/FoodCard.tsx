@@ -1,16 +1,21 @@
 "use client";
 
 import { FC, useCallback } from "react";
+
 import Link from "next/link";
 import Image from "next/image";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, removeItem } from "@/store/slices/cartSlice";
-import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
-import { FoodCardProps } from "@/types/foodCard";
+import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
+
 import FavoriteButton from "../FavoriteButton/FavoriteButton";
 import RatingStars from "../RatingStars/RatingStars";
-import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
+
+import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { FoodCardProps } from "@/types/foodCard";
 
 import "./FoodCard.scss";
 

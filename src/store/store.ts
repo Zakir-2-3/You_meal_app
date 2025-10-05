@@ -19,6 +19,7 @@ import {
 
 import categoryReducer from "./slices/categorySlice";
 import cartReducer from "./slices/cartSlice";
+import tipsReducer from "./slices/tipsSlice";
 import userReducer from "./slices/userSlice";
 import promoReducer from "./slices/promoSlice";
 import productMetaReducer from "./slices/productMetaSlice";
@@ -27,6 +28,7 @@ import { autoSaveMiddleware } from "./middleware/autoSaveMiddleware";
 
 const rootReducer = combineReducers({
   cart: cartReducer,
+  tips: tipsReducer,
   user: userReducer,
   promo: promoReducer,
   category: categoryReducer,
@@ -36,7 +38,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "cart", "promo", "productMeta"],
+  whitelist: ["user", "cart", "promo", "productMeta", "tips"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

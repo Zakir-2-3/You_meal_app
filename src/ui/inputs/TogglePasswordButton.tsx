@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { FC } from "react";
+
+import Image from "next/image";
 
 import hidePasswordIcon from "@/assets/icons/hide-password-icon.svg";
 import showPasswordIcon from "@/assets/icons/show-password-icon.svg";

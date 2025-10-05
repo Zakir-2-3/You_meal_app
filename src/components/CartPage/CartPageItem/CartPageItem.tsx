@@ -1,10 +1,15 @@
 import { FC } from "react";
+
 import Image from "next/image";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
+
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
+
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
 import { Item } from "@/types/item";
 
 import "./CartPageItem.scss";
@@ -59,20 +64,25 @@ const CartPageItem: FC<Item> = ({
         <Image src={image} alt={name_ru} width={100} height={100} />
       </div>
       <div className="cart-page-section__description">
-        <h3>{name_ru}</h3>
-        <p>
+        <h3 className="cart-page-section__name">{name_ru}</h3>
+        <div className="cart-page-section__price">
           {hasDiscount ? (
             <>
-              <span className="old-price">{formattedPrice} ₽</span>
+              <span
+                className="old-price"
+                title={`Скидка: ${activated.join(", ")}`}
+              >
+                {formattedPrice} ₽
+              </span>
               <span className="discounted-price">
-                {formattedDiscountedPrice} ₽
+                {formattedDiscountedPrice}₽
               </span>
             </>
           ) : (
-            `${formattedPrice} ₽`
+            `${formattedPrice}₽`
           )}
-        </p>
-        <p>{size}г</p>
+        </div>
+        <div className="cart-page-section__size">{size}г.</div>
       </div>
       <QuantityControl
         count={count}

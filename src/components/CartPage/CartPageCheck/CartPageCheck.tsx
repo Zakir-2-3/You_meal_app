@@ -1,21 +1,27 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { setTips } from "@/store/slices/tipsSlice";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { DEFAULT_PROMOS } from "@/constants/defaults";
 
 import TotalPriceItemListSkeleton from "@/ui/skeletons/TotalPriceItemListSkeleton";
 
 import "./CartPageCheck.scss";
 
-const CartPageCheck: FC = () => {
+const CartPageCheck = () => {
   const { items, savedDate } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
+  const selectedTipPercentage = useSelector(
+    (s: RootState) => s.tips.percentage
+  );
 
-  const [selectedTipPercentage, setSelectedTipPercentage] = useState<number>(0);
+  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(() => items.length > 0);
 
   const roundUp = (num: number) => Math.round(num);
@@ -25,11 +31,24 @@ const CartPageCheck: FC = () => {
     return sum + item.price_rub * (item.count ?? 0);
   }, 0);
 
+  const discountLabels = activated
+    .map((code) => {
+      if (DEFAULT_PROMOS.includes(code)) {
+        if (code === "PromoFirst10") return "10%";
+        if (code === "PromoFrom2020" && rawTotal >= 2000) return "20%";
+        return null; // дефолтный промокод не подошёл
+      }
+      return code; // если ручной, показываем его название
+    })
+    .filter(Boolean);
+
   // Получаем скидку в процентах
   const { discount } = getDiscountedPrice(activated, rawTotal);
 
   // Применяем скидку
   const discountedTotal = roundUp(rawTotal * (1 - discount / 100));
+
+  const savedMoney = rawTotal - discountedTotal;
 
   // НДС
   const vat = roundUp(discountedTotal * 0.05);
@@ -43,11 +62,6 @@ const CartPageCheck: FC = () => {
   // Общая сумма со скидкой, НДС и чаевыми
   const discountedTotalWithTips = baseTotalWithVat + discountedSelectedTip;
 
-  // Альтернативная сумма (если без скидки)
-  const totalWithTips = roundUp(
-    rawTotal * 1.05 + rawTotal * selectedTipPercentage
-  );
-
   useEffect(() => {
     if (items.length > 0) {
       setTimeout(() => setIsLoading(false), 1000);
@@ -56,9 +70,9 @@ const CartPageCheck: FC = () => {
 
   useEffect(() => {
     if (rawTotal === 0) {
-      setSelectedTipPercentage(0);
+      dispatch(setTips(0));
     }
-  }, [rawTotal]);
+  }, [rawTotal, dispatch]);
 
   return (
     <>
@@ -70,12 +84,13 @@ const CartPageCheck: FC = () => {
         ) : (
           <ul>
             {items.map((item) => {
-              const totalPrice = item.price_rub * (item.count ?? 0);
+              const itemTotal = item.price_rub * (item.count ?? 0);
+
               return (
                 <li key={item.instanceId}>
                   <span>{item.count}</span>
                   <span>{item.name_ru}</span>
-                  <span>{roundUp(totalPrice)}₽</span>
+                  <span>{itemTotal}₽</span>
                 </li>
               );
             })}
@@ -85,28 +100,23 @@ const CartPageCheck: FC = () => {
       <div className="total-price-wrapper">
         <p>
           ЧИСТЫЙ СЧЕТ
-          <span>{discountedTotal}₽</span>
+          <span>{rawTotal}₽</span>
         </p>
         <p>
-          НДС (5%)
-          <span>{vat}₽</span>
+          СКИДКА
+          {discountLabels.length > 0 ? `(${discountLabels.join(",")})` : ""}
+          <span>{savedMoney > 0 ? `-${savedMoney}₽` : "0₽"}</span>
+        </p>
+        <p>
+          НДС(5%)
+          <span>
+            {vat === 0 ? "" : "+"}
+            {vat}₽
+          </span>
         </p>
         <p>
           ВСЕГО
-          <span>
-            {activated ? (
-              <>
-                {items.length > 0 && (
-                  <span className="old-price">{totalWithTips}₽</span>
-                )}
-                <span className="discounted-price">
-                  {discountedTotalWithTips}₽
-                </span>
-              </>
-            ) : (
-              `${totalWithTips}₽`
-            )}
-          </span>
+          <span>{discountedTotalWithTips}₽</span>
         </p>
       </div>
       <p className="total-price-thank">THANK YOU FOR VISITING!</p>
@@ -125,11 +135,11 @@ const CartPageCheck: FC = () => {
                 selectedTipPercentage === tip ? "tip-option--active" : ""
               }`}
               onClick={() =>
-                setSelectedTipPercentage((prev) => (prev === tip ? 0 : tip))
+                dispatch(setTips(selectedTipPercentage === tip ? 0 : tip))
               }
               disabled={rawTotal === 0}
             >
-              {tip * 100}% = {tipAmount}₽
+              {tip * 100}% = +{tipAmount}₽
             </button>
           );
         })}

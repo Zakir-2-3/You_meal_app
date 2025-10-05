@@ -1,7 +1,11 @@
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
+
 import { SortBy, SortDir } from "@/store/slices/productMetaSlice";
+
 import { SORT_OPTIONS } from "@/constants/sortOptions";
+
 import "./SortBar.scss";
 
 type Props = {

@@ -1,4 +1,5 @@
 import React from "react";
+
 import Image from "next/image";
 
 import registrationFormCloseBtnIcon from "@/assets/icons/registration-form-close-btn-icon.svg";

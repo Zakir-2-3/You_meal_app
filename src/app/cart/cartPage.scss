@@ -78,6 +78,49 @@
     position: sticky;
     top: 10px;
     max-height: 531px;
+    & .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+
+      &__content {
+        background: #fff;
+        padding: 20px 30px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+        animation: popupFadeIn 0.3s ease;
+
+        & p {
+          line-height: 1.8;
+          font-size: 18px;
+        }
+
+        &-button {
+          margin-top: 15px;
+          padding: 8px 16px;
+          background: #ff8800;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+
+          &:hover {
+            background: #ff6600;
+          }
+        }
+      }
+    }
   }
   &__total-price {
     display: flex;
@@ -121,5 +164,16 @@
       -ms-transform: translate(0px, -5px);
       -o-transform: translate(0px, -5px);
     }
+  }
+}
+
+@keyframes popupFadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }
