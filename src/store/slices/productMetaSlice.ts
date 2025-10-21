@@ -43,13 +43,14 @@ const productMetaSlice = createSlice({
       }
     },
     hydrateMeta(state, action: PayloadAction<Partial<ProductMetaState>>) {
-      // Когда гидратируемся серверными данными — считаем, что metaSynced = true
+      console.log("🔄 hydrateMeta called with:", action.payload);
       if (action.payload.ratings) state.ratings = action.payload.ratings;
       if (action.payload.favorites) state.favorites = action.payload.favorites;
       if (action.payload.sort) state.sort = action.payload.sort;
       state.metaSynced = true;
+      console.log("✅ metaSynced set to:", state.metaSynced);
     },
-    // Явный reset для logout
+    // reset для logout
     resetMeta(state) {
       state.metaSynced = false;
     },

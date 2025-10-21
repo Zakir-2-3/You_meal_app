@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { createClient } from "@supabase/supabase-js";
 import type { AuthOptions } from "next-auth";
+
 import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
 
 const supabase = createClient(

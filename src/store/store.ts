@@ -22,6 +22,7 @@ import cartReducer from "./slices/cartSlice";
 import tipsReducer from "./slices/tipsSlice";
 import userReducer from "./slices/userSlice";
 import promoReducer from "./slices/promoSlice";
+import languageReducer from "./slices/languageSlice";
 import productMetaReducer from "./slices/productMetaSlice";
 
 import { autoSaveMiddleware } from "./middleware/autoSaveMiddleware";
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
   promo: promoReducer,
   category: categoryReducer,
   productMeta: productMetaReducer,
+  language: languageReducer,
 });
 
 const persistConfig = {

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useTransition } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,8 @@ import { RootState } from "@/store/store";
 import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { useTranslate } from "@/hooks/useTranslate";
 
 import CartSidebarItemSkeleton from "@/ui/skeletons/CartSidebarItemSkeleton";
 
@@ -23,6 +25,12 @@ interface CartSidebarProps {
 const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
   const { items } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
+
+  const { t } = useTranslate();
+
+  const { title, emptyCart, total2, discount2Tr } = t.cart;
+  const { checkout } = t.buttons;
+  const { freeShipping, freeShipping2 } = t.deliveryPage;
 
   const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0);
 
@@ -51,7 +59,7 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
   return (
     <aside className="cart-sidebar">
       <div className="cart-sidebar__total-orders">
-        <h2 className="cart-sidebar__title">Корзина</h2>
+        <h2 className="cart-sidebar__title">{title}</h2>
         <span style={{ color: totalCount === 99 ? "red" : "inherit" }}>
           {totalCount}
         </span>
@@ -65,7 +73,7 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
             ))
           ) : items.length === 0 ? (
             <li className="cart-sidebar__item cart-sidebar__item--empty">
-              Пустая корзина :(
+              {emptyCart}
             </li>
           ) : (
             items.map((item) => (
@@ -76,13 +84,13 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
       </div>
 
       <div className="cart-sidebar__total-price">
-        <p>Итого:</p>
+        <p>{total2}</p>
 
         <div className="cart-sidebar__total-price-wrapper">
           {items.length > 0 && rawTotal !== discountedTotal && (
             <span
               className="old-price"
-              title={`Скидка: ${activated.join(", ")}`}
+              title={`${discount2Tr} ${activated.join(", ")}`}
             >
               {formattedRawTotalPrice}₽
             </span>
@@ -102,18 +110,22 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
       </div>
 
       <div className="cart-sidebar__place-order">
-        <Link href="/cart">Оформить заказ</Link>
+        <Link href="/cart">{checkout}</Link>
       </div>
 
       <div className="cart-sidebar__delivery">
-        <Link href="/delivery" className="cart-sidebar__delivery-link">
+        <Link
+          href="/delivery"
+          className="cart-sidebar__delivery-link"
+          title={freeShipping2}
+        >
           <Image
             src={deliveryIcon}
             alt="delivery-icon"
             width={24}
             height={24}
           />
-          Бесплатная доставка*
+          {freeShipping}
         </Link>
       </div>
     </aside>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+
 import Image from "next/image";
 
 import Cropper from "react-easy-crop";
@@ -11,9 +12,11 @@ import { setAvatarUrl } from "@/store/slices/userSlice";
 
 import { getCroppedImg } from "@/utils/cropImage";
 
-import { supabase } from "@/lib/supabaseClient";
+import { useTranslate } from "@/hooks/useTranslate";
 
 import { DEFAULT_AVATAR } from "@/constants/defaults";
+
+import { supabase } from "@/lib/supabaseClient";
 
 import CloseButton from "@/ui/buttons/CloseButton";
 
@@ -43,6 +46,12 @@ function AvatarUploader({
   const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
+
+  const { t } = useTranslate();
+
+  const { avatarUploadText } = t.user;
+  const { save, changeTr } = t.buttons;
+  const { avatarAdded, avatarUpdated, avatarSaveFailed } = t.toastTr;
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: { "image/*": [] },
@@ -123,9 +132,7 @@ function AvatarUploader({
         dispatch(setAvatarUrl(publicUrl));
       }
 
-      toast.success(
-        isDefaultBefore ? "Аватарка добавлена" : "Аватарка обновлена"
-      );
+      toast.success(isDefaultBefore ? avatarAdded : avatarUpdated);
 
       // Обновляем в базе данных
       const state = store.getState();
@@ -148,7 +155,7 @@ function AvatarUploader({
       URL.revokeObjectURL(tempUrl);
     } catch (e) {
       console.error("Ошибка сохранения аватарки:", e);
-      toast.error("Не удалось сохранить аватарку");
+      toast.error(avatarSaveFailed);
     }
   }, [imageSrc, croppedAreaPixels, onSave, onClose, email, dispatch]);
 
@@ -224,9 +231,7 @@ function AvatarUploader({
                   height={100}
                   alt="upload-file-icon"
                 />
-                <p className="crop__text">
-                  Перетащите файл сюда или кликните для загрузки.
-                </p>
+                <p className="crop__text">{avatarUploadText}</p>
               </div>
             </div>
           ) : (
@@ -277,14 +282,14 @@ function AvatarUploader({
                     className="controls__button controls__button--primary"
                     onClick={showCroppedImage}
                   >
-                    Сохранить
+                    {save}
                   </button>
                   <button
                     type="button"
                     className="controls__button controls__button--secondary"
                     onClick={handleResetImage}
                   >
-                    Изменить
+                    {changeTr}
                   </button>
                 </div>
               </div>

@@ -1,27 +1,34 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+
 import { toast } from "react-toastify";
 
 import { AppDispatch, RootState, store, persistor } from "@/store/store";
 import { resetCart } from "@/store/slices/cartSlice";
 import { resetPromos } from "@/store/slices/promoSlice";
-import { resetUser, setGeoCity } from "@/store/slices/userSlice";
 import { resetMeta } from "@/store/slices/productMetaSlice";
-
-import { DEFAULT_AVATAR, DEFAULT_PROMOS } from "@/constants/defaults";
+import { resetUser, setGeoCity } from "@/store/slices/userSlice";
 
 import { detectGeoCity } from "@/utils/geo";
+
+import { useTranslate } from "@/hooks/useTranslate";
+
+import { DEFAULT_AVATAR, DEFAULT_PROMOS } from "@/constants/defaults";
 
 export const logout = async (
   dispatch: AppDispatch,
   onSuccess?: (redirectUrl: string) => void
 ) => {
+  const { t } = useTranslate();
+
+  const { logoutError, logoutSuccess } = t.toastTr;
+
   try {
     localStorage.setItem("hasLoggedOut", "true");
 
     const state: RootState = store.getState();
-    const { email, balance, avatarUrl } = state.user;
+    const { email, balance, avatarUrl, geoCity } = state.user;
     const { items: cart } = state.cart;
     const { activated, available } = state.promo;
 
@@ -48,6 +55,8 @@ export const logout = async (
       });
     }
 
+    const currentCity = geoCity || localStorage.getItem("city");
+
     // Приостанавливаем persist перед сбросом redux
     await persistor.pause();
 
@@ -61,23 +70,32 @@ export const logout = async (
     await persistor.flush();
     await persistor.purge();
 
-    // Определяем гео
-    const detectedCity = await detectGeoCity();
-
-    if (detectedCity && detectedCity !== "Геолокация отключена") {
-      dispatch(setGeoCity(detectedCity));
-      localStorage.setItem("city", detectedCity);
+    // Восстанавливаем текущий город
+    if (
+      currentCity &&
+      currentCity !== "geolocation_disabled" &&
+      currentCity !== "geolocation_not_supported"
+    ) {
+      dispatch(setGeoCity(currentCity));
+      localStorage.setItem("city", currentCity);
     } else {
-      const cityFromStorage = localStorage.getItem("city");
-      if (cityFromStorage) {
-        dispatch(setGeoCity(cityFromStorage));
+      // Если текущий город - ошибка геолокации, пробуем определить заново
+      const detectedCity = await detectGeoCity("ru");
+      if (
+        detectedCity &&
+        detectedCity !== "geolocation_disabled" &&
+        detectedCity !== "geolocation_not_supported"
+      ) {
+        dispatch(setGeoCity(detectedCity));
+        localStorage.setItem("city", detectedCity);
       } else {
-        dispatch(setGeoCity(""));
-        localStorage.removeItem("city");
+        // Если не удалось определить город, оставляем текущий
+        dispatch(setGeoCity(currentCity || ""));
+        localStorage.setItem("city", currentCity || "");
       }
     }
 
-    toast.error("Вы вышли из аккаунта");
+    toast.error(logoutSuccess);
 
     const signOutOptions = {
       callbackUrl: "/",
@@ -95,6 +113,6 @@ export const logout = async (
     }, 100);
   } catch (error) {
     console.error("Logout error:", error);
-    toast.error("Произошла ошибка при выходе из аккаунта");
+    toast.error(logoutError);
   }
 };

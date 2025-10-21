@@ -8,12 +8,14 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, removeItem } from "@/store/slices/cartSlice";
-import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
+import { toggleFavorite } from "@/store/slices/productMetaSlice";
 
-import FavoriteButton from "../FavoriteButton/FavoriteButton";
 import RatingStars from "../RatingStars/RatingStars";
+import FavoriteButton from "../FavoriteButton/FavoriteButton";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { useTranslate } from "@/hooks/useTranslate";
 
 import { FoodCardProps } from "@/types/foodCard";
 
@@ -24,6 +26,7 @@ const FoodCard: FC<FoodCardProps> = ({
   instanceId,
   image,
   name_ru,
+  name_en,
   price_rub,
   size,
 }) => {
@@ -31,7 +34,12 @@ const FoodCard: FC<FoodCardProps> = ({
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const activated = useSelector((state: RootState) => state.promo.activated);
   const { ratings, favorites } = useSelector((s: RootState) => s.productMeta);
-  const { isAuth } = useSelector((s: RootState) => s.user);
+
+  const { t, lang } = useTranslate();
+
+  const { removeFromCart, addToCart } = t.buttons;
+  const { grams } = t.product;
+  const { discount10Tr } = t.cart;
 
   const isPromoFirst10Active = activated.includes("PromoFirst10");
 
@@ -43,13 +51,6 @@ const FoodCard: FC<FoodCardProps> = ({
   const handleToggleFavorite = useCallback(() => {
     dispatch(toggleFavorite(iid));
   }, [dispatch, iid]);
-
-  const handleRatingChange = useCallback(
-    (value: number) => {
-      dispatch(setRating({ id: iid, value }));
-    },
-    [dispatch, iid]
-  );
 
   const { discount } = getDiscountedPrice(activated, price_rub);
   const hasFirstOrderDiscount = activated.includes("PromoFirst10");
@@ -66,6 +67,7 @@ const FoodCard: FC<FoodCardProps> = ({
         id,
         instanceId: iid,
         name_ru,
+        name_en,
         price_rub,
         image,
         size,
@@ -79,17 +81,24 @@ const FoodCard: FC<FoodCardProps> = ({
       <FavoriteButton active={isFav} onToggle={handleToggleFavorite} />
       <Link href={`/product/${iid}`}>
         <div className="food-section__card-img">
-          <Image src={image} alt={name_ru} width={180} height={180} />
+          <Image
+            src={image}
+            alt={lang === "ru" ? name_ru : name_en}
+            width={180}
+            height={180}
+          />
         </div>
         <div className="food-section__card-description">
-          <p className="food-section__card-name">{name_ru}</p>
+          <p className="food-section__card-name">
+            {lang === "ru" ? name_ru : name_en}
+          </p>
           <h3 className="food-section__card-price">
             {hasFirstOrderDiscount ? (
               <>
                 <span className="discounted-price">{discountedPrice}₽</span>
                 <span className="old-price">{price_rub}₽</span>
                 {isPromoFirst10Active && (
-                  <span className="active-discount" title="Скидка 10%">
+                  <span className="active-discount" title={discount10Tr}>
                     <i>-</i>10%
                   </span>
                 )}
@@ -103,7 +112,9 @@ const FoodCard: FC<FoodCardProps> = ({
       <div className="stars-container">
         <RatingStars value={ratingValue} />
       </div>
-      <p className="food-section__card-size">{size} г.</p>
+      <p className="food-section__card-size">
+        {size} {grams}
+      </p>
       <div className="food-section__card-add">
         <button
           className={`food-section__card-add-btn ${
@@ -111,7 +122,7 @@ const FoodCard: FC<FoodCardProps> = ({
           }`}
           onClick={onClickAdd}
         >
-          {isAdded ? "Удалить" : "Добавить"}
+          {isAdded ? removeFromCart : addToCart}
         </button>
       </div>
     </div>

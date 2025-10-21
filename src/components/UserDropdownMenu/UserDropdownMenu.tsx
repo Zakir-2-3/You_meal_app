@@ -9,6 +9,8 @@ import { RootState } from "@/store/store";
 
 import { logout } from "@/utils/logout";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { DEFAULT_AVATAR } from "@/constants/defaults";
 
 import dropdownMenuUserIcon from "@/assets/icons/dropdown-menu-user-icon.svg";
@@ -32,6 +34,10 @@ const UserDropdownMenu = ({
   );
   const dispatch = useDispatch();
   const pathname = usePathname();
+
+  const { t } = useTranslate();
+
+  const { profile, settings, logOut } = t.headerDropdownMenu;
 
   const handleLogout = () => {
     // Сначала закрываем дропдаун
@@ -60,7 +66,7 @@ const UserDropdownMenu = ({
       <div className="user-dropdown__header">
         <Image
           src={avatarUrl || DEFAULT_AVATAR}
-          alt="Аватар"
+          alt="avatar"
           width={24}
           height={24}
           className="user-dropdown__avatar"
@@ -82,10 +88,10 @@ const UserDropdownMenu = ({
           src={dropdownMenuUserIcon}
           width={24}
           height={24}
-          alt="Профиль"
+          alt="user"
           className="user-dropdown__icon"
         />
-        <span>Профиль</span>
+        <span>{profile}</span>
       </Link>
       <Link
         href="/user"
@@ -99,10 +105,10 @@ const UserDropdownMenu = ({
           src={dropdownMenuSettingsIcon}
           width={24}
           height={24}
-          alt="Настройки"
+          alt="settings"
           className="user-dropdown__icon"
         />
-        <span>Настройки</span>
+        <span>{settings}</span>
       </Link>
       <button
         type="button"
@@ -113,10 +119,10 @@ const UserDropdownMenu = ({
           src={dropdownMenuLogoutIcon}
           width={24}
           height={24}
-          alt="Выйти"
+          alt="logout"
           className="user-dropdown__icon"
         />
-        <span>Выйти</span>
+        <span>{logOut}</span>
       </button>
     </div>
   );

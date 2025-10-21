@@ -12,6 +12,8 @@ import {
   setAvatarUrl,
 } from "@/store/slices/userSlice";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { supabase } from "@/lib/supabaseClient";
 
 import { DEFAULT_AVATAR } from "@/constants/defaults";
@@ -21,6 +23,10 @@ export const deleteAccount = async (
   email: string,
   avatarUrl?: string
 ) => {
+  const { t } = useTranslate();
+
+  const { accountDeleteFailed, accountDeleted, accountDeleteError } = t.toastTr;
+
   try {
     const confirmed = window.confirm("Вы точно хотите удалить аккаунт?");
     if (!confirmed) return;
@@ -42,7 +48,7 @@ export const deleteAccount = async (
     const { error } = await supabase.from("users").delete().eq("email", email);
     if (error) {
       console.error("Ошибка при удалении пользователя:", error.message);
-      toast.error("Ошибка при удалении аккаунта");
+      toast.error(accountDeleteError);
       return;
     }
 
@@ -59,7 +65,7 @@ export const deleteAccount = async (
     await persistor.purge();
     localStorage.removeItem("persist:root");
 
-    toast.error("Аккаунт удалён");
+    toast.error(accountDeleted);
 
     // Сбрасывает JWT токен
     await signOut({ redirect: false });
@@ -69,6 +75,6 @@ export const deleteAccount = async (
     }, 1500);
   } catch (err) {
     console.error("Ошибка удаления аккаунта:", err);
-    toast.error("Не удалось удалить аккаунт");
+    toast.error(accountDeleteFailed);
   }
 };

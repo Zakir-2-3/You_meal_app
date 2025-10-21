@@ -106,4 +106,5 @@ export const {
   setItems,
   resetCart,
 } = cartSlice.actions;
+
 export default cartSlice.reducer;

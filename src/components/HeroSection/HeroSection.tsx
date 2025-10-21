@@ -1,13 +1,18 @@
 import React, { FC } from "react";
 
 import Image from "next/image";
-import Link from "next/link";
+
+import { useTranslate } from "@/hooks/useTranslate";
 
 import heroSectionImg_1 from "@/assets/images/hero-section-img-1.png";
 
 import "./HeroSection.scss";
 
 const HeroSection: FC = React.memo(() => {
+  const { t } = useTranslate();
+
+  const { title, title2 } = t.header;
+
   return (
     <section className="hero-section">
       <div className="hero-section__content">
@@ -21,15 +26,10 @@ const HeroSection: FC = React.memo(() => {
         />
         <div className="hero-section__text">
           <h1 className="hero-section__title">
-            Только самые <br />
-            <b>сочные бургеры!</b>
+            {title}
+            <br />
+            <b>{title2}</b>
           </h1>
-          <Link
-            href="/delivery"
-            className="hero-section__delivery cart-sidebar__delivery-link"
-          >
-            Бесплатная доставка от 1499₽*
-          </Link>
         </div>
       </div>
       <div></div>

@@ -147,7 +147,7 @@
 
 .personal-account__field {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto;
   grid-template-rows: auto auto;
   justify-content: start;
   align-items: center;
@@ -318,10 +318,6 @@
   align-items: center;
   gap: 14px;
   margin-top: 20px;
-  & > .personal-account__hint {
-    color: red;
-    font-size: 14px;
-  }
 }
 
 .personal-account__button--save:disabled {
@@ -560,7 +556,7 @@
 
 .personal-account__promo-error {
   position: absolute;
-  top: 36px;
+  top: -17px;
   left: 0;
   color: red;
   font-size: 13px;
@@ -699,4 +695,10 @@
 
 .personal-account__user-info--edit .personal-account__field:nth-child(1) {
   position: relative;
+}
+
+.personal-account__user-info--edit .personal-account__field:nth-child(3) .personal-account__hint,
+.personal-account__user-info--edit .personal-account__field:nth-child(2) .personal-account__hint {
+  color: red;
+  font-size: 14px;
 }

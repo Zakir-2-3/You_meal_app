@@ -2,6 +2,8 @@ import { useFormContext } from "react-hook-form";
 
 import { toast } from "react-toastify";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 type Props = {
   email: string;
   name: string;
@@ -25,6 +27,13 @@ export default function VerifyCodeForm({
   onBack,
   onSubmit,
 }: Props) {
+  const { t } = useTranslate();
+
+  const { resendVia, resendCode, backBtn, confirmBtn } = t.regForm;
+  const { codeFromEmailPlaceholder, enterCode } = t.user;
+  const { codeResent, codeAlreadySent, tooManyAttemptsTryLater, resendError } =
+    t.toastTr;
+
   const {
     register: registerVerify,
     handleSubmit,
@@ -47,12 +56,12 @@ export default function VerifyCodeForm({
       const result = await res.json();
 
       if (res.status === 208) {
-        toast.info(result.message || "Код уже был отправлен.");
+        toast.info(result.message || codeAlreadySent);
         return;
       }
 
       if (res.status === 429) {
-        toast.error(result.error || "Слишком много попыток. Попробуйте позже.");
+        toast.error(result.error || tooManyAttemptsTryLater);
         if (result.blockedUntil) {
           const remaining = Math.ceil(
             (new Date(result.blockedUntil).getTime() - Date.now()) / 1000
@@ -63,7 +72,7 @@ export default function VerifyCodeForm({
       }
 
       if (!res.ok) {
-        toast.error(result.error || "Ошибка повторной отправки");
+        toast.error(result.error || resendError);
         return;
       }
 
@@ -71,13 +80,13 @@ export default function VerifyCodeForm({
 
       if (nextAttempts >= 2) {
         startTimer(7200);
-        toast.error("Слишком много попыток. Попробуйте позже.");
+        toast.error(tooManyAttemptsTryLater);
       } else {
         startTimer(10);
-        toast.success(result.message || "Код повторно отправлен");
+        toast.success(result.message || codeResent);
       }
     } catch {
-      toast.error("Ошибка повторной отправки");
+      toast.error(resendError);
     }
   };
 
@@ -87,7 +96,7 @@ export default function VerifyCodeForm({
       onSubmit={handleSubmit(onSubmit)}
     >
       <label className="registration-form__label" htmlFor="code">
-        Введите код:
+        {enterCode}
       </label>
       <input
         id="code"
@@ -98,7 +107,7 @@ export default function VerifyCodeForm({
             /^\d{6}$/.test(value) || "Введите 6-значный код из цифр",
         })}
         className="registration-form__input"
-        placeholder="Код из почты"
+        placeholder={codeFromEmailPlaceholder}
       />
       {typeof verifyErrors.code?.message === "string" && (
         <p className="registration-form__input--error">
@@ -110,7 +119,7 @@ export default function VerifyCodeForm({
         <p className="registration-form__label">
           {attempts >= 2
             ? `Слишком много попыток. ${formatTime()}`
-            : `Повторная отправка через: ${formatTime()}`}
+            : `${resendVia} ${formatTime()}`}
         </p>
       ) : (
         <button
@@ -118,7 +127,7 @@ export default function VerifyCodeForm({
           className="registration-form__button registration-form__button--secondary"
           onClick={handleResendCode}
         >
-          Отправить код повторно
+          {resendCode}
         </button>
       )}
 
@@ -127,14 +136,14 @@ export default function VerifyCodeForm({
           type="submit"
           className="registration-form__button registration-form__button--primary"
         >
-          Подтвердить
+          {confirmBtn}
         </button>
         <button
           type="button"
           onClick={onBack}
           className="registration-form__button registration-form__button--secondary"
         >
-          Назад
+          {backBtn}
         </button>
       </div>
     </form>

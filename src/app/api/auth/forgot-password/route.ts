@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
+
 import nodemailer from "nodemailer";
+
 import { supabase } from "@/lib/supabaseClient";
-import { passwordRecoveryEmailTemplate } from "@/lib/emailTemplates/passwordRecoveryEmailTemplate";
 import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
+import { passwordRecoveryEmailTemplate } from "@/lib/emailTemplates/passwordRecoveryEmailTemplate";
 
 export async function POST(req: Request) {
   try {
     // Удаляем старых пользователей (старше 1 месяца)
     await cleanupOldUsers();
 
-    const { email } = await req.json();
+    const { email, lang = "ru" } = await req.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email обязателен" }, { status: 400 });
@@ -35,7 +37,9 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "Этот аккаунт использует вход через Google. Сброс пароля недоступен.",
+            lang === "ru"
+              ? "Этот аккаунт использует вход через Google. Сброс пароля недоступен."
+              : "This account uses Google login. Password reset is not available.",
         },
         { status: 403 }
       );
@@ -46,7 +50,9 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "Почта ещё не подтверждена. Войдите для завершения регистрации.",
+            lang === "ru"
+              ? "Почта ещё не подтверждена. Войдите для завершения регистрации."
+              : "This email is not confirmed yet. Please complete registration.",
         },
         { status: 403 }
       );
@@ -55,7 +61,12 @@ export async function POST(req: Request) {
     // Если вообще нет такого email
     if (!user) {
       return NextResponse.json(
-        { error: "Пользователь с таким email не найден" },
+        {
+          error:
+            lang === "ru"
+              ? "Пользователь с таким email не найден"
+              : "User with this email not found",
+        },
         { status: 404 }
       );
     }
@@ -92,7 +103,10 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         {
-          message: "Слишком много попыток. Код уже был отправлен ранее.",
+          message:
+            lang === "ru"
+              ? "Слишком много попыток. Код уже был отправлен ранее."
+              : "Too many attempts. The code has already been sent earlier.",
           blockedUntil: existingCode.blockedUntil,
         },
         { status: 429 }
@@ -139,6 +153,7 @@ export async function POST(req: Request) {
       }
     }
 
+    // Отправляем письмо с учётом языка
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),
@@ -148,15 +163,21 @@ export async function POST(req: Request) {
       },
     });
 
+    const subject =
+      lang === "ru" ? "Восстановление пароля" : "Password Recovery";
+
     await transporter.sendMail({
       from: `"YourMeal" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: "Восстановление пароля",
-      html: passwordRecoveryEmailTemplate(verificationCode),
+      subject,
+      html: passwordRecoveryEmailTemplate(verificationCode, lang),
     });
 
     return NextResponse.json({
-      message: "Код восстановления отправлен на почту",
+      message:
+        lang === "ru"
+          ? "Код восстановления отправлен на почту"
+          : "Password recovery code has been sent to your email",
       blockedUntil: updateData.blockedUntil || null,
     });
   } catch (error: any) {

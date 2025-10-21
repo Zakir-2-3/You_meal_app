@@ -28,14 +28,19 @@
     padding: 30px;
     background: #fff;
     & .empty-cart-img {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      -webkit-transform: translate(-50%, -50%);
-      -moz-transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-      -o-transform: translate(-50%, -50%);
+      margin-top: 25px;
+    }
+    & .empty-cart-text {
+      font-size: 34px;
+      color: #ffaf00;
+      font-weight: 600;
+    }
+    &--empty {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-direction: column;
+      gap: 10px;
     }
   }
   &__clear-cart {

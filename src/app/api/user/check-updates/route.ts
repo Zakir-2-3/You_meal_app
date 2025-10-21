@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import { supabase } from "@/lib/supabaseClient";
 import { checkPasswordMatch } from "@/lib/checkPasswordMatch";
 

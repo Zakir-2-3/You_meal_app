@@ -1,11 +1,10 @@
-import { Nunito } from "next/font/google";
 import { Metadata } from "next";
-
-import AppProvider from "./AppProvider";
+import { Nunito } from "next/font/google";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import AppProvider from "./AppProvider";
 import Header from "@/components/Header/Header";
 import RegistrationForm from "@/components/auth/RegistrationForm/RegistrationForm";
 import Footer from "@/components/Footer/Footer";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 
@@ -27,13 +28,11 @@ import NotFoundPage from "@/app/not-found";
 
 import { deleteAccount } from "@/utils/deleteAccount";
 import { logout } from "@/utils/logout";
-import {
-  nameEditValidation,
-  optionalPasswordEditValidation,
-  repeatPasswordEditValidation,
-} from "@/utils/validationUserPage";
+import { createUserValidationRules } from "@/utils/validationUserPage";
 
 import { supabase } from "@/lib/supabaseClient";
+
+import { useTranslate } from "@/hooks/useTranslate";
 
 import {
   DEFAULT_AVATAR,
@@ -77,6 +76,48 @@ export default function UserPage() {
   );
   const dispatch = useDispatch();
 
+  const { t, lang } = useTranslate();
+
+  const {
+    title,
+    titleNav,
+    nameLabel,
+    emailLabel,
+    passwordLabel,
+    balanceLabel,
+    promoCodeLabel,
+    repeatPasswordPlaceholder,
+    enterPromoCodePlaceholder,
+    promoCodeLong,
+  } = t.user;
+
+  const { newPasswordLabel } = t.regForm;
+
+  const {
+    logOutAccountTr,
+    deleteAccountTr,
+    activateTr,
+    changeTr,
+    deleteTr,
+    topUp,
+    withdraw,
+    cancelTr,
+    editTr,
+    save,
+    uploadAvatar,
+  } = t.buttons;
+
+  const {
+    avatarDeleted,
+    avatarDeleteFailed,
+    nameUpdateFailed,
+    passwordChangeFailed,
+    dataUpdatedSuccess,
+    dataValidationError,
+  } = t.toastTr;
+
+  const userValidationRules = createUserValidationRules(t.formErrors);
+
   const isGoogleUser = session?.user?.image?.includes("googleusercontent");
 
   const maxPromosReached = activated.length >= 3;
@@ -106,7 +147,7 @@ export default function UserPage() {
     const subscription = watch((value, { name }) => {
       if (name === "newPassword") {
         trigger("repeatPassword"); // Перезапускаем валидацию repeatPassword
-        setPasswordSameError(""); // очищаем текст при изменении имени
+        setPasswordSameError("");
       }
       if (name === "name") {
         setNameSameError(""); // очищаем текст при изменении имени
@@ -115,14 +156,6 @@ export default function UserPage() {
 
     return () => subscription.unsubscribe();
   }, [watch, trigger]);
-
-  useEffect(() => {
-    if (session?.user) {
-      dispatch(setAuthStatus(true));
-      dispatch(setEmail(session.user.email || ""));
-      dispatch(setName(session.user.name || ""));
-    }
-  }, [session, dispatch]);
 
   const handleDeleteAvatar = async () => {
     if (avatarUrl === DEFAULT_AVATAR) return;
@@ -134,7 +167,7 @@ export default function UserPage() {
     setTimeout(() => {
       dispatch(setAvatarUrl(DEFAULT_AVATAR));
       setAvatarVisible(true);
-      toast.error("Аватарка удалена");
+      toast.error(avatarDeleted);
     }, 300);
 
     try {
@@ -176,7 +209,7 @@ export default function UserPage() {
       setTimeout(() => {
         dispatch(setAvatarUrl(previousAvatarUrl));
         setAvatarVisible(true);
-        toast.error("Не удалось удалить аватарку");
+        toast.error(avatarDeleteFailed);
       }, 300);
     }
   };
@@ -287,7 +320,7 @@ export default function UserPage() {
           .eq("email", email);
 
         if (updateError) {
-          toast.error("Не удалось обновить имя");
+          toast.error(nameUpdateFailed);
           console.error(updateError.message);
           return;
         }
@@ -309,13 +342,13 @@ export default function UserPage() {
           updated = true;
         } catch (err) {
           console.error(err);
-          toast.error("Не удалось изменить пароль");
+          toast.error(passwordChangeFailed);
           return;
         }
       }
 
       if (updated) {
-        toast.success("Данные успешно обновлены");
+        toast.success(dataUpdatedSuccess);
         setEditMode(false);
         reset({
           name: "",
@@ -329,7 +362,7 @@ export default function UserPage() {
       }
     } catch (err) {
       console.error("Ошибка при проверке обновлений:", err);
-      toast.error("Ошибка при проверке данных");
+      toast.error(dataValidationError);
     } finally {
       setIsChecking(false);
     }
@@ -342,8 +375,8 @@ export default function UserPage() {
   return (
     <section className="personal-account">
       <div className="container">
-        <h1 className="personal-account__title">Личный кабинет YourMeal</h1>
-        <NavButtons customTitle="Личный кабинет" />
+        <h1 className="personal-account__title">{title}</h1>
+        <NavButtons customTitle={titleNav} />
 
         <div className="personal-account__left">
           <Image
@@ -353,7 +386,7 @@ export default function UserPage() {
             }`}
             width={330}
             height={330}
-            alt="Аватар"
+            alt="avatar"
             priority
           />
           <div className="personal-account__actions">
@@ -361,14 +394,14 @@ export default function UserPage() {
               className="personal-account__button personal-account__button--edit"
               onClick={() => setShowAvatarUploader(true)}
             >
-              {avatarUrl === DEFAULT_AVATAR ? "Добавить" : "Изменить"}
+              {avatarUrl === DEFAULT_AVATAR ? uploadAvatar : changeTr}
             </button>
             <button
               className="personal-account__button personal-account__button--delete"
               onClick={handleDeleteAvatar}
               disabled={avatarUrl === DEFAULT_AVATAR}
             >
-              Удалить
+              {deleteTr}
             </button>
           </div>
           {showAvatarUploader && (
@@ -393,17 +426,24 @@ export default function UserPage() {
                     className="personal-account__label"
                     htmlFor="user-name"
                   >
-                    Имя:
+                    {nameLabel}
                   </label>
                   <input
                     id="user-name"
                     type="text"
-                    placeholder="Имя"
+                    placeholder={nameLabel}
                     className="personal-account__input personal-account__input--edit"
-                    {...register("name", nameEditValidation)}
+                    {...register(
+                      "name",
+                      userValidationRules.nameEditValidation
+                    )}
                   />
                   {errors.name && (
-                    <p className="registration-form__input--error personal-account__name-error">
+                    <p
+                      className={`registration-form__input--error personal-account__name-error ${
+                        lang === "en" ? "english-style" : ""
+                      }`}
+                    >
                       {errors.name.message}
                     </p>
                   )}
@@ -415,7 +455,7 @@ export default function UserPage() {
                 </>
               ) : (
                 <>
-                  <label className="personal-account__label">Имя:</label>
+                  <label className="personal-account__label">{nameLabel}</label>
                   <span className="personal-account__value">{name}</span>
                 </>
               )}
@@ -428,7 +468,7 @@ export default function UserPage() {
                     className="personal-account__label"
                     htmlFor="user-email"
                   >
-                    Почта:
+                    {emailLabel}
                   </label>
                   <input
                     id="user-email"
@@ -438,10 +478,17 @@ export default function UserPage() {
                     disabled
                     readOnly
                   />
+                  {isGoogleUser && (
+                    <p className="personal-account__hint">
+                      Недоступно в Google-аккаунте
+                    </p>
+                  )}
                 </>
               ) : (
                 <>
-                  <label className="personal-account__label">Почта:</label>
+                  <label className="personal-account__label">
+                    {emailLabel}
+                  </label>
                   <span className="personal-account__value">{email}</span>
                 </>
               )}
@@ -449,68 +496,98 @@ export default function UserPage() {
 
             <div className="personal-account__field">
               {editMode ? (
-                <>
-                  <label
-                    className="personal-account__label"
-                    htmlFor="user-new-password"
-                  >
-                    Пароль:
-                  </label>
-                  <div className="personal-account__input-password-wrapper">
-                    <input
-                      id="user-new-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Новый пароль"
-                      className="personal-account__input personal-account__input--edit"
-                      {...register(
-                        "newPassword",
-                        optionalPasswordEditValidation
-                      )}
-                    />
-                    <button
-                      type="button"
-                      className="personal-account__value-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
+                !isGoogleUser ? (
+                  <>
+                    <label
+                      className="personal-account__label"
+                      htmlFor="user-new-password"
                     >
-                      <Image
-                        src={showPassword ? showPasswordIcon : hidePasswordIcon}
-                        width={20}
-                        height={20}
-                        alt="toggle-password"
+                      {passwordLabel}
+                    </label>
+                    <div className="personal-account__input-password-wrapper">
+                      <input
+                        id="user-new-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder={newPasswordLabel}
+                        className="personal-account__input personal-account__input--edit"
+                        {...register(
+                          "newPassword",
+                          userValidationRules.optionalPasswordEditValidation
+                        )}
                       />
-                    </button>
+                      <button
+                        type="button"
+                        className="personal-account__value-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <Image
+                          src={
+                            showPassword ? showPasswordIcon : hidePasswordIcon
+                          }
+                          width={20}
+                          height={20}
+                          alt="toggle-password"
+                        />
+                      </button>
 
+                      <input
+                        id="user-repeat-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder={repeatPasswordPlaceholder}
+                        className="personal-account__input personal-account__input--edit"
+                        {...register(
+                          "repeatPassword",
+                          userValidationRules.repeatPasswordEditValidation(() =>
+                            watch("newPassword")
+                          )
+                        )}
+                      />
+                    </div>
+
+                    {errors.newPassword && (
+                      <p className="registration-form__input--error personal-account__password-error">
+                        {errors.newPassword.message}
+                      </p>
+                    )}
+                    {passwordSameError && (
+                      <p className="registration-form__input--error personal-account__password-error">
+                        {passwordSameError}
+                      </p>
+                    )}
+                    {errors.repeatPassword && (
+                      <p className="registration-form__input--error personal-account__repeat-password-error">
+                        {errors.repeatPassword.message}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <label
+                      className="personal-account__label"
+                      htmlFor="user-password"
+                    >
+                      {passwordLabel}
+                    </label>
                     <input
-                      id="user-repeat-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Повторите пароль"
+                      id="user-password"
+                      type="password"
                       className="personal-account__input personal-account__input--edit"
-                      {...register(
-                        "repeatPassword",
-                        repeatPasswordEditValidation(() => watch("newPassword"))
-                      )}
+                      value="••••••••"
+                      disabled
+                      readOnly
                     />
-                  </div>
-
-                  {errors.newPassword && (
-                    <p className="registration-form__input--error personal-account__password-error">
-                      {errors.newPassword.message}
-                    </p>
-                  )}
-                  {passwordSameError && (
-                    <p className="registration-form__input--error personal-account__password-error">
-                      {passwordSameError}
-                    </p>
-                  )}
-                  {errors.repeatPassword && (
-                    <p className="registration-form__input--error personal-account__repeat-password-error">
-                      {errors.repeatPassword.message}
-                    </p>
-                  )}
-                </>
+                    {isGoogleUser && (
+                      <p className="personal-account__hint">
+                        Недоступно в Google-аккаунте
+                      </p>
+                    )}
+                  </>
+                )
               ) : (
                 <>
-                  <label className="personal-account__label">Пароль:</label>
+                  <label className="personal-account__label">
+                    {passwordLabel}
+                  </label>
                   <div className="personal-account__value-container">
                     <span className="personal-account__value">••••••••</span>
                   </div>
@@ -525,17 +602,14 @@ export default function UserPage() {
                   className="personal-account__button personal-account__button--save"
                   disabled={!isDirty || !isValid || isChecking}
                 >
-                  Сохранить
+                  {save}
                 </button>
               )}
               <button
                 type="button"
-                className={`personal-account__button personal-account__button--edit ${
-                  isGoogleUser ? "disabled-google" : ""
-                }`}
+                className="personal-account__button personal-account__button--edit"
                 onClick={() => {
                   if (editMode) {
-                    // При выходе из режима — возвращаем исходные данные
                     reset({
                       name,
                       email: email || "",
@@ -543,7 +617,6 @@ export default function UserPage() {
                       repeatPassword: "",
                     });
                   } else {
-                    // При входе в режим очищаем поля
                     reset({
                       name: "",
                       email: email || "",
@@ -553,21 +626,15 @@ export default function UserPage() {
                   }
                   setEditMode(!editMode);
                 }}
-                disabled={isGoogleUser}
               >
-                {editMode ? "Отмена" : "Редактировать"}
+                {editMode ? cancelTr : editTr}
               </button>
-              {isGoogleUser && (
-                <p className="personal-account__hint">
-                  Редактирование данных недоступно в Google-аккаунте
-                </p>
-              )}
             </div>
           </form>
 
           <div className="personal-account__balance">
             <div className="personal-account__field">
-              <label className="personal-account__label">Баланс:</label>
+              <label className="personal-account__label">{balanceLabel}</label>
               <span className="personal-account__value">{balance} ₽</span>
             </div>
             <div className="personal-account__balance-controls">
@@ -575,13 +642,13 @@ export default function UserPage() {
                 onClick={() => alert("Пополнить баланс")}
                 className="personal-account__button personal-account__button--primary"
               >
-                Пополнить
+                {topUp}
               </button>
               <button
                 onClick={() => alert("Вывести средства")}
                 className="personal-account__button personal-account__button--secondary"
               >
-                Вывести
+                {withdraw}
               </button>
             </div>
           </div>
@@ -596,12 +663,14 @@ export default function UserPage() {
               className="personal-account__field"
               style={{ gap: promoError ? "25px 10px" : "15px 10px" }}
             >
-              <label className="personal-account__label">Промокод:</label>
+              <label className="personal-account__label">
+                {promoCodeLabel}
+              </label>
 
               <div className="personal-account__promo-wrapper">
                 <input
                   type="text"
-                  placeholder="Введите промокод"
+                  placeholder={enterPromoCodePlaceholder}
                   className="personal-account__input"
                   value={promoInput}
                   onChange={(e) => {
@@ -609,7 +678,7 @@ export default function UserPage() {
                     setPromoInput(value);
 
                     if (value.length > 10) {
-                      setPromoError("Слишком длинный промокод.");
+                      setPromoError(promoCodeLong);
                     } else {
                       setPromoError("");
                     }
@@ -704,7 +773,7 @@ export default function UserPage() {
                     maxPromosReached
                   }
                 >
-                  Активировать
+                  {activateTr}
                 </button>
               </div>
 
@@ -749,14 +818,14 @@ export default function UserPage() {
               className="personal-account__button--logout"
               onClick={handleLogout}
             >
-              Выйти из аккаунта
+              {logOutAccountTr}
             </button>
 
             <button
               className="personal-account__button--logout personal-account__button--danger"
               onClick={() => deleteAccount(dispatch, email, avatarUrl)}
             >
-              Удалить аккаунт
+              {deleteAccountTr}
             </button>
           </div>
         </div>

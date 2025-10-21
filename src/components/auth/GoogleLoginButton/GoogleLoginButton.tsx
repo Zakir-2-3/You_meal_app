@@ -2,14 +2,35 @@
 
 import { signIn } from "next-auth/react";
 
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+
+import { useCleanupOnAuth } from "@/hooks/useCleanupOnAuth";
+import { useTranslate } from "@/hooks/useTranslate";
+
 import "./GoogleLoginButton.scss";
 
 const GoogleLoginButton = () => {
-  const handleClick = () => {
-    signIn("google", {
-      prompt: "select_account",
-      callbackUrl: "/",
-    });
+  const doCleanup = useCleanupOnAuth();
+
+  const cart = useSelector((state: RootState) => state.cart.items);
+
+  const { t } = useTranslate();
+  const { loginGoogle } = t.regForm;
+
+  const handleClick = async () => {
+    try {
+      // Сохраняем корзину в отдельное место
+      if (cart.length > 0) {
+        sessionStorage.setItem("googleAuthCart", JSON.stringify(cart));
+      }
+
+      doCleanup();
+
+      await signIn("google", { prompt: "select_account", callbackUrl: "/" });
+    } catch (error) {
+      console.error("Ошибка входа через Google:", error);
+    }
   };
 
   return (
@@ -38,7 +59,7 @@ const GoogleLoginButton = () => {
           d="M272 107.7c39.5 0 75 13.6 102.8 40.3l77.1-77.1C405.7 24.6 344.6 0 272 0 165.3 0 73.8 61.6 29.3 149.1l90.2 70.6C141 155.5 201.1 107.7 272 107.7z"
         />
       </svg>
-      <span className="login-btn-google__text">Войти через Google</span>
+      <span className="login-btn-google__text">{loginGoogle}</span>
     </button>
   );
 };

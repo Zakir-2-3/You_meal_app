@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { SortBy, SortDir } from "@/store/slices/productMetaSlice";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { SORT_OPTIONS } from "@/constants/sortOptions";
 
 import "./SortBar.scss";
@@ -18,7 +20,24 @@ export default function SortBar({ by, dir, onChange }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const { t } = useTranslate();
+
+  const {
+    titleSort,
+    defaultSort: sortDefault,
+    priceSort,
+    ratingSort,
+    favoritesSort,
+  } = t.sorting;
+
   const canUseDir = by !== "default" && by !== "favorites";
+
+  const labelMap: Record<SortBy, string> = {
+    default: sortDefault,
+    price: priceSort,
+    rating: ratingSort,
+    favorites: favoritesSort,
+  };
 
   // Закрытие по клику вне
   useEffect(() => {
@@ -36,14 +55,14 @@ export default function SortBar({ by, dir, onChange }: Props) {
 
   return (
     <div className="sort-bar">
-      <label className="sort-bar__label">Сортировка:</label>
+      <label className="sort-bar__label">{titleSort}</label>
 
       <div className="sort-bar__dropdown" ref={dropdownRef}>
         <button
           className="sort-bar__toggle"
           onClick={() => setIsOpen((p) => !p)}
         >
-          {SORT_OPTIONS.find((opt) => opt.value === by)?.label}
+          {labelMap[by]}
           <span
             className={`sort-bar__arrow ${
               isOpen ? "sort-bar__arrow--open" : ""
@@ -64,10 +83,10 @@ export default function SortBar({ by, dir, onChange }: Props) {
               }`}
               onClick={() => {
                 onChange({ by: opt.value, dir });
-                setIsOpen(false); // плавное закрытие после выбора
+                setIsOpen(false);
               }}
             >
-              {opt.label}
+              {labelMap[opt.value]}
             </div>
           ))}
         </div>

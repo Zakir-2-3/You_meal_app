@@ -8,6 +8,8 @@ import { setTips } from "@/store/slices/tipsSlice";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { DEFAULT_PROMOS } from "@/constants/defaults";
 
 import TotalPriceItemListSkeleton from "@/ui/skeletons/TotalPriceItemListSkeleton";
@@ -15,14 +17,28 @@ import TotalPriceItemListSkeleton from "@/ui/skeletons/TotalPriceItemListSkeleto
 import "./CartPageCheck.scss";
 
 const CartPageCheck = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const { items, savedDate } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
   const selectedTipPercentage = useSelector(
     (s: RootState) => s.tips.percentage
   );
 
-  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(() => items.length > 0);
+
+  const { t, lang } = useTranslate();
+
+  const {
+    subtotal,
+    discountTr,
+    vatTr,
+    total,
+    tipsTr,
+    thank,
+    checkDate,
+    checkReceipt,
+  } = t.cart;
 
   const roundUp = (num: number) => Math.round(num);
 
@@ -76,8 +92,10 @@ const CartPageCheck = () => {
 
   return (
     <>
-      <h3 className="total-price-title">YourMeal Check</h3>
-      <span className="total-price-date">Дата: {savedDate}</span>
+      <h3 className="total-price-title">{checkReceipt}</h3>
+      <span className="total-price-date">
+        {checkDate} {savedDate}
+      </span>
       <div className="total-price-item-list">
         {isLoading ? (
           <TotalPriceItemListSkeleton />
@@ -89,7 +107,7 @@ const CartPageCheck = () => {
               return (
                 <li key={item.instanceId}>
                   <span>{item.count}</span>
-                  <span>{item.name_ru}</span>
+                  <span>{lang === "ru" ? item.name_ru : item.name_en}</span>
                   <span>{itemTotal}₽</span>
                 </li>
               );
@@ -99,29 +117,29 @@ const CartPageCheck = () => {
       </div>
       <div className="total-price-wrapper">
         <p>
-          ЧИСТЫЙ СЧЕТ
+          {subtotal}
           <span>{rawTotal}₽</span>
         </p>
         <p>
-          СКИДКА
+          {discountTr}
           {discountLabels.length > 0 ? `(${discountLabels.join(",")})` : ""}
           <span>{savedMoney > 0 ? `-${savedMoney}₽` : "0₽"}</span>
         </p>
         <p>
-          НДС(5%)
+          {vatTr}(5%)
           <span>
             {vat === 0 ? "" : "+"}
             {vat}₽
           </span>
         </p>
         <p>
-          ВСЕГО
+          {total}
           <span>{discountedTotalWithTips}₽</span>
         </p>
       </div>
-      <p className="total-price-thank">THANK YOU FOR VISITING!</p>
+      <p className="total-price-thank">{thank}</p>
       <div className="total-price-tips">
-        <p>ЧАЕВЫЕ</p>
+        <p>{tipsTr}</p>
         {[0.05, 0.1, 0.15].map((tip) => {
           const tipBase = activated
             ? baseTotalWithVat

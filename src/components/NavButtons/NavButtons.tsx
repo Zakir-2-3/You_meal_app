@@ -9,27 +9,43 @@ import { RootState } from "@/store/store";
 
 import { categories } from "@/constants/categories";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { NavButtonsProps } from "@/types/navButtons";
 
 import "./NavButtons.scss";
 
 const NavButtons: FC<NavButtonsProps> = ({ customTitle }) => {
-  // Получаем активную категорию
+  const { t } = useTranslate();
+
+  const { homeNav } = t.buttons;
+
   const activeCategory = useSelector(
     (state: RootState) => state.category.activeIndex
   );
 
-  // Текст в навигации
-  const defaultCategoryTitle =
-    categories[activeCategory]?.title || "Неизвестно";
+  // Текущая категория
+  const currentCategory = categories[activeCategory];
+
+  // Берем ключ категории
+  const categoryKey = currentCategory?.key as keyof typeof t.categories;
+
+  // Если есть перевод, берем его, иначе оригинал
+  const translatedCategoryTitle =
+    (categoryKey && t.categories[categoryKey]) ||
+    currentCategory?.title ||
+    "Неизвестно";
+
+  // Текст для навигации
+  const navTitle = customTitle || translatedCategoryTitle;
 
   return (
     <nav className="nav-buttons">
       <ol>
         <li>
-          <Link href="/">Главная</Link>
+          <Link href="/">{homeNav}</Link>
         </li>
-        <li>{customTitle || defaultCategoryTitle}</li>
+        <li>{navTitle}</li>
       </ol>
     </nav>
   );

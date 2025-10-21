@@ -1,10 +1,21 @@
 export interface CategoryState {
   activeIndex: number;
-  activeCategoryName: string;
+  activeKey: string;
 }
+
+export type CategoryKey =
+  | "burgers"
+  | "snacks"
+  | "combo"
+  | "shawarma"
+  | "breakfasts"
+  | "drinks"
+  | "desserts"
+  | "sauces";
 
 export interface Category {
   id: number;
-  title: string;
+  key: string;
+  title?: string;
   image: string;
 }

@@ -1,11 +1,18 @@
 import { useFormContext } from "react-hook-form";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 type Props = {
   email: string;
   onSubmit: (data: { password: string }) => Promise<void>;
 };
 
 export default function SetNewPasswordForm({ email, onSubmit }: Props) {
+  const { t } = useTranslate();
+
+  const { newPasswordLabel } = t.regForm;
+  const { enterNewPasswordPlaceholder, repeatPasswordPlaceholder } = t.user;
+
   const {
     register,
     handleSubmit,
@@ -19,13 +26,13 @@ export default function SetNewPasswordForm({ email, onSubmit }: Props) {
       onSubmit={handleSubmit(onSubmit)}
     >
       <label className="registration-form__label" htmlFor="reset-password">
-        Новый пароль:
+        {newPasswordLabel}
       </label>
       <input
         id="reset-password"
         type="password"
         className="registration-form__input"
-        placeholder="Введите новый пароль"
+        placeholder={enterNewPasswordPlaceholder}
         {...register("password", {
           required: "Введите пароль",
           minLength: { value: 6, message: "Минимум 6 символов" },
@@ -44,7 +51,7 @@ export default function SetNewPasswordForm({ email, onSubmit }: Props) {
         id="repeat-password"
         type="password"
         className="registration-form__input"
-        placeholder="Повторите пароль"
+        placeholder={repeatPasswordPlaceholder}
         {...register("repeatPassword", {
           validate: (val) => val === watch("password") || "Пароли не совпадают",
         })}

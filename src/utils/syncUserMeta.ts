@@ -16,7 +16,6 @@ export const syncUserMetaIfAuth = (): AppThunk<
     if (!isAuth || !email) return null;
 
     if (metaSynced) {
-      console.log("Метаданные уже синхронизированы, пропускаем");
       return null;
     }
 
@@ -43,12 +42,7 @@ export const syncUserMetaIfAuth = (): AppThunk<
           ? payload.ratings
           : {};
 
-      console.log("Получены серверные метаданные:", {
-        favorites: serverFavorites,
-        ratings: serverRatings,
-      });
-
-      // Определяем какие данные использовать
+      // Логика приоритета данных
       let finalFavorites = serverFavorites;
       let finalRatings = serverRatings;
       let source = "server";
@@ -62,8 +56,30 @@ export const syncUserMetaIfAuth = (): AppThunk<
         finalFavorites = localFavorites;
         finalRatings = localRatings;
         source = "local";
+      }
+      // Серверные данные рейтингов в приоритете
+      else if (Object.keys(serverRatings).length > 0) {
+        finalRatings = serverRatings;
+        // Если серверные данные избранных пустые, то используем локальные
+        finalFavorites =
+          serverFavorites.length > 0 ? serverFavorites : localFavorites;
+        source = "server-ratings-priority";
+      }
+      // Если серверные данные избранных пустые, то используем локальные
+      else if (serverFavorites.length === 0 && localFavorites.length > 0) {
+        finalFavorites = localFavorites;
+        finalRatings = localRatings;
+        source = "local-favorites";
+      }
+      // По умолчанию используем серверные данные
+      else {
+        finalFavorites = serverFavorites;
+        finalRatings = serverRatings;
+        source = "server-default";
+      }
 
-        // Сохраняем локальные данные на сервер через существующий endpoint
+      // Сохраняем выбранные данные на сервер, если использовали локальные
+      if (source === "local" || source === "local-favorites") {
         await fetch("/api/user/update", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -73,7 +89,6 @@ export const syncUserMetaIfAuth = (): AppThunk<
             ratings: finalRatings,
           }),
         });
-        console.log("Локальные данные сохранены на сервер");
       }
 
       // Применяем выбранные данные

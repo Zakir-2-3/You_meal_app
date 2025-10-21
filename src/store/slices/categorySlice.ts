@@ -4,7 +4,7 @@ import { CategoryState } from "@/types/category";
 
 const initialState: CategoryState = {
   activeIndex: 0,
-  activeCategoryName: "Бургеры",
+  activeKey: "burgers",
 };
 
 const categorySlice = createSlice({
@@ -13,10 +13,10 @@ const categorySlice = createSlice({
   reducers: {
     setActiveCategory: (
       state,
-      action: PayloadAction<{ index: number; title: string }>
+      action: PayloadAction<{ index: number; key: string }>
     ) => {
       state.activeIndex = action.payload.index;
-      state.activeCategoryName = action.payload.title;
+      state.activeKey = action.payload.key;
     },
   },
 });

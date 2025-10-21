@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+
 import nodemailer from "nodemailer";
+
+import { supabase } from "@/lib/supabaseClient";
 import { orderEmailTemplate } from "@/lib/emailTemplates/orderEmailTemplate";
 
 export async function POST(req: NextRequest) {
@@ -8,13 +10,25 @@ export async function POST(req: NextRequest) {
     const {
       email,
       items,
-      rawTotal, // чистый счёт (без скидок)
-      discount, // суммарный % скидки
+      rawTotal,
+      discount,
       vat,
       tips,
       tipsPercent,
       finalTotal,
       activated,
+      lang = "ru",
+    }: {
+      email: string;
+      items: any[];
+      rawTotal: number;
+      discount: number;
+      vat: number;
+      tips: number;
+      tipsPercent: number;
+      finalTotal: number;
+      activated?: string[];
+      lang?: "ru" | "en";
     } = await req.json();
 
     if (!email || !Array.isArray(items) || items.length === 0) {
@@ -62,6 +76,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Локализованный заголовок письма
+    const subjects = {
+      ru: `Ваш заказ №${newOrderNumber} подтверждён ✅`,
+      en: `Your order №${newOrderNumber} has been confirmed ✅`,
+    };
+
     // Отправляем письмо
     try {
       const transporter = nodemailer.createTransport({
@@ -75,7 +95,7 @@ export async function POST(req: NextRequest) {
       await transporter.sendMail({
         from: `"YourMeal" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: `Ваш заказ №${newOrderNumber} подтверждён`,
+        subject: subjects[lang] || subjects.ru,
         html: orderEmailTemplate({
           orderNumber: newOrderNumber,
           items,
@@ -86,6 +106,7 @@ export async function POST(req: NextRequest) {
           tipsPercent,
           finalTotal,
           activated,
+          lang,
         }),
       });
     } catch (mailError: any) {

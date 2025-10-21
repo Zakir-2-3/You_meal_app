@@ -5,13 +5,14 @@ import { Item } from "@/types/item";
 type OrderEmailParams = {
   orderNumber: number;
   items: Item[];
-  rawTotal: number; // чистый счёт без скидок
-  discount: number; // общий процент скидки
-  vat: number; // НДС
-  tips: number; // чаевые
-  tipsPercent: number; // процент чаевых
-  finalTotal: number; // итоговая сумма
-  activated?: string[]; // список промокодов
+  rawTotal: number;
+  discount: number;
+  vat: number;
+  tips: number;
+  tipsPercent: number;
+  finalTotal: number;
+  activated?: string[];
+  lang?: "ru" | "en";
 };
 
 export const orderEmailTemplate = ({
@@ -24,20 +25,52 @@ export const orderEmailTemplate = ({
   tipsPercent,
   finalTotal,
   activated = [],
+  lang = "ru",
 }: OrderEmailParams) => {
-  // Метки для скидок
+  const texts = {
+    ru: {
+      title: `Ваш заказ №${orderNumber} <span style="white-space: nowrap;">оплачен ✅</span>`,
+      thanks: "❤️ Спасибо, что выбрали <b>YourMeal</b> 🍔",
+      qty: "Кол-во",
+      price: "Цена",
+      raw: "Чистый счёт",
+      discount: "Скидка",
+      vat: "НДС (5%)",
+      tips: "Чаевые",
+      total: "✅ Итого",
+      eta: "⏳ Ваш заказ будет готов в течение <b>30 мин</b>.",
+      notify:
+        "Мы отправим уведомление, как только он будет доступен для получения.",
+      rights: "Все права защищены.",
+    },
+    en: {
+      title: `Your order №${orderNumber} <span style="white-space: nowrap;">has been paid ✅</span>`,
+      thanks: "❤️ Thank you for choosing <b>YourMeal</b> 🍔",
+      qty: "Qty",
+      price: "Price",
+      raw: "Subtotal",
+      discount: "Discount",
+      vat: "VAT (5%)",
+      tips: "Tips",
+      total: "✅ Total",
+      eta: "⏳ Your order will be ready within <b>30 min</b>.",
+      notify: "We’ll notify you when it’s ready for pickup.",
+      rights: "All rights reserved.",
+    },
+  }[lang];
+
+  // Скидки
   const discountLabels = activated
     .map((code) => {
       if (DEFAULT_PROMOS.includes(code)) {
         if (code === "PromoFirst10") return "10%";
         if (code === "PromoFrom2020" && rawTotal >= 2000) return "20%";
-        return null; // если дефолтный промокод не подошёл
+        return null;
       }
-      return code; // ручные коды показываем как есть
+      return code;
     })
     .filter(Boolean);
 
-  // Сумма после скидок (для корректного savedMoney)
   const discountedTotal = Math.round(rawTotal * (1 - discount / 100));
   const savedMoney = rawTotal - discountedTotal;
 
@@ -50,8 +83,8 @@ export const orderEmailTemplate = ({
         <table width="100%" style="background:#ffab08;padding:30px 20px">
           <tr>
             <td align="center" style="color:#fff">
-              <h1 style="margin:0;font-size:22px">Ваш заказ №${orderNumber} оплачен ✅</h1>
-              <p style="margin:5px 0;font-size:16px">❤️ Спасибо, что выбрали <b>YourMeal</b> 🍔</p>
+              <h1 style="margin:0;font-size:22px">${texts.title}</h1>
+              <p style="margin:5px 0;font-size:16px">${texts.thanks}</p>
             </td>
           </tr>
         </table>
@@ -64,12 +97,16 @@ export const orderEmailTemplate = ({
               return `
                 <tr style="border-bottom:1px solid #eee">
                   <td width="80">
-                    <img src="${item.image}" width="70" height="70" style="border-radius:8px"/>
+                    <img src="${
+                      item.image
+                    }" width="70" height="70" style="border-radius:8px"/>
                   </td>
                   <td style="font-size:14px;color:#333">
-                    <div><b>${item.name_ru}</b></div>
-                    <div>Кол-во: ${item.count}</div>
-                    <div>Цена: ${itemTotal}₽</div>
+                    <div><b>${
+                      lang === "ru" ? item.name_ru : item.name_en
+                    }</b></div>
+                    <div>${texts.qty}: ${item.count}</div>
+                    <div>${texts.price}: ${itemTotal}₽</div>
                   </td>
                 </tr>
               `;
@@ -80,22 +117,21 @@ export const orderEmailTemplate = ({
         <!-- Summary -->
         <table width="100%" cellpadding="10" style="background:#fff1e6;padding:15px">
           <tr><td>
-            <p style="margin:4px 0">Чистый счёт: ${rawTotal}₽</p>
+            <p style="margin:4px 0">${texts.raw}: ${rawTotal}₽</p>
             <p style="margin:4px 0; color:#ff8000;">
-              Скидка${
-                discountLabels.length > 0
-                  ? ` (${discountLabels.join(", ")})`
-                  : ""
-              }: -${savedMoney}₽
+              ${texts.discount}${
+    discountLabels.length > 0 ? ` (${discountLabels.join(", ")})` : ""
+  }: -${savedMoney}₽
             </p>
-            <p style="margin:4px 0; color:#ff0000;">НДС (5%): +${vat}₽</p>
-            <p style="margin:4px 0">Чаевые (${tipsPercent || 0}%): +${
+            <p style="margin:4px 0; color:#ff0000;">${texts.vat}: +${vat}₽</p>
+            <p style="margin:4px 0">${texts.tips} (${tipsPercent || 0}%): +${
     tips || 0
   }₽</p>
-            <h3 style="margin:8px 0; color:#28a745;">✅ Всего: ${finalTotal}₽</h3>
+            <h3 style="margin:8px 0; color:#28a745;">${
+              texts.total
+            }: ${finalTotal}₽</h3>
             <p style="margin:8px 0; font-size:14px; color:#555;">
-              ⏳ Ваш заказ будет готов в течение <b>30 минут</b>.  
-              Мы отправим уведомление, как только он будет доступен для получения.  
+              ${texts.eta}<br/>${texts.notify}
             </p>
           </td></tr>
         </table>
@@ -103,7 +139,7 @@ export const orderEmailTemplate = ({
         <!-- Footer -->
         <table width="100%" cellpadding="10" style="background:#fff;padding:15px">
           <tr><td align="center" style="font-size:12px;color:#999">
-            © ${new Date().getFullYear()} YourMeal. Все права защищены.
+            © ${new Date().getFullYear()} YourMeal. ${texts.rights}
           </td></tr>
         </table>
       </td></tr>

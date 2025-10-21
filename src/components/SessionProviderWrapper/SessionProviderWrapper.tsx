@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store/store";
+import { AppDispatch, RootState, store } from "@/store/store";
 import { setItems } from "@/store/slices/cartSlice";
 import { setPromoCodes } from "@/store/slices/promoSlice";
 import {
@@ -29,6 +29,7 @@ export function SyncAuthUserWithRedux() {
 
   const hasLoadedData = useRef(false);
   const hasSavedData = useRef(false);
+  const syncInProgress = useRef(false);
 
   // Загрузка пользовательских данных из Supabase
   useEffect(() => {
@@ -38,6 +39,10 @@ export function SyncAuthUserWithRedux() {
         session?.user &&
         !hasLoadedData.current
       ) {
+        // Защита от дубликатов
+        if (syncInProgress.current) return;
+
+        syncInProgress.current = true;
         hasLoadedData.current = true;
 
         dispatch(setAuthStatus(true));
@@ -62,7 +67,13 @@ export function SyncAuthUserWithRedux() {
           dispatch(
             setAvatarUrl(data.avatar ?? session.user.image ?? DEFAULT_AVATAR)
           );
-          dispatch(setItems(data.cart || []));
+
+          if (data.cart && data.cart.length > 0) {
+            dispatch(setItems(data.cart));
+          }
+
+          const currentPromoCodes = store.getState().promo;
+          let newPromoCodes: { activated: string[]; available: string[] };
 
           if (
             data.promoCodes &&
@@ -70,11 +81,22 @@ export function SyncAuthUserWithRedux() {
             Array.isArray(data.promoCodes.activated) &&
             Array.isArray(data.promoCodes.available)
           ) {
-            dispatch(setPromoCodes(data.promoCodes));
+            // Если в базе есть промокоды - используем их
+            newPromoCodes = data.promoCodes;
+          } else if (
+            currentPromoCodes.activated.length > 0 ||
+            currentPromoCodes.available.length > 0
+          ) {
+            // Если в базе пусто, но локально есть промокоды - используем локальные
+            newPromoCodes = {
+              activated: currentPromoCodes.activated,
+              available: currentPromoCodes.available,
+            };
           } else {
-            dispatch(setPromoCodes({ activated: [], available: [] }));
+            // Если везде пусто - используем пустые массивы
+            newPromoCodes = { activated: [], available: [] };
           }
-
+          dispatch(setPromoCodes(newPromoCodes));
           dispatch(setBalance(data.balance || 0));
           hasSavedData.current = true;
         } catch (error) {
@@ -138,7 +160,7 @@ export default function SessionProviderWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider refetchInterval={5 * 60} refetchOnWindowFocus={false}>
+    <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
       <SyncAuthUserWithRedux />
       {children}
     </SessionProvider>

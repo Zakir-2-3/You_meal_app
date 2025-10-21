@@ -4,6 +4,8 @@ import Image from "next/image";
 
 import debounce from "lodash.debounce";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import searchIcon from "@/assets/icons/search-icon.svg";
 import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
 
@@ -20,6 +22,9 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const [searchClick, setSearchClick] = useState(false);
+
+  const { t } = useTranslate();
+  const { searchInputPlaceholder } = t.product;
 
   // Фокус в инпуте при клике на поиск
   useEffect(() => {
@@ -91,7 +96,7 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
         value={value}
         ref={inputRef}
         type="text"
-        placeholder="Найти"
+        placeholder={searchInputPlaceholder}
       />
       <button
         className="food-categories__search-button"
@@ -99,7 +104,7 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
       >
         <Image
           src={value || searchClick ? searchCloseIcon : searchIcon}
-          alt="Поиск"
+          alt="search"
           width={20}
           height={20}
         />

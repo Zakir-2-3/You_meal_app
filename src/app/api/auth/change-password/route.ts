@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+
 import bcrypt from "bcryptjs";
+
+import { supabase } from "@/lib/supabaseClient";
 import { checkPasswordMatch } from "@/lib/checkPasswordMatch";
 
 export async function POST(req: Request) {

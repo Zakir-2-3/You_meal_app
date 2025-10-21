@@ -1,7 +1,9 @@
 "use client";
 
 import axios from "axios";
+
 import { useEffect, useState, useRef } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import {
@@ -9,25 +11,34 @@ import {
   setManyRatings,
   setSort,
 } from "@/store/slices/productMetaSlice";
+
 import HeroSection from "@/components/HeroSection/HeroSection";
 import FoodCategories from "@/components/FoodCategories/FoodCategories";
 import FoodCategoriesSearch from "@/components/FoodCategoriesSearch/FoodCategoriesSearch";
 import CartSidebar from "@/components/CartSidebar/CartSidebar";
+import { translations } from "@/components/i18n/translations";
 import FoodCard from "@/components/FoodCard/FoodCard";
 import SortBar from "@/components/SortBar/SortBar";
-import { Item } from "@/types/item";
-import { syncUserMetaIfAuth } from "@/utils/syncUserMeta";
-import FoodCardSkeleton from "@/ui/skeletons/FoodCardSkeleton";
-import "@/styles/home.scss";
+
 import {
   insertSorted,
   sortItemsWithAnimation,
   UIItem,
 } from "@/utils/insertSorted";
+import { syncUserMetaIfAuth } from "@/utils/syncUserMeta";
+
+import { useTranslate } from "@/hooks/useTranslate";
+
+import { categories } from "@/constants/categories";
+
+import FoodCardSkeleton from "@/ui/skeletons/FoodCardSkeleton";
+
+import type { CategoryKey } from "@/types/category";
+import { Item } from "@/types/item";
+
+import "@/styles/home.scss";
 
 export default function Home() {
-  const dispatch = useDispatch<AppDispatch>();
-
   const [originalItems, setOriginalItems] = useState<Item[]>([]);
   const [baseDisplayedItems, setBaseDisplayedItems] = useState<Item[]>([]);
   const [displayedItems, setDisplayedItems] = useState<UIItem[]>([]);
@@ -35,7 +46,7 @@ export default function Home() {
   const [searchValue, setSearchValue] = useState("");
   const [noMorePulse, setNoMorePulse] = useState(false);
 
-  const LOAD_MORE_COUNT = 6;
+  const dispatch = useDispatch<AppDispatch>();
 
   const { ratings, favorites, sort } = useSelector(
     (s: RootState) => s.productMeta
@@ -43,9 +54,21 @@ export default function Home() {
   const { isAuth, email } = useSelector((s: RootState) => s.user);
   const rehydrated = useSelector((s: any) => s._persist?.rehydrated);
   const metaSynced = useSelector((s: RootState) => s.productMeta.metaSynced);
-  const activeCategoryName = useSelector(
-    (s: RootState) => s.category.activeCategoryName
+  const { activeKey } = useSelector((state: RootState) => state.category);
+
+  const { t } = useTranslate();
+
+  const categoryTitle = (t.categories as Record<string, string>)[activeKey];
+
+  const LOAD_MORE_COUNT = 6;
+
+  const activeIndex = useSelector(
+    (state: RootState) => state.category.activeIndex
   );
+  const categoryKey = categories[activeIndex]?.key as CategoryKey | undefined;
+
+  const { loadMore } = t.buttons;
+  const { nothingFound } = t.product;
 
   // Для отслеживания номера страницы
   const pageCountRef = useRef(1);
@@ -209,10 +232,16 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setOriginalItems([]);
+      setBaseDisplayedItems([]);
+      setDisplayedItems([]);
       try {
+        // Используем ру название категории для mockapi-запроса
         const categoryParam =
-          searchValue === "" && activeCategoryName
-            ? `category=${activeCategoryName}`
+          searchValue === "" && categoryKey
+            ? `category=${encodeURIComponent(
+                translations.ru.categories[categoryKey]
+              )}`
             : "";
         const searchParam = searchValue ? `search=${searchValue}` : "";
         const queryParams = [categoryParam, searchParam]
@@ -252,7 +281,7 @@ export default function Home() {
     };
 
     fetchData();
-  }, [activeCategoryName, searchValue, dispatch]);
+  }, [categoryKey, searchValue, dispatch]);
 
   useEffect(() => {
     if (!baseDisplayedItems.length) {
@@ -298,7 +327,7 @@ export default function Home() {
         <CartSidebar isLoading={isLoading} />
 
         <section className="food-section">
-          <h2 className="food-section__title">{activeCategoryName}</h2>
+          <h2 className="food-section__title">{categoryTitle}</h2>
 
           <SortBar
             by={sort.by}
@@ -334,7 +363,7 @@ export default function Home() {
             ) : !isLoading ? (
               <p className="food-section__empty">
                 <b>¯\_(ツ)_/¯</b>
-                <br /> Ничего не найдено
+                <br /> {nothingFound}
               </p>
             ) : null}
           </div>
@@ -348,7 +377,7 @@ export default function Home() {
                 }`}
                 onClick={handleLoadMore}
               >
-                Загрузить еще
+                {loadMore}
               </button>
             )}
         </section>

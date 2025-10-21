@@ -1,7 +1,7 @@
-export async function detectGeoCity(): Promise<string> {
+export async function detectGeoCity(lang: "ru" | "en" = "ru"): Promise<string> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      return resolve("Геолокация не поддерживается");
+      return resolve("geolocation_not_supported");
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -15,14 +15,14 @@ export async function detectGeoCity(): Promise<string> {
             data.address?.city ||
             data.address?.town ||
             data.address?.village ||
-            "Геолокация отключена";
+            "geolocation_disabled";
           resolve(cityName);
         } catch {
-          resolve("Геолокация отключена");
+          resolve("geolocation_disabled");
         }
       },
       () => {
-        resolve("Геолокация отключена");
+        resolve("geolocation_disabled");
       }
     );
   });

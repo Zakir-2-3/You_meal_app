@@ -10,6 +10,8 @@ import QuantityControl from "@/components/QuantityControl/QuantityControl";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { Item } from "@/types/item";
 
 import "./CartPageItem.scss";
@@ -18,6 +20,7 @@ const CartPageItem: FC<Item> = ({
   id,
   instanceId,
   name_ru,
+  name_en,
   image,
   price_rub,
   size,
@@ -26,6 +29,11 @@ const CartPageItem: FC<Item> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { activated } = useSelector((state: RootState) => state.promo);
   const { items } = useSelector((state: RootState) => state.cart);
+
+  const { t, lang } = useTranslate();
+
+  const { grams } = t.product;
+  const { discount2Tr } = t.cart;
 
   const iid = instanceId ?? String(id);
 
@@ -64,13 +72,15 @@ const CartPageItem: FC<Item> = ({
         <Image src={image} alt={name_ru} width={100} height={100} />
       </div>
       <div className="cart-page-section__description">
-        <h3 className="cart-page-section__name">{name_ru}</h3>
+        <h3 className="cart-page-section__name">
+          {lang === "ru" ? name_ru : name_en}
+        </h3>
         <div className="cart-page-section__price">
           {hasDiscount ? (
             <>
               <span
                 className="old-price"
-                title={`Скидка: ${activated.join(", ")}`}
+                title={`${discount2Tr} ${activated.join(", ")}`}
               >
                 {formattedPrice} ₽
               </span>
@@ -82,7 +92,9 @@ const CartPageItem: FC<Item> = ({
             `${formattedPrice}₽`
           )}
         </div>
-        <div className="cart-page-section__size">{size}г.</div>
+        <div className="cart-page-section__size">
+          {size} {grams}
+        </div>
       </div>
       <QuantityControl
         count={count}

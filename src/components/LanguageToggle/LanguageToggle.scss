@@ -1,0 +1,85 @@
+.lang-toggle {
+  align-items: center;
+  width: 50px;
+  height: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+
+  &__text {
+    color: #fff;
+    z-index: 1;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: color 0.3s;
+    display: flex;
+    position: absolute;
+
+    &--ru {
+      left: 0;
+      background-color: #f86310;
+      border-top: 1px solid #ffab08;
+      border-bottom: 1px solid #ffab08;
+      border-left: 1px solid #ffab08;
+    }
+
+    &--en {
+      right: 0;
+      background-color: #f86310;
+      border-top: 1px solid #ffab08;
+      border-bottom: 1px solid #ffab08;
+      border-right: 1px solid #ffab08;
+    }
+  }
+
+  &__slider {
+    color: #f86310;
+    z-index: 2;
+    background: #fff;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    position: absolute;
+    left: 0;
+
+    &--right {
+      left: calc(50% - 0px);
+      transform: translateX(0);
+    }
+  }
+
+  // Когда слайдер справа (EN активен)
+  &:has(.lang-toggle__slider--right) {
+    .lang-toggle__text--ru {
+      // border-left: 0;
+    }
+  }
+
+  // Когда слайдер слева (RU активен)
+  &:not(:has(.lang-toggle__slider--right)) {
+    .lang-toggle__text--en {
+      // border-right: 0;
+    }
+  }
+
+  // Когда слайдер на RU, подсвечиваем RU текст
+  &:not(:has(.lang-toggle__slider--right)) .lang-toggle__text--en {
+    color: #fff;
+  }
+
+  // Когда слайдер на EN, подсвечиваем EN текст
+  &:has(.lang-toggle__slider--right) .lang-toggle__text--ru {
+    color: #fff;
+  }
+}

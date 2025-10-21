@@ -23,7 +23,7 @@ const TogglePasswordButton: FC<Props> = ({ visible, onToggle }) => {
         src={visible ? showPasswordIcon : hidePasswordIcon}
         width={20}
         height={20}
-        alt="Переключить отображение пароля"
+        alt="toggle-password-icon"
       />
     </button>
   );

@@ -12,9 +12,17 @@ import { setGeoCity } from "@/store/slices/userSlice";
 
 import { detectGeoCity } from "@/utils/geo";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import locationIcon from "@/assets/icons/location-icon.svg";
 
 import "./GeoLocationSelector.scss";
+
+// Константы для статусов геолокации
+const GEO_STATUS = {
+  DISABLED: "geolocation_disabled",
+  NOT_SUPPORTED: "geolocation_not_supported",
+} as const;
 
 const GeoLocationSelector = () => {
   const dispatch = useDispatch();
@@ -22,44 +30,75 @@ const GeoLocationSelector = () => {
   const email = useSelector((state: RootState) => state.user.email);
 
   const [inputVisible, setInputVisible] = useState(false);
-  const [inputValue, setInputValue] = useState(savedCity || "");
-  const [city, setCity] = useState(savedCity || "");
+  const [inputValue, setInputValue] = useState("");
+  const [city, setCity] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [hasUserTyped, setHasUserTyped] = useState(false);
   const [geoTried, setGeoTried] = useState(false);
 
+  const { t, lang } = useTranslate();
+  const {
+    disabledGeo,
+    enterCityGeo,
+    retryGeo,
+    changeCityGeo,
+    notSupportedGeo,
+  } = t.geo;
+
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Определить гео
-  const tryGeoDetect = async () => {
-    const cityName = await detectGeoCity();
-    dispatch(setGeoCity(cityName));
-    localStorage.setItem("city", cityName);
-    setCity(cityName);
-    setInputValue(cityName);
-    setGeoTried(cityName === "Геолокация отключена");
+  // Функция для определения, является ли город ошибкой геолокации
+  const isGeoError = (cityName: string): boolean => {
+    return (
+      cityName === GEO_STATUS.DISABLED || cityName === GEO_STATUS.NOT_SUPPORTED
+    );
   };
 
-  // Инициализация
+  // Функция для получения отображаемого названия города
+  const getDisplayCity = (cityName: string): string => {
+    if (cityName === GEO_STATUS.DISABLED) return disabledGeo;
+    if (cityName === GEO_STATUS.NOT_SUPPORTED) return notSupportedGeo;
+    return cityName;
+  };
+
+  // Определить гео
+  const tryGeoDetect = async () => {
+    const cityName = await detectGeoCity(lang);
+
+    // Сохраняем статус вместо переведенного текста
+    let status = cityName;
+    if (cityName === disabledGeo) status = GEO_STATUS.DISABLED;
+    if (cityName === notSupportedGeo) status = GEO_STATUS.NOT_SUPPORTED;
+
+    dispatch(setGeoCity(status));
+    localStorage.setItem("city", status);
+    setCity(status);
+    setInputValue(getDisplayCity(status));
+    setGeoTried(status === GEO_STATUS.DISABLED);
+  };
+
   useEffect(() => {
-    if (
-      !savedCity ||
-      savedCity === "" ||
-      savedCity === "Геолокация отключена"
-    ) {
-      const storedCity = localStorage.getItem("city");
-      if (storedCity) {
-        dispatch(setGeoCity(storedCity));
-        setCity(storedCity);
-        setInputValue(storedCity);
-        return;
+    const initializeCity = async () => {
+      if (!savedCity || savedCity === "" || isGeoError(savedCity)) {
+        const storedCity = localStorage.getItem("city");
+        if (storedCity && !isGeoError(storedCity)) {
+          // Если в localStorage не пустой город
+          dispatch(setGeoCity(storedCity));
+          setCity(storedCity);
+          setInputValue(storedCity);
+        } else {
+          // Пытаемся определить геолокацию
+          await tryGeoDetect();
+        }
+      } else {
+        // Используем сохраненный город
+        setCity(savedCity);
+        setInputValue(getDisplayCity(savedCity));
       }
-      tryGeoDetect();
-    } else {
-      setCity(savedCity);
-      setInputValue(savedCity);
-    }
+    };
+
+    initializeCity();
   }, [savedCity, dispatch]);
 
   // Клик вне компонента
@@ -72,7 +111,7 @@ const GeoLocationSelector = () => {
       ) {
         setInputVisible(false);
         setSuggestions([]);
-        setInputValue(city);
+        setInputValue(getDisplayCity(city));
       }
     };
     document.addEventListener("click", handler);
@@ -125,7 +164,7 @@ const GeoLocationSelector = () => {
 
   // Клик по иконке гео
   const handleGeoClick = async () => {
-    if (city === "Геолокация отключена") {
+    if (isGeoError(city)) {
       try {
         if (navigator.permissions) {
           const permission = await navigator.permissions.query({
@@ -146,10 +185,11 @@ const GeoLocationSelector = () => {
     if (!inputVisible) {
       setInputVisible(true);
       setHasUserTyped(false);
-      setInputValue(city === "Геолокация отключена" ? "" : city);
+      setInputValue(isGeoError(city) ? "" : city);
     } else {
       setInputVisible(false);
       setSuggestions([]);
+      setInputValue(getDisplayCity(city));
     }
   };
 
@@ -182,16 +222,12 @@ const GeoLocationSelector = () => {
       <div className="geo-selector__container">
         <button
           className={`geo-selector__icon ${
-            city === "Геолокация отключена"
+            isGeoError(city)
               ? "geo-selector__icon--error"
               : "geo-selector__icon--success"
           }`}
           onClick={handleGeoClick}
-          title={
-            city === "Геолокация отключена"
-              ? "Повторить попытку определить геолокацию или ввести вручную"
-              : "Изменить город"
-          }
+          title={isGeoError(city) ? retryGeo : changeCityGeo}
         >
           <Image src={locationIcon} alt="geo" width={16} height={16} />
         </button>
@@ -213,7 +249,7 @@ const GeoLocationSelector = () => {
               }
             }}
             className="geo-selector__input"
-            placeholder="Введите название"
+            placeholder={enterCityGeo}
             autoFocus={inputVisible}
           />
           {hasUserTyped && inputValue.trim() && suggestions.length > 0 && (
@@ -232,7 +268,7 @@ const GeoLocationSelector = () => {
         </div>
       </div>
 
-      <span className="geo-selector__label">{city}</span>
+      <span className="geo-selector__label">{getDisplayCity(city)}</span>
     </div>
   );
 };

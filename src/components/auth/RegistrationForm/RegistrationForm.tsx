@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -21,15 +22,15 @@ import {
   setAvatarUrl,
 } from "@/store/slices/userSlice";
 
-import GoogleLoginButton from "../GoogleLoginButton/GoogleLoginButton";
-import ForgotPasswordForm from "../ForgotPasswordForm/ForgotPasswordForm";
-import LoginOrSignupForm from "../LoginOrSignupForm/LoginOrSignupForm";
 import VerifyCodeForm from "../VerifyCodeForm/VerifyCodeForm";
+import GoogleLoginButton from "../GoogleLoginButton/GoogleLoginButton";
+import LoginOrSignupForm from "../LoginOrSignupForm/LoginOrSignupForm";
+import ForgotPasswordForm from "../ForgotPasswordForm/ForgotPasswordForm";
 import SetNewPasswordForm from "../SetNewPasswordForm/SetNewPasswordForm";
 
+import { useTranslate } from "@/hooks/useTranslate";
 import { useResendTimer } from "@/hooks/useResendTimer";
-
-import { syncUserMetaIfAuth } from "@/utils/syncUserMeta";
+import { useCleanupOnAuth } from "@/hooks/useCleanupOnAuth";
 
 import { DEFAULT_AVATAR } from "@/constants/defaults";
 
@@ -58,7 +59,30 @@ const RegistrationForm = () => {
     "login"
   );
 
+  const doCleanup = useCleanupOnAuth();
+
   const { canResend, startTimer, formatTime } = useResendTimer();
+
+  const { t, lang } = useTranslate();
+
+  const { title1, title2, title3 } = t.regForm;
+
+  const {
+    passwordUpdated,
+    passwordResetError,
+    userNotFound,
+    loginErrorTr,
+    loginSuccess,
+    loginOrServerError,
+    accountExists,
+    tooManyAttemptsTryLater,
+    codeAlreadySent,
+    codeSendError,
+    codeSent,
+    registrationError,
+    successfulRegistration,
+    invalidCode,
+  } = t.toastTr;
 
   const isFormOpen = useSelector((state: any) => state.user.isRegFormOpen);
   const geoCity = useSelector((state: any) => state.user.geoCity);
@@ -69,6 +93,10 @@ const RegistrationForm = () => {
 
   const methods = useForm<RegForm>({ mode: "onChange" });
   const verifyMethods = useForm<{ code: string }>({ mode: "onChange" });
+
+  const { data: session } = useSession();
+  const isGoogleUser = session?.user?.image?.includes("googleusercontent");
+  const isAuth = useSelector((state: any) => state.user.isAuth);
 
   const {
     register,
@@ -110,7 +138,7 @@ const RegistrationForm = () => {
           const errorData = await res.json();
 
           if (errorData.code === "email_not_found") {
-            toast.error("Пользователь с таким email не найден");
+            toast.error(userNotFound);
             setError("email", { type: "server", message: "Почта не найдена" });
           } else if (errorData.code === "invalid_password") {
             setError("password", {
@@ -118,28 +146,33 @@ const RegistrationForm = () => {
               message: "Неверный пароль",
             });
           } else {
-            toast.error(errorData.message || "Ошибка входа");
+            toast.error(errorData.message || loginErrorTr);
           }
           return;
         }
 
         const user = await res.json();
+
         dispatch(setAuthStatus(true));
         dispatch(setEmail(user.email));
         dispatch(setName(user.name));
         localStorage.removeItem("hasLoggedOut");
+
         await loadUserData(user.email);
-        toast.success("Вы успешно вошли");
+
+        doCleanup();
+
+        toast.success(loginSuccess);
         dispatch(activeRegForm(false));
       } catch {
-        toast.error("Ошибка входа или сервер недоступен");
+        toast.error(loginOrServerError);
       }
     } else {
       try {
         // Проверка, существует ли уже аккаунт
         const exists = await checkUserExists(data.email);
         if (exists) {
-          toast.warn("Аккаунт уже существует");
+          toast.warn(accountExists);
           setSignupOn(false);
           setStep("form");
           reset();
@@ -153,6 +186,7 @@ const RegistrationForm = () => {
           body: JSON.stringify({
             ...data,
             city: geoCity || localStorage.getItem("city") || "",
+            lang,
           }),
         });
 
@@ -160,9 +194,7 @@ const RegistrationForm = () => {
 
         // Обработка блокировки
         if (res.status === 429) {
-          toast.error(
-            result.error || "Слишком много попыток. Попробуйте позже."
-          );
+          toast.error(result.error || tooManyAttemptsTryLater);
           if (result.blockedUntil) {
             const remaining = Math.ceil(
               (new Date(result.blockedUntil).getTime() - Date.now()) / 1000
@@ -174,12 +206,9 @@ const RegistrationForm = () => {
 
         // Если код уже был отправлен ранее — открываем verify-экран
         if (res.status === 208) {
-          toast.info(
-            result.message || "Код уже был отправлен. Проверьте почту",
-            {
-              autoClose: 5000,
-            }
-          );
+          toast.info(result.message || codeAlreadySent, {
+            autoClose: 5000,
+          });
           setLocalEmail(data.email);
           setLocalName(data.name);
           setLocalPassword(data.password);
@@ -198,11 +227,11 @@ const RegistrationForm = () => {
 
         // Если код был отправлен впервые или повторно (после истечения)
         if (!res.ok) {
-          toast.error(result.error || "Ошибка при отправке кода");
+          toast.error(result.error || codeSendError);
           return;
         }
 
-        toast.success(result.message || "Код отправлен на почту");
+        toast.success(result.message || codeSent);
 
         setLocalEmail(data.email);
         setLocalName(data.name);
@@ -210,6 +239,8 @@ const RegistrationForm = () => {
         dispatch(setName(data.name));
         dispatch(setEmail(data.email));
         setStep("verify");
+
+        doCleanup();
 
         if (result.blockedUntil) {
           const remaining = Math.ceil(
@@ -220,7 +251,7 @@ const RegistrationForm = () => {
           startTimer(10);
         }
       } catch {
-        toast.error("Ошибка при регистрации");
+        toast.error(registrationError);
       }
     }
   };
@@ -242,7 +273,7 @@ const RegistrationForm = () => {
         throw new Error("Код неверен");
       }
 
-      toast.success("Успешная регистрация");
+      toast.success(successfulRegistration);
       dispatch(setAuthStatus(true));
 
       localStorage.removeItem("hasLoggedOut");
@@ -251,11 +282,11 @@ const RegistrationForm = () => {
       await loadUserData(localEmail);
 
       // Загружаем рейтинг и избранные
-      await dispatch(syncUserMetaIfAuth());
+      // await dispatch(syncUserMetaIfAuth());
 
       dispatch(activeRegForm(false));
     } catch {
-      toast.error("Неверный код или ошибка сервера");
+      toast.error(invalidCode);
     }
   });
 
@@ -279,11 +310,96 @@ const RegistrationForm = () => {
         return;
       }
 
-      const localCart = (store.getState() as RootState).cart.items;
+      // Берем корзину из SessionStorage, а не из Redux
+      const savedCart = JSON.parse(
+        sessionStorage.getItem("googleAuthCart") || "[]"
+      );
+      const localCart =
+        savedCart.length > 0
+          ? savedCart
+          : (store.getState() as RootState).cart.items;
+
+      // Очищаем SessionStorage после использования
+      if (savedCart.length > 0) {
+        sessionStorage.removeItem("googleAuthCart");
+      }
+
+      const localCity =
+        (store.getState() as RootState).user.geoCity ||
+        localStorage.getItem("city");
+
+      // Получаем текущий локальный город
+      const currentLocalCity = localCity;
+
+      // Получаем город из базы данных
+      const dbCity = data.city;
+
+      // Проверка, является ли город пустым
+      const isBadCity = (city: string | null): boolean => {
+        if (!city) return true;
+        return (
+          city === "geolocation_disabled" ||
+          city === "geolocation_not_supported" ||
+          city === t.geo.disabledGeo ||
+          city === t.geo.notSupportedGeo ||
+          city === "Геолокация отключена" ||
+          city === "Geolocation disabled"
+        );
+      };
+
+      // Проверка, является ли город не пустым
+      const isGoodCity = (city: string | null): boolean => {
+        return !!city && !isBadCity(city);
+      };
+
+      let finalCity = dbCity;
+
+      // В базе пустой город (geolocation_disabled), а локально не пустой
+      if (isBadCity(dbCity) && isGoodCity(currentLocalCity)) {
+        finalCity = currentLocalCity;
+
+        // Сохраняем не пустой город в базу
+        await fetch("/api/user/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            city: currentLocalCity,
+          }),
+        });
+      }
+      // В базе пусто, а локально не пустой город
+      else if (!dbCity && isGoodCity(currentLocalCity)) {
+        finalCity = currentLocalCity;
+
+        // Сохраняем не пустой город в базу
+        await fetch("/api/user/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            city: currentLocalCity,
+          }),
+        });
+      }
+      // В базе не пустой город - используем его (самый высокий приоритет)
+      else if (isGoodCity(dbCity)) {
+        finalCity = dbCity;
+      }
+      // В базе пустой город и локально тоже - оставляем как есть
+      else {
+        finalCity = dbCity || currentLocalCity;
+      }
+
+      // Устанавливаем финальный город
+      if (finalCity) {
+        dispatch(setGeoCity(finalCity));
+        localStorage.setItem("city", finalCity);
+      }
 
       if (!data.cart || data.cart.length === 0) {
         if (localCart.length > 0) {
-          // Заливаем локальные данные в Supabase
+          // Сохраняем корзину в базу
           await fetch("/api/user/update", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -292,27 +408,45 @@ const RegistrationForm = () => {
               cart: localCart,
             }),
           });
-
+          // Восстанавливаем корзину
           dispatch(setItems(localCart));
-          console.log("Локальная корзина перенесена в Supabase:", localCart);
         } else {
-          dispatch(setItems([]));
+          console.log("Корзина пустая");
         }
       } else {
+        // Если в базе есть корзина - используем ее
         dispatch(setItems(data.cart));
       }
 
-      dispatch(setPromoCodes(data.promoCodes || []));
+      const currentPromoCodes = store.getState().promo;
+      let newPromoCodes: { activated: string[]; available: string[] };
+
+      if (
+        data.promoCodes &&
+        typeof data.promoCodes === "object" &&
+        Array.isArray(data.promoCodes.activated) &&
+        Array.isArray(data.promoCodes.available)
+      ) {
+        // Если в базе есть промокоды - используем их
+        newPromoCodes = data.promoCodes;
+      } else if (
+        currentPromoCodes.activated.length > 0 ||
+        currentPromoCodes.available.length > 0
+      ) {
+        // Если в базе пусто, но локально есть промокоды - используем локальные
+        newPromoCodes = {
+          activated: currentPromoCodes.activated,
+          available: currentPromoCodes.available,
+        };
+      } else {
+        // Если везде пусто - используем пустые массивы
+        newPromoCodes = { activated: [], available: [] };
+      }
+
+      dispatch(setPromoCodes(newPromoCodes));
 
       dispatch(setBalance(data.balance || 0));
-
       dispatch(setAvatarUrl(data.avatar || DEFAULT_AVATAR));
-
-      if (data.city) {
-        dispatch(setGeoCity(data.city));
-        localStorage.setItem("city", data.city);
-        console.log("Город из базы:", data.city);
-      }
     } catch (err) {
       console.error("Ошибка загрузки данных:", err);
     }
@@ -337,6 +471,28 @@ const RegistrationForm = () => {
     if (isFormOpen) reset();
   }, [isFormOpen, reset]);
 
+  useEffect(() => {
+    if (session?.user?.email && isGoogleUser && !isAuth) {
+      // Восстанавливаем корзину
+      const savedCart = JSON.parse(
+        sessionStorage.getItem("googleAuthCart") || "[]"
+      );
+      if (savedCart.length > 0) {
+        dispatch(setItems(savedCart));
+        sessionStorage.removeItem("googleAuthCart");
+      }
+
+      // Устанавливаем данные пользователя
+      dispatch(setAuthStatus(true));
+      dispatch(setEmail(session.user.email));
+      dispatch(setName(session.user.name || ""));
+      dispatch(setAvatarUrl(session.user.image || DEFAULT_AVATAR));
+
+      // Загружаем остальные данные
+      loadUserData(session.user.email);
+    }
+  }, [session, isGoogleUser, isAuth, dispatch, loadUserData]);
+
   if (!isFormOpen) return null;
 
   return (
@@ -349,7 +505,7 @@ const RegistrationForm = () => {
             className="registration-form__image"
             width={300}
             height={300}
-            alt="Изображение"
+            alt="registration-from-img"
           />
         </div>
 
@@ -357,9 +513,13 @@ const RegistrationForm = () => {
           <h2 className="registration-form__title">
             {step === "verify"
               ? "Подтвердите почту"
+              : step === "set-new-password"
+              ? "Восстановление пароля"
+              : forgotMode
+              ? title3
               : signupOn
-              ? "Регистрация"
-              : "Войти"}
+              ? title1
+              : title2}
           </h2>
 
           {step === "form" && forgotMode ? (
@@ -442,11 +602,11 @@ const RegistrationForm = () => {
                 const result = await res.json();
 
                 if (!res.ok) {
-                  toast.error(result.message || "Ошибка при сбросе пароля");
+                  toast.error(result.message || passwordResetError);
                   return;
                 }
 
-                toast.success("Пароль успешно обновлён!");
+                toast.success(passwordUpdated);
                 dispatch(setAuthStatus(true));
                 dispatch(setEmail(localEmail));
                 await loadUserData(localEmail);

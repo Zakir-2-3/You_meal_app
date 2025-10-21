@@ -1,4 +1,24 @@
-export const passwordRecoveryEmailTemplate = (code: string) => `
+export const passwordRecoveryEmailTemplate = (
+  code: string,
+  lang: "ru" | "en" = "ru"
+) => {
+  const isRu = lang === "ru";
+
+  const texts = {
+    title: isRu ? "Восстановление пароля для" : "Password recovery for",
+    subtitle: isRu
+      ? "Не волнуйтесь, с каждым бывает 🧠🔒"
+      : "Don't worry, it happens to everyone 🧠🔒",
+    codeTitle: isRu
+      ? "Вот ваш код для сброса пароля:"
+      : "Here’s your password reset code:",
+    valid10min: isRu
+      ? "Код действителен в течение 10 минут. Если вы не запрашивали восстановление — просто проигнорируйте это письмо."
+      : "The code is valid for 10 minutes. If you didn’t request a password reset, just ignore this email.",
+    rights: isRu ? "Все права защищены." : "All rights reserved.",
+  };
+
+  return `
   <table
     width="100%"
     cellpadding="0"
@@ -34,10 +54,13 @@ export const passwordRecoveryEmailTemplate = (code: string) => `
                   </td>
                   <td valign="middle" style="color: #fff">
                     <h1 style="margin: 0; font-size: 24px; color: #fff;">
-                      Восстановление пароля для
-                      <span style="color: #ff5c00;">YourMeal</span>
+                      ${
+                        texts.title
+                      } <span style="color: #ff5c00;">YourMeal</span>
                     </h1>
-                    <p style="margin-top: 10px; font-size: 16px;">Не волнуйтесь, с каждым бывает 🧠🔒</p>
+                    <p style="margin-top: 10px; font-size: 16px;">${
+                      texts.subtitle
+                    }</p>
                   </td>
                 </tr>
               </table>
@@ -49,7 +72,7 @@ export const passwordRecoveryEmailTemplate = (code: string) => `
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #fff; padding: 30px 20px">
           <tr>
             <td align="center">
-              <p style="font-size: 18px; color: #333;">Вот ваш код для сброса пароля:</p>
+              <p style="font-size: 18px; color: #333;">${texts.codeTitle}</p>
               <div
                 style="
                   font-size: 36px;
@@ -66,7 +89,7 @@ export const passwordRecoveryEmailTemplate = (code: string) => `
                 ${code}
               </div>
               <p style="margin-top: 30px; font-size: 14px; color: #666">
-                Код действителен в течение 10 минут. Если вы не запрашивали восстановление — просто проигнорируйте это письмо.
+                ${texts.valid10min}
               </p>
             </td>
           </tr>
@@ -76,7 +99,7 @@ export const passwordRecoveryEmailTemplate = (code: string) => `
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #fff1e6; padding: 15px">
           <tr>
             <td align="center" style="font-size: 12px; color: #999;">
-              © ${new Date().getFullYear()} YourMeal. Все права защищены.
+              © ${new Date().getFullYear()} YourMeal. ${texts.rights}
             </td>
           </tr>
         </table>
@@ -84,3 +107,4 @@ export const passwordRecoveryEmailTemplate = (code: string) => `
     </tr>
   </table>
 `;
+};

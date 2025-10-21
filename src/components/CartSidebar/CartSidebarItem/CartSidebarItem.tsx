@@ -8,6 +8,8 @@ import { addItem, minusItem } from "@/store/slices/cartSlice";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { Item } from "@/types/item";
 
 import "./CartSidebarItem.scss";
@@ -16,6 +18,7 @@ const CartSidebarItem: FC<Item> = ({
   id,
   instanceId,
   name_ru,
+  name_en,
   image,
   price_rub,
   size,
@@ -23,6 +26,8 @@ const CartSidebarItem: FC<Item> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const activated = useSelector((state: RootState) => state.promo.activated);
+
+  const { lang } = useTranslate();
 
   const { discount, hasDiscount } = getDiscountedPrice(activated, price_rub);
   const discountedPrice = Math.round(price_rub * (1 - discount / 100));
@@ -42,7 +47,9 @@ const CartSidebarItem: FC<Item> = ({
         <Image src={image} alt={name_ru} width={64} height={64} />
       </div>
       <div className="cart-sidebar__item-description">
-        <h3 className="cart-sidebar__item-title">{name_ru}</h3>
+        <h3 className="cart-sidebar__item-title">
+          {lang === "ru" ? name_ru : name_en}
+        </h3>
         <div className="cart-sidebar__item-price">
           {hasDiscount ? (
             <>

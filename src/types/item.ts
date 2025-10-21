@@ -3,6 +3,7 @@ export interface Item {
   instanceId?: string;
   image: string;
   name_ru: string;
+  name_en: string;
   price_rub: number;
   size: number;
   count?: number;

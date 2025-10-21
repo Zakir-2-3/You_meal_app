@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { supabase } from "@/lib/supabaseClient";
+
+import { DEFAULT_AVATAR } from "@/constants/defaults";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,11 +13,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Проверяем, есть ли user
     const { data: userRow, error: findErr } = await supabase
       .from("users")
-      .select("id, favorites, ratings, email")
+      .select("id, favorites, ratings, email, avatar")
       .eq("email", email)
+      .limit(1)
       .maybeSingle();
 
     if (findErr) {
@@ -25,15 +28,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("User found in sync:", userRow);
-
-    // Если тет строки, то создаём новую с пустыми данными
+    // Если нет строки, то создаём новую с пустыми данными
     if (!userRow) {
       console.log("Creating new user record for sync");
       const { error: insertErr } = await supabase.from("users").insert({
         email,
         favorites: [],
         ratings: {},
+        avatar: DEFAULT_AVATAR,
       });
 
       if (insertErr) {
@@ -47,6 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         favorites: [],
         ratings: {},
+        avatar: DEFAULT_AVATAR,
       });
     }
 
@@ -57,9 +60,9 @@ export async function POST(req: NextRequest) {
         userRow.ratings && typeof userRow.ratings === "object"
           ? userRow.ratings
           : {},
+      avatar: userRow.avatar || DEFAULT_AVATAR,
     };
 
-    console.log("Returning sync data:", responseData);
     return NextResponse.json(responseData);
   } catch (e) {
     console.error("sync route error:", e);

@@ -12,6 +12,7 @@ import { activeRegForm } from "@/store/slices/userSlice";
 
 import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
 import GeoLocationSelector from "../GeoLocationSelector/GeoLocationSelector";
+import LanguageToggle from "../LanguageToggle/LanguageToggle";
 
 import { validRoutes } from "@/constants/validRoutes";
 
@@ -85,6 +86,9 @@ const Header = () => {
         </div>
         <div className="header__geo">
           <GeoLocationSelector />
+        </div>
+        <div className="header__language">
+          <LanguageToggle />
         </div>
         <div className="header__profile">
           {isAuth ? (

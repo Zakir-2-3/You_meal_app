@@ -11,9 +11,10 @@ import {
   setName,
 } from "@/store/slices/userSlice";
 
-import { emailValidation, passwordValidation } from "@/utils/validationRules";
+import { createValidationRules } from "@/utils/validationRules";
 
 import { useResendTimer } from "@/hooks/useResendTimer";
+import { useTranslate } from "@/hooks/useTranslate";
 
 import TogglePasswordButton from "@/ui/inputs/TogglePasswordButton";
 
@@ -44,6 +45,45 @@ const ForgotPasswordForm = ({
   const [attempts, setAttempts] = useState(0);
   const [emailInput, setEmailInput] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { t } = useTranslate();
+
+  const {
+    emailPlaceholder,
+    enterNewPasswordPlaceholder,
+    repeatPasswordPlaceholder,
+  } = t.user;
+
+  const {
+    forgotPasswordLabel,
+    sendCodeBtn,
+    backBtn,
+    resendVia,
+    codeFromEmailLabel,
+    sixDigitCode,
+    newPasswordLabel,
+    changePasswordBtn,
+    resendCode,
+  } = t.regForm;
+
+  const {
+    tooManyAttempts,
+    resendError,
+    emailNotVerified,
+    userNotFound,
+    codeSendError,
+    codeSent,
+    passwordsNotMatch,
+    invalidCode,
+    passwordChangedButNoLogin,
+    loginSuccess,
+    passwordRecoveryError,
+    tooManyAttemptsTryLater,
+    codeResent,
+    errorSendingCode,
+  } = t.toastTr;
+
+  const validationRules = createValidationRules(t.formErrors);
 
   const {
     canResend,
@@ -81,7 +121,7 @@ const ForgotPasswordForm = ({
       const result = await res.json();
 
       if (res.status === 429) {
-        toast.error(result.message || "Слишком много попыток.");
+        toast.error(result.message || tooManyAttempts);
         setEmailInput(data.email);
         setStep("code");
         resetCodeForm();
@@ -96,24 +136,22 @@ const ForgotPasswordForm = ({
       }
 
       if (res.status === 403) {
-        toast.info(
-          result.error || "Почта ещё не подтверждена. Завершите регистрацию."
-        );
+        toast.info(result.error || emailNotVerified);
         return;
       }
 
       if (res.status === 404) {
-        toast.error(result.error || "Пользователь с таким email не найден");
+        toast.error(result.error || userNotFound);
         setError("email", { type: "server", message: "Почта не найдена" });
         return;
       }
 
       if (!res.ok) {
-        toast.error(result.message || "Ошибка при отправке кода");
+        toast.error(result.message || codeSendError);
         return;
       }
 
-      toast.success(result.message || "Код отправлен на почту");
+      toast.success(result.message || codeSent);
 
       setEmailInput(data.email);
       setStep("code");
@@ -127,13 +165,13 @@ const ForgotPasswordForm = ({
         startTimer(10);
       }
     } catch {
-      toast.error("Ошибка отправки кода");
+      toast.error(errorSendingCode);
     }
   };
 
   const onSubmitCode = async (data: CodeStepData) => {
     if (data.newPassword !== data.repeatPassword) {
-      return toast.error("Пароли не совпадают");
+      return toast.error(passwordsNotMatch);
     }
 
     try {
@@ -151,7 +189,7 @@ const ForgotPasswordForm = ({
       const result = await res.json();
 
       if (!res.ok) {
-        toast.error(result.message || "Неверный код или ошибка сервера");
+        toast.error(result.message || invalidCode);
         return;
       }
 
@@ -163,7 +201,7 @@ const ForgotPasswordForm = ({
       });
 
       if (!loginRes.ok) {
-        toast.error("Пароль сменён, но вход не выполнен");
+        toast.error(passwordChangedButNoLogin);
         return;
       }
 
@@ -174,11 +212,11 @@ const ForgotPasswordForm = ({
       localStorage.removeItem("hasLoggedOut");
       await loadUserData(user.email);
 
-      toast.success("Вы успешно вошли");
+      toast.success(loginSuccess);
       onCompleteReset(user.email);
       dispatch(activeRegForm(false));
     } catch {
-      toast.error("Ошибка восстановления пароля");
+      toast.error(passwordRecoveryError);
     }
   };
 
@@ -205,14 +243,14 @@ const ForgotPasswordForm = ({
         onSubmit={handleSubmit(onSubmitEmail)}
       >
         <label className="registration-form__label" htmlFor="forgot-email">
-          Введите почту для восстановления:
+          {forgotPasswordLabel}
         </label>
         <input
           id="forgot-email"
           type="email"
-          placeholder="Введите почту"
+          placeholder={emailPlaceholder}
           className="registration-form__input"
-          {...register("email", emailValidation)}
+          {...register("email", validationRules.emailValidation)}
         />
         {errors.email && (
           <p className="registration-form__forgot-error registration-form__forgot-error--email">
@@ -226,14 +264,14 @@ const ForgotPasswordForm = ({
             className="registration-form__button registration-form__button--primary"
             disabled={!canResend}
           >
-            Отправить код
+            {sendCodeBtn}
           </button>
           <button
             type="button"
             className="registration-form__button registration-form__button--secondary"
             onClick={onBack}
           >
-            Назад
+            {backBtn}
           </button>
         </div>
       </form>
@@ -246,12 +284,12 @@ const ForgotPasswordForm = ({
       onSubmit={handleCodeSubmit(onSubmitCode)}
     >
       <label className="registration-form__label" htmlFor="code">
-        Код из почты:
+        {codeFromEmailLabel}
       </label>
       <input
         id="code"
         type="text"
-        placeholder="6-значный код"
+        placeholder={sixDigitCode}
         className="registration-form__input"
         {...registerCode("code", {
           required: "Введите код",
@@ -278,7 +316,7 @@ const ForgotPasswordForm = ({
               const result = await res.json();
 
               if (!res.ok) {
-                toast.error(result.message || "Ошибка повторной отправки");
+                toast.error(result.message || resendError);
                 return;
               }
 
@@ -287,36 +325,36 @@ const ForgotPasswordForm = ({
 
               if (nextAttempts >= 2) {
                 startTimer(7200);
-                toast.error("Слишком много попыток. Попробуйте позже.");
+                toast.error(tooManyAttemptsTryLater);
               } else {
                 startTimer(10);
-                toast.success(result.message || "Код повторно отправлен");
+                toast.success(result.message || codeResent);
               }
             } catch {
-              toast.error("Ошибка повторной отправки");
+              toast.error(resendError);
             }
           }}
         >
-          Отправить код повторно
+          {resendCode}
         </button>
       ) : (
         <p className="registration-form__label">
           {attempts >= 2
             ? `Слишком много попыток. Повторно через ${formatTime()}`
-            : `Повторная отправка через ${formatTime()}`}
+            : `${resendVia} ${formatTime()}`}
         </p>
       )}
 
       <label className="registration-form__label" htmlFor="new-password">
-        Новый пароль:
+        {newPasswordLabel}
       </label>
       <div className="registration-form__password-container">
         <input
           id="new-password"
           type={showPassword ? "text" : "password"}
           className="registration-form__input"
-          placeholder="Введите новый пароль"
-          {...registerCode("newPassword", passwordValidation)}
+          placeholder={enterNewPasswordPlaceholder}
+          {...registerCode("newPassword", validationRules.passwordValidation)}
         />
         <TogglePasswordButton
           visible={showPassword}
@@ -331,7 +369,7 @@ const ForgotPasswordForm = ({
 
       <input
         type={showPassword ? "text" : "password"}
-        placeholder="Повторите пароль"
+        placeholder={repeatPasswordPlaceholder}
         className="registration-form__input"
         {...registerCode("repeatPassword", {
           validate: (val) =>
@@ -349,14 +387,14 @@ const ForgotPasswordForm = ({
           type="submit"
           className="registration-form__button registration-form__button--primary"
         >
-          Сменить пароль
+          {changePasswordBtn}
         </button>
         <button
           type="button"
           className="registration-form__button registration-form__button--secondary"
           onClick={onBack}
         >
-          Назад
+          {backBtn}
         </button>
       </div>
     </form>

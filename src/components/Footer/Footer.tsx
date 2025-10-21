@@ -9,8 +9,10 @@ import { RootState } from "@/store/store";
 
 import { validRoutes } from "@/constants/validRoutes";
 
-import footerLogo from "@/assets/images/footer-logo.png";
+import { useTranslate } from "@/hooks/useTranslate";
+
 import phoneIcon from "@/assets/icons/phone-icon.svg";
+import footerLogo from "@/assets/images/footer-logo.png";
 import socialIcon_1 from "@/assets/icons/socialIcon_1.svg";
 import socialIcon_2 from "@/assets/icons/socialIcon_2.svg";
 import socialIcon_3 from "@/assets/icons/socialIcon_3.svg";
@@ -19,7 +21,12 @@ import "./Footer.scss";
 
 const Footer = () => {
   const pathname = usePathname();
+
   const { isAuth } = useSelector((state: RootState) => state.user);
+
+  const { t } = useTranslate();
+
+  const { design, rights, orderNumber, socialNetworks } = t.footer;
 
   // Проверяем, нужно ли скрывать footer
   const isHidden =
@@ -42,22 +49,22 @@ const Footer = () => {
           </Link>
         </div>
         <div className="footer__number">
-          <p>Номер для заказа</p>
+          <p>{orderNumber}</p>
           <Link href="tel:+79333333911">
             <Image src={phoneIcon} alt="phone-icon" width={24} height={24} />
             +7 (933) 333-39-11
           </Link>
         </div>
         <div className="footer__social">
-          <p>Мы в соцсетях</p>
+          <p>{socialNetworks}</p>
           <ul className="footer__social-list">
             <li className="footer__social-item">
               <Link href={"https://x.com/"} target="_blank">
                 <Image
                   src={socialIcon_1}
                   alt="socialIcon_1"
-                  width={26}
-                  height={26}
+                  width={24}
+                  height={24}
                 />
               </Link>
             </li>
@@ -84,8 +91,8 @@ const Footer = () => {
           </ul>
         </div>
         <div className="footer__copyright">
-          <p>© YouMeal, 2022</p>
-          <p>Design: Anastasia Ilina</p>
+          <p>© YouMeal 2022. {rights}</p>
+          <p>{design} Anastasia Ilina</p>
         </div>
       </div>
     </footer>

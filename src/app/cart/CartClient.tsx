@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+
 import { useEffect, useState } from "react";
+
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { clearItems } from "@/store/slices/cartSlice";
@@ -9,7 +11,10 @@ import { clearTips } from "@/store/slices/tipsSlice";
 
 import CartPageItem from "@/components/CartPage/CartPageItem/CartPageItem";
 import CartPageCheck from "@/components/CartPage/CartPageCheck/CartPageCheck";
+
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { useTranslate } from "@/hooks/useTranslate";
 
 import CartPageItemSkeleton from "@/ui/skeletons/CartPageItemSkeleton";
 
@@ -25,12 +30,23 @@ export default function CartClient() {
     orderNumber?: number;
   }>(null);
 
-  const { items, totalPrice } = useSelector((state: RootState) => state.cart);
+  const { items } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
   const { percentage: tipsPercent } = useSelector((s: RootState) => s.tips);
   const { isAuth, email } = useSelector((s: RootState) => s.user);
 
   const dispatch = useDispatch<AppDispatch>();
+
+  const { t, lang } = useTranslate();
+
+  const { clearCart, checkout, ok } = t.buttons;
+  const {
+    emptyCart2,
+    orderPopupCart,
+    orderPopupCart2,
+    orderPopupCart3,
+    orderPopupCart4,
+  } = t.cart;
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1000);
@@ -38,7 +54,7 @@ export default function CartClient() {
 
   const onClickClearCart = () => {
     if (items.length > 0) {
-      window.confirm("Очистить корзину ?") && dispatch(clearItems());
+      window.confirm(`${clearCart} ?`) && dispatch(clearItems());
       dispatch(clearTips());
     }
   };
@@ -85,6 +101,7 @@ export default function CartClient() {
           tipsPercent: tipsPercent * 100,
           finalTotal,
           activated,
+          lang,
         }),
       });
 
@@ -104,7 +121,11 @@ export default function CartClient() {
 
   return (
     <>
-      <div className="cart-page-section__list-wrapper">
+      <div
+        className={`cart-page-section__list-wrapper ${
+          items.length === 0 ? "cart-page-section__list-wrapper--empty" : ""
+        }`}
+      >
         <button
           onClick={onClickClearCart}
           className="cart-page-section__clear-cart"
@@ -115,7 +136,7 @@ export default function CartClient() {
             width={17}
             height={17}
           />
-          Очистить корзину
+          {clearCart}
         </button>
         {items.length > 0 ? (
           <ul className="cart-page-section__list">
@@ -128,14 +149,17 @@ export default function CartClient() {
                 ))}
           </ul>
         ) : (
-          <Image
-            src={emptyCartImg}
-            className="empty-cart-img"
-            priority
-            alt="empty-cart-img"
-            width={495}
-            height={351}
-          />
+          <>
+            <Image
+              src={emptyCartImg}
+              className="empty-cart-img"
+              priority
+              alt="empty-cart-img"
+              width={495}
+              height={233}
+            />
+            <p className="empty-cart-text">{emptyCart2}</p>
+          </>
         )}
       </div>
       <div className="cart-page-section__right-side">
@@ -143,15 +167,13 @@ export default function CartClient() {
           <CartPageCheck />
         </div>
         <button onClick={handleCheckout} className="cart-page-section__pay-btn">
-          Оформить заказ
+          {checkout}
         </button>
 
         {popup?.type === "auth" && (
           <div className="popup">
             <div className="popup__content">
-              <p>
-                Чтобы оформить заказ, пожалуйста, войдите или зарегистрируйтесь.
-              </p>
+              <p>{orderPopupCart4}</p>
               <button
                 className="popup__content-button"
                 onClick={() => setPopup(null)}
@@ -165,15 +187,16 @@ export default function CartClient() {
           <div className="popup">
             <div className="popup__content">
               <p>
-                Ваш заказ №{popup.orderNumber} оформлен 🎉
+                {orderPopupCart}
+                {popup.orderNumber} {orderPopupCart2}
                 <br />
-                Подтверждение отправлено на почту.
+                {orderPopupCart3}
               </p>
               <button
                 className="popup__content-button"
                 onClick={() => setPopup(null)}
               >
-                OK
+                {ok}
               </button>
             </div>
           </div>

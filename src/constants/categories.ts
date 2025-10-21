@@ -10,12 +10,12 @@ import categoryIcon7 from "@/assets/icons/category-icon-7.svg";
 import categoryIcon8 from "@/assets/icons/category-icon-8.svg";
 
 export const categories: Category[] = [
-  { id: 1, title: "Бургеры", image: categoryIcon1 },
-  { id: 2, title: "Закуски", image: categoryIcon2 },
-  { id: 3, title: "Комбо", image: categoryIcon3 },
-  { id: 4, title: "Шаурма", image: categoryIcon4 },
-  { id: 5, title: "Завтраки", image: categoryIcon5 },
-  { id: 6, title: "Напитки", image: categoryIcon6 },
-  { id: 7, title: "Десерты", image: categoryIcon7 },
-  { id: 8, title: "Соусы", image: categoryIcon8 },
+  { id: 1, key: "burgers", image: categoryIcon1 },
+  { id: 2, key: "snacks", image: categoryIcon2 },
+  { id: 3, key: "combo", image: categoryIcon3 },
+  { id: 4, key: "shawarma", image: categoryIcon4 },
+  { id: 5, key: "breakfasts", image: categoryIcon5 },
+  { id: 6, key: "drinks", image: categoryIcon6 },
+  { id: 7, key: "desserts", image: categoryIcon7 },
+  { id: 8, key: "sauces", image: categoryIcon8 },
 ];

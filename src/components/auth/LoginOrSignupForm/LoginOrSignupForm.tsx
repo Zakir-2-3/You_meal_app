@@ -1,12 +1,8 @@
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 
-import GoogleLoginButton from "../GoogleLoginButton/GoogleLoginButton";
+import { createValidationRules } from "@/utils/validationRules";
 
-import {
-  emailValidation,
-  nameValidation,
-  passwordValidation,
-} from "@/utils/validationRules";
+import { useTranslate } from "@/hooks/useTranslate";
 
 import { RegForm } from "@/types/regForm";
 
@@ -47,6 +43,21 @@ export default function LoginOrSignupForm({
   onForgotPassword,
   onSwitchMode,
 }: Props) {
+  const { t, lang } = useTranslate();
+
+  const { registerTr, forgotPassword, loginAccountTr, orTr } = t.regForm;
+
+  const {
+    nameLabel,
+    emailLabel,
+    passwordLabel,
+    namePlaceholder,
+    emailPlaceholder,
+    passwordPlaceholder,
+  } = t.user;
+
+  const validationRules = createValidationRules(t.formErrors);
+
   return (
     <form
       className={
@@ -57,17 +68,21 @@ export default function LoginOrSignupForm({
       {signupOn && (
         <div className="registration-form__field">
           <label className="registration-form__label" htmlFor="name">
-            Имя:
+            {nameLabel}
           </label>
           <input
             id="name"
             type="text"
-            {...register("name", nameValidation)}
+            {...register("name", validationRules.nameValidation)}
             className="registration-form__input"
-            placeholder="Введите имя"
+            placeholder={namePlaceholder}
           />
           {typeof errors.name?.message === "string" && (
-            <p className="registration-form__input--error">
+            <p
+              className={`registration-form__input--error ${
+                lang === "en" ? "english-style" : ""
+              }`}
+            >
               {errors.name.message}
             </p>
           )}
@@ -76,17 +91,21 @@ export default function LoginOrSignupForm({
 
       <div className="registration-form__field">
         <label className="registration-form__label" htmlFor="email">
-          Почта:
+          {emailLabel}
         </label>
         <input
           id="email"
           type="email"
-          {...register("email", emailValidation)}
+          {...register("email", validationRules.emailValidation)}
           className="registration-form__input"
-          placeholder="Введите почту"
+          placeholder={emailPlaceholder}
         />
         {typeof errors.email?.message === "string" && (
-          <p className="registration-form__input--error">
+          <p
+            className={`registration-form__input--error ${
+              lang === "en" ? "english-style" : ""
+            }`}
+          >
             {errors.email.message}
           </p>
         )}
@@ -94,15 +113,15 @@ export default function LoginOrSignupForm({
 
       <div className="registration-form__field">
         <label className="registration-form__label" htmlFor="password">
-          Пароль:
+          {passwordLabel}
         </label>
         <div className="registration-form__password-container">
           <input
             id="password"
             type={showPassword ? "text" : "password"}
-            {...register("password", passwordValidation)}
+            {...register("password", validationRules.passwordValidation)}
             className="registration-form__input"
-            placeholder="Введите пароль"
+            placeholder={passwordPlaceholder}
           />
           <TogglePasswordButton
             visible={showPassword}
@@ -110,7 +129,11 @@ export default function LoginOrSignupForm({
           />
         </div>
         {typeof errors.password?.message === "string" && (
-          <p className="registration-form__input--error">
+          <p
+            className={`registration-form__input--error ${
+              lang === "en" ? "english-style" : ""
+            }`}
+          >
             {errors.password.message}
           </p>
         )}
@@ -128,7 +151,7 @@ export default function LoginOrSignupForm({
           onClick={onForgotPassword}
           className="registration-form__button--secondary registration-form__forgot-button"
         >
-          Забыли пароль?
+          {forgotPassword}
         </button>
 
         <button
@@ -136,7 +159,7 @@ export default function LoginOrSignupForm({
           onClick={onSwitchMode}
           className="registration-form__button--secondary"
         >
-          {signupOn ? "Войти в аккаунт" : "Зарегистрироваться"}
+          {signupOn ? loginAccountTr : registerTr}
         </button>
       </div>
 
@@ -144,12 +167,12 @@ export default function LoginOrSignupForm({
         type="submit"
         className="registration-form__button registration-form__button--primary"
       >
-        {signupOn ? "Зарегистрироваться" : "Войти в аккаунт"}
+        {signupOn ? registerTr : loginAccountTr}
       </button>
 
       <div className="registration-form__divider">
         <div className="registration-form__line" />
-        <div className="registration-form__or">ИЛИ</div>
+        <div className="registration-form__or">{orTr}</div>
         <div className="registration-form__line" />
       </div>
     </form>

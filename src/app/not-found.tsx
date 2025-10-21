@@ -4,12 +4,19 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import notFoundImg from "@/assets/images/not-found-img.png";
 
 import "@/styles/NotFoundPage.scss";
 
 export default function NotFoundPage() {
   const router = useRouter();
+
+  const { t } = useTranslate();
+
+  const { goBack } = t.buttons;
+  const { pageNotFound } = t.product;
 
   const handleClick = () => {
     router.replace("/"); // Запрещаем возвращение на страницу 404
@@ -28,9 +35,9 @@ export default function NotFoundPage() {
         />{" "}
         <b>4</b>
       </h1>
-      <p className="not-found-wrapper__description">Страница не найдена</p>
+      <p className="not-found-wrapper__description">{pageNotFound}</p>
       <button className="not-found-wrapper__btn" onClick={handleClick}>
-        Вернуться назад
+        {goBack}
       </button>
     </div>
   );

@@ -1,22 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+
+import axios from "axios";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
+import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
 
-import NavButtons from "@/components/NavButtons/NavButtons";
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
 import FavoriteButton from "@/components/FavoriteButton/FavoriteButton";
 import RatingStars from "@/components/RatingStars/RatingStars";
-import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
+import NavButtons from "@/components/NavButtons/NavButtons";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+
+import { useTranslate } from "@/hooks/useTranslate";
+
 import { categories } from "@/constants/categories";
+
+import type { CategoryKey } from "@/types/category";
 import { Product } from "@/types/product";
+
 import ProductPageSkeleton from "@/ui/skeletons/ProductPageSkeleton";
 
 import "./productPage.scss";
@@ -43,7 +52,32 @@ export default function ProductClient() {
     (state: RootState) => state.promo.activated
   );
 
-  const categoryTitle = categories[activeIndex]?.title || "Неизвестно";
+  const { t, lang } = useTranslate();
+
+  const {
+    imageDescription,
+    price,
+    descriptionComposition,
+    weightVolume,
+    grams,
+    nutritionalValue,
+    units,
+    energy,
+    kj,
+    calories,
+    kcal,
+    proteins,
+    fats,
+    carbohydrates,
+  } = t.product;
+
+  const { addToCart, removeFromCart } = t.buttons;
+
+  const categoryKey = categories[activeIndex]?.key as CategoryKey | undefined;
+
+  const categoryTitle = categoryKey
+    ? (t.categories as Record<CategoryKey, string>)[categoryKey]
+    : "Неизвестно";
 
   const isFav = meta.favorites.includes(instanceId);
   const ratingValue = meta.ratings[instanceId] ?? 0;
@@ -66,6 +100,7 @@ export default function ProductClient() {
         id: Number(product.originalId), // Используем originalId для связи с MockAPI
         instanceId: instanceId, // Используем instanceId со страницы
         name_ru: product.name_ru,
+        name_en: product.name_en,
         image: product.image,
         price_rub: product.price_rub,
         size: product.size,
@@ -88,6 +123,7 @@ export default function ProductClient() {
           id: Number(product.originalId),
           instanceId: instanceId,
           name_ru: product.name_ru,
+          name_en: product.name_en,
           image: product.image,
           price_rub: product.price_rub,
           size: product.size,
@@ -156,15 +192,18 @@ export default function ProductClient() {
                     height={500}
                   />
                   <figcaption>
-                    {product.name_ru}. Источник фото - burgerking.ru
+                    {lang === "ru" ? product.name_ru : product.name_en}
+                    {imageDescription}
                   </figcaption>
                 </figure>
               </div>
               <div className="product-section__info">
-                <h1 className="product-section__title">{product?.name_ru}</h1>
+                <h1 className="product-section__title">
+                  {lang === "ru" ? product.name_ru : product.name_en}
+                </h1>
 
                 <div className="product-section__info-price">
-                  <p>Цена:</p>
+                  <p>{price}</p>
                   <p>
                     {hasDiscount ? (
                       <>
@@ -201,55 +240,62 @@ export default function ProductClient() {
                     }`}
                     onClick={onClickAdd}
                   >
-                    {isAdded ? "Удалить из корзины" : "Добавить в корзину"}
+                    {isAdded ? removeFromCart : addToCart}
                   </button>
                 </div>
                 <div className="product-section__info-description">
-                  <p>Описание/состав:</p>
-                  <span>{product?.description_ru}</span>
+                  <p>{descriptionComposition}</p>
+                  <span>
+                    {lang === "ru"
+                      ? product?.description_ru
+                      : product?.description_en}
+                  </span>
                 </div>
                 <div className="product-section__info-size">
                   <p>
-                    Вес/объём: <span>{product?.size} г.</span>
+                    {weightVolume}{" "}
+                    <span>
+                      {product?.size} {grams}
+                    </span>
                   </p>
                 </div>
                 <div className="product-section__info-nutritional-values">
                   <table>
                     <thead>
                       <tr>
-                        <th>Пищевая ценность</th>
-                        <th>Единицы</th>
+                        <th>{nutritionalValue}</th>
+                        <th>{units}</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td>Энергия</td>
+                        <td>{energy}</td>
                         <td>
-                          <span>{product?.energy}</span> кДж
+                          <span>{product?.energy}</span> {kj}
                         </td>
                       </tr>
                       <tr>
-                        <td>Калории</td>
+                        <td>{calories}</td>
                         <td>
-                          <span>{product?.calories}</span> ККал
+                          <span>{product?.calories}</span> {kcal}
                         </td>
                       </tr>
                       <tr>
-                        <td>Белки</td>
+                        <td>{proteins}</td>
                         <td>
-                          <span>{product?.proteins}</span> г
+                          <span>{product?.proteins}</span> {grams}
                         </td>
                       </tr>
                       <tr>
-                        <td>Жиры</td>
+                        <td>{fats}</td>
                         <td>
-                          <span>{product?.fats}</span> г
+                          <span>{product?.fats}</span> {grams}
                         </td>
                       </tr>
                       <tr>
-                        <td>Углеводы</td>
+                        <td>{carbohydrates}</td>
                         <td>
-                          <span>{product?.carbohydrates}</span> г
+                          <span>{product?.carbohydrates}</span> {grams}
                         </td>
                       </tr>
                     </tbody>

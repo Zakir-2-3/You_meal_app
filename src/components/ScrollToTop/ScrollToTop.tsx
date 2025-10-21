@@ -4,13 +4,20 @@ import React, { useEffect, useState } from "react";
 
 import Image from "next/image";
 
+import { useTranslate } from "@/hooks/useTranslate";
+
 import scrollToTop from "@/assets/icons/scroll-to-top.svg";
 
 import "./ScrollToTop.scss";
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
+
   const THRESHOLD = 1000; // отображение кнопки после 1000px
+
+  const { t } = useTranslate();
+
+  const { scrollToTopTr } = t.buttons;
 
   useEffect(() => {
     const onScroll = () => {
@@ -38,7 +45,7 @@ export default function ScrollToTop() {
       onClick={handleClick}
       onKeyDown={handleKey}
       aria-label="Scroll to top"
-      title="Наверх"
+      title={scrollToTopTr}
     >
       <Image src={scrollToTop} alt="scroll-to-top" width={40} height={30} />
     </button>
