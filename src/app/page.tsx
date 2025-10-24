@@ -304,10 +304,6 @@ export default function Home() {
     const initializeMetaData = async () => {
       if (!rehydrated) return;
       if (isAuth && email && !metaSynced) {
-        const serverMeta = await dispatch(syncUserMetaIfAuth());
-        if (serverMeta) {
-          console.log("Метаданные загружены с сервера");
-        }
       } else if (!isAuth && metaSynced) {
         dispatch(resetMeta());
       }

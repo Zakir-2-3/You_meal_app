@@ -7,10 +7,7 @@ interface LanguageState {
 }
 
 const initialState: LanguageState = {
-  current:
-    (typeof window !== "undefined" &&
-      (localStorage.getItem("lang") as Language)) ||
-    "ru",
+  current: "ru",
 };
 
 const languageSlice = createSlice({
@@ -19,15 +16,9 @@ const languageSlice = createSlice({
   reducers: {
     setLanguage: (state, action: PayloadAction<Language>) => {
       state.current = action.payload;
-      if (typeof window !== "undefined") {
-        localStorage.setItem("lang", action.payload);
-      }
     },
     toggleLanguage: (state) => {
       state.current = state.current === "ru" ? "en" : "ru";
-      if (typeof window !== "undefined") {
-        localStorage.setItem("lang", state.current);
-      }
     },
   },
 });

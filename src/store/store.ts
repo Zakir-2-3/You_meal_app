@@ -17,12 +17,13 @@ import {
   REGISTER,
 } from "redux-persist";
 
-import categoryReducer from "./slices/categorySlice";
 import cartReducer from "./slices/cartSlice";
 import tipsReducer from "./slices/tipsSlice";
 import userReducer from "./slices/userSlice";
 import promoReducer from "./slices/promoSlice";
 import languageReducer from "./slices/languageSlice";
+import currencyReducer from "./slices/currencySlice";
+import categoryReducer from "./slices/categorySlice";
 import productMetaReducer from "./slices/productMetaSlice";
 
 import { autoSaveMiddleware } from "./middleware/autoSaveMiddleware";
@@ -35,12 +36,21 @@ const rootReducer = combineReducers({
   category: categoryReducer,
   productMeta: productMetaReducer,
   language: languageReducer,
+  currency: currencyReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "cart", "promo", "productMeta", "tips"],
+  whitelist: [
+    "user",
+    "cart",
+    "promo",
+    "productMeta",
+    "tips",
+    "currency",
+    "language",
+  ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

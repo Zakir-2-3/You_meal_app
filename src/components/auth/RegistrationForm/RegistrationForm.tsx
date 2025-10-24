@@ -410,8 +410,6 @@ const RegistrationForm = () => {
           });
           // Восстанавливаем корзину
           dispatch(setItems(localCart));
-        } else {
-          console.log("Корзина пустая");
         }
       } else {
         // Если в базе есть корзина - используем ее

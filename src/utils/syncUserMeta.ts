@@ -52,7 +52,6 @@ export const syncUserMetaIfAuth = (): AppThunk<
         serverFavorites.length === 0 &&
         Object.keys(serverRatings).length === 0
       ) {
-        console.log("Серверные данные пустые, используем локальные данные");
         finalFavorites = localFavorites;
         finalRatings = localRatings;
         source = "local";
@@ -102,10 +101,6 @@ export const syncUserMetaIfAuth = (): AppThunk<
       // Немедленно записываем обновленное состояние в persist storage
       try {
         await persistor.flush();
-        console.log(
-          "Метаданные сохранены в persist storage, источник:",
-          source
-        );
       } catch (e) {
         console.error("Ошибка при сохранении в persist:", e);
         throw e;

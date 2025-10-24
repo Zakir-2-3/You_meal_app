@@ -4,25 +4,22 @@ import { signOut } from "next-auth/react";
 
 import { toast } from "react-toastify";
 
-import { AppDispatch, RootState, store, persistor } from "@/store/store";
 import { resetCart } from "@/store/slices/cartSlice";
 import { resetPromos } from "@/store/slices/promoSlice";
 import { resetMeta } from "@/store/slices/productMetaSlice";
 import { resetUser, setGeoCity } from "@/store/slices/userSlice";
+import { AppDispatch, RootState, store, persistor } from "@/store/store";
 
 import { detectGeoCity } from "@/utils/geo";
-
-import { useTranslate } from "@/hooks/useTranslate";
 
 import { DEFAULT_AVATAR, DEFAULT_PROMOS } from "@/constants/defaults";
 
 export const logout = async (
   dispatch: AppDispatch,
+  translations: { logoutError: string; logoutSuccess: string },
   onSuccess?: (redirectUrl: string) => void
 ) => {
-  const { t } = useTranslate();
-
-  const { logoutError, logoutSuccess } = t.toastTr;
+  const { logoutError, logoutSuccess } = translations;
 
   try {
     localStorage.setItem("hasLoggedOut", "true");

@@ -10,9 +10,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { activeRegForm } from "@/store/slices/userSlice";
 
+import LanguageToggle from "../LanguageToggle/LanguageToggle";
+import CurrencySwitcher from "../CurrencySwitcher/CurrencySwitcher";
 import UserDropdownMenu from "../UserDropdownMenu/UserDropdownMenu";
 import GeoLocationSelector from "../GeoLocationSelector/GeoLocationSelector";
-import LanguageToggle from "../LanguageToggle/LanguageToggle";
 
 import { validRoutes } from "@/constants/validRoutes";
 
@@ -25,8 +26,10 @@ import "./Header.scss";
 
 const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
+
   const pathname = usePathname();
 
   const { items } = useSelector((state: RootState) => state.cart);
@@ -34,6 +37,7 @@ const Header = () => {
   const isFormOpen = useSelector(
     (state: RootState) => state.user.isRegFormOpen
   );
+
   const dispatch = useDispatch();
 
   const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0); // Общее кол-во товаров в корзине
@@ -89,6 +93,9 @@ const Header = () => {
         </div>
         <div className="header__language">
           <LanguageToggle />
+        </div>
+        <div className="header__currency">
+          <CurrencySwitcher />
         </div>
         <div className="header__profile">
           {isAuth ? (
