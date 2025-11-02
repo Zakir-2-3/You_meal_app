@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,11 +9,14 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
+import { LottieIcon } from "../LottieIcon";
+
 import { validRoutes } from "@/constants/validRoutes";
 
 import { useTranslate } from "@/hooks/useTranslate";
 
-import phoneIcon from "@/assets/icons/phone-icon.svg";
+import phoneAnimation from "@/assets/animations/phone_animation.json";
+
 import footerLogo from "@/assets/images/footer-logo.png";
 import socialIcon_1 from "@/assets/icons/socialIcon_1.svg";
 import socialIcon_2 from "@/assets/icons/socialIcon_2.svg";
@@ -20,6 +25,8 @@ import socialIcon_3 from "@/assets/icons/socialIcon_3.svg";
 import "./Footer.scss";
 
 const Footer = () => {
+  const [hovered, setHovered] = useState(false);
+
   const pathname = usePathname();
 
   const { isAuth } = useSelector((state: RootState) => state.user);
@@ -50,8 +57,18 @@ const Footer = () => {
         </div>
         <div className="footer__number">
           <p>{orderNumber}</p>
-          <Link href="tel:+79333333911">
-            <Image src={phoneIcon} alt="phone-icon" width={24} height={24} />
+          <Link
+            className="footer__number-link"
+            href="tel:+79333333911"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+          >
+            <LottieIcon
+              trigger="hover+load"
+              isHovered={hovered}
+              animationData={phoneAnimation}
+              size={24}
+            />
             +7 (933) 333-39-11
           </Link>
         </div>

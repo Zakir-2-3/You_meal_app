@@ -7,7 +7,6 @@ import { DEFAULT_AVATAR } from "@/constants/defaults";
 export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();
-    console.log("Sync request for email:", email);
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });

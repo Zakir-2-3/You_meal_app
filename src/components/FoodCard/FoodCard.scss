@@ -16,6 +16,23 @@
   -moz-transition: all 0.2s ease-in;
   -ms-transition: all 0.2s ease-in;
   -o-transition: all 0.2s ease-in;
+  & > div:first-child {
+    transition: filter 0.2s ease;
+    -webkit-transition: filter 0.2s ease;
+    -moz-transition: filter 0.2s ease;
+    -ms-transition: filter 0.2s ease;
+    -o-transition: filter 0.2s ease;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    filter: contrast(0.1);
+    -webkit-filter: contrast(0.1);
+    &:hover,
+    &.active-fav {
+      filter: contrast(2);
+      -webkit-filter: contrast(2);
+    }
+  }
   &:hover {
     cursor: pointer;
     box-shadow: rgb(0 0 0 / 16%) 1px 5px 16px -5px;

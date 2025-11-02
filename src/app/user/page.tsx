@@ -2,32 +2,29 @@
 
 import { useState, useRef, useEffect } from "react";
 
-import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
-import { useDispatch, useSelector } from "react-redux";
 import { RootState, store } from "@/store/store";
-import {
-  setAuthStatus,
-  setAvatarUrl,
-  setEmail,
-  setName,
-} from "@/store/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setAvatarUrl, setName } from "@/store/slices/userSlice";
 import {
   activatePromo,
   deletePromo,
   removePromo,
 } from "@/store/slices/promoSlice";
 
-import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
 
-import AvatarUploader from "@/components/AvatarUploader/AvatarUploader";
+import { LottieIcon } from "@/components/LottieIcon";
 import NavButtons from "@/components/NavButtons/NavButtons";
+import AvatarUploader from "@/components/AvatarUploader/AvatarUploader";
+
 import NotFoundPage from "@/app/not-found";
 
-import { deleteAccount } from "@/utils/deleteAccount";
 import { logout } from "@/utils/logout";
+import { deleteAccount } from "@/utils/deleteAccount";
 import { createUserValidationRules } from "@/utils/validationUserPage";
 
 import { supabase } from "@/lib/supabaseClient";
@@ -42,9 +39,9 @@ import {
 
 import CloseIcon from "@/ui/icons/CloseIcon";
 
+import saleAnimation from "@/assets/animations/sale_animation.json";
 import hidePasswordIcon from "@/assets/icons/hide-password-icon.svg";
 import showPasswordIcon from "@/assets/icons/show-password-icon.svg";
-import listPromoCodeIcon from "@/assets/icons/list-promo-code-icon.svg";
 
 import "./userPage.scss";
 
@@ -114,6 +111,8 @@ export default function UserPage() {
     passwordChangeFailed,
     dataUpdatedSuccess,
     dataValidationError,
+    logoutError,
+    logoutSuccess,
   } = t.toastTr;
 
   const userValidationRules = createUserValidationRules(t.formErrors);
@@ -229,7 +228,14 @@ export default function UserPage() {
   };
 
   const handleLogout = () => {
-    logout(dispatch, (url) => window.location.replace(url));
+    logout(
+      dispatch,
+      {
+        logoutError,
+        logoutSuccess,
+      },
+      (url: string) => window.location.replace(url)
+    );
   };
 
   useEffect(() => {
@@ -384,8 +390,8 @@ export default function UserPage() {
             className={`personal-account__avatar ${
               avatarVisible ? "avatar-visible" : "avatar-hidden"
             }`}
-            width={330}
-            height={330}
+            width={300}
+            height={300}
             alt="avatar"
             priority
           />
@@ -702,13 +708,12 @@ export default function UserPage() {
                       }
                     }}
                   >
-                    <Image
-                      src={listPromoCodeIcon}
-                      width={34}
-                      height={34}
-                      alt="list-promo-code-icon"
+                    <LottieIcon
+                      animationData={saleAnimation}
+                      trigger="always"
+                      loop
+                      size={34}
                     />
-                    <p className="personal-account__promo-symbol">%</p>
                   </button>
                   {promoOpen && availablePromoCodes.length > 0 && (
                     <ul className="personal-account__promo-list">

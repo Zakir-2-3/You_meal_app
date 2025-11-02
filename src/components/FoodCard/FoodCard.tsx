@@ -10,8 +10,8 @@ import { AppDispatch, RootState } from "@/store/store";
 import { addItem, removeItem } from "@/store/slices/cartSlice";
 import { toggleFavorite } from "@/store/slices/productMetaSlice";
 
+import { LottieIcon } from "../LottieIcon";
 import RatingStars from "../RatingStars/RatingStars";
-import FavoriteButton from "../FavoriteButton/FavoriteButton";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
@@ -19,6 +19,8 @@ import { useTranslate } from "@/hooks/useTranslate";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 
 import { FoodCardProps } from "@/types/foodCard";
+
+import favoriteAnimation from "@/assets/animations/favorite_animation.json";
 
 import "./FoodCard.scss";
 
@@ -108,7 +110,14 @@ const FoodCard: FC<FoodCardProps> = ({
 
   return (
     <div className="food-section__card">
-      <FavoriteButton active={isFav} onToggle={handleToggleFavorite} />
+      <LottieIcon
+        animationData={favoriteAnimation}
+        onToggle={handleToggleFavorite}
+        trigger="toggleClick"
+        size={55}
+        hitBoxSize={22}
+        activeFav={isFav}
+      />
       <Link href={`/product/${iid}`}>
         <div className="food-section__card-img">
           <Image

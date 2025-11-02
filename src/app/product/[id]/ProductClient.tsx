@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -13,9 +13,9 @@ import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
 import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
 
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
-import FavoriteButton from "@/components/FavoriteButton/FavoriteButton";
 import RatingStars from "@/components/RatingStars/RatingStars";
 import NavButtons from "@/components/NavButtons/NavButtons";
+import { LottieIcon } from "@/components/LottieIcon";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
 
@@ -27,6 +27,8 @@ import type { CategoryKey } from "@/types/category";
 import { Product } from "@/types/product";
 
 import ProductPageSkeleton from "@/ui/skeletons/ProductPageSkeleton";
+
+import favoriteAnimation from "@/assets/animations/favorite_animation.json";
 
 import "./productPage.scss";
 
@@ -91,6 +93,10 @@ export default function ProductClient() {
   if (instanceId.includes("-copy-")) {
     originalId = instanceId.split("-copy-")[0]; // Из "1-copy-5" получаем "1"
   }
+
+  const handleToggleFavorite = useCallback(() => {
+    dispatch(toggleFavorite(instanceId));
+  }, [dispatch, instanceId]);
 
   const onClickPlus = () => {
     if (!product) return;
@@ -178,9 +184,13 @@ export default function ProductClient() {
                 style={{ position: "relative" }}
               >
                 <div className="product-section__favorite-wrapper">
-                  <FavoriteButton
-                    active={isFav}
-                    onToggle={() => dispatch(toggleFavorite(instanceId))}
+                  <LottieIcon
+                    animationData={favoriteAnimation}
+                    onToggle={handleToggleFavorite}
+                    trigger="toggleClick"
+                    size={80}
+                    hitBoxSize={34}
+                    activeFav={isFav}
                   />
                 </div>
                 <figure>

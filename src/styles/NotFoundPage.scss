@@ -16,18 +16,15 @@
     gap: 0 12px;
     color: #ffab08;
   }
-  &__title img {
-    transform: perspective(300px) rotateX(20deg);
-  }
   &__description {
-    font-size: 20px;
+    font-size: 24px;
   }
   &__btn {
     font-size: 20px;
-    margin-top: 110px;
+    margin-top: 80px;
     color: #fff;
     border-radius: 25px;
-    padding: 8px 16px;
+    padding: 8px 22px;
     background: #ff7020;
     transition: 0.1s ease-in-out;
     -webkit-transition: 0.1s ease-in-out;
@@ -45,9 +42,6 @@
     }
   }
   &__title b {
-    transform: perspective(1000px) rotateX(15deg) scale(1.07);
-  }
-  &__title b:hover {
     transform: perspective(300px) rotateX(33deg) scaleY(0.8);
     text-shadow:
       0 0 10px #be7e06b8,

@@ -1,11 +1,11 @@
-import { FC, useTransition } from "react";
+import { FC, useState } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
+import { LottieIcon } from "../LottieIcon";
 import CartSidebarItem from "./CartSidebarItem/CartSidebarItem";
 
 import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
@@ -14,7 +14,7 @@ import { useTranslate } from "@/hooks/useTranslate";
 
 import CartSidebarItemSkeleton from "@/ui/skeletons/CartSidebarItemSkeleton";
 
-import deliveryIcon from "@/assets/icons/delivery-icon.svg";
+import deliveryAnimation from "@/assets/animations/delivery_animation.json";
 
 import "./CartSidebar.scss";
 
@@ -23,6 +23,8 @@ interface CartSidebarProps {
 }
 
 const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
+  const [hovered, setHovered] = useState(false);
+
   const { items } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
 
@@ -118,12 +120,14 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
           href="/delivery"
           className="cart-sidebar__delivery-link"
           title={freeShipping2}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
-          <Image
-            src={deliveryIcon}
-            alt="delivery-icon"
-            width={24}
-            height={24}
+          <LottieIcon
+            animationData={deliveryAnimation}
+            trigger="hover+load"
+            size={32}
+            isHovered={hovered}
           />
           {freeShipping}
         </Link>

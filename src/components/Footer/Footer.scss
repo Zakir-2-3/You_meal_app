@@ -22,7 +22,7 @@
       font-weight: 400;
       margin-bottom: 25px;
     }
-    & a {
+    &-link {
       display: flex;
       flex-flow: row nowrap;
       align-items: flex-end;
@@ -34,6 +34,10 @@
       -moz-transition: 0.3s ease;
       -ms-transition: 0.3s ease;
       -o-transition: 0.3s ease;
+      line-height: 15px;
+      & > div {
+        filter: brightness(0.8);
+      }
       &:hover {
         color: #0027ff;
         text-decoration: underline;

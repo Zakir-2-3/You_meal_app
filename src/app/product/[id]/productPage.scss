@@ -165,9 +165,26 @@ tr:hover {
   top: 8px;
   right: 8px;
   z-index: 2;
+  & > div:first-child {
+    transition: filter 0.2s ease;
+    -webkit-transition: filter 0.2s ease;
+    -moz-transition: filter 0.2s ease;
+    -ms-transition: filter 0.2s ease;
+    -o-transition: filter 0.2s ease;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    filter: contrast(0.1);
+    -webkit-filter: contrast(0.1);
+    &:hover,
+    &.active-fav {
+      filter: contrast(2);
+      -webkit-filter: contrast(2);
+    }
+  }
   & .product-section__favorite-button,
   & .product-section__favorite-icon {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 34px;
   }
 }

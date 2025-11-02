@@ -1,7 +1,8 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import { createClient } from "@supabase/supabase-js";
 import type { AuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+
+import { createClient } from "@supabase/supabase-js";
 
 import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
 
@@ -52,7 +53,6 @@ export const authOptions: AuthOptions = {
           if (insertError) {
             console.error("Ошибка при создании пользователя:", insertError);
           } else {
-            console.log("Новый пользователь создан:", newUser);
             token.id = newUser.id;
           }
         } else {

@@ -376,6 +376,7 @@
   -moz-transition: background 0.2s;
   -ms-transition: background 0.2s;
   -o-transition: background 0.2s;
+  filter: brightness(1.1);
   & > img {
     animation: listPromoIconSpin 3s linear infinite;
     -webkit-animation: listPromoIconSpin 3s linear infinite;
@@ -427,7 +428,7 @@
 
 .personal-account__promo-list {
   position: absolute;
-  top: 110%;
+  top: 112%;
   left: 0;
   width: 172px;
   max-height: 157px;

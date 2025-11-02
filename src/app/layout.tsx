@@ -22,7 +22,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "YourMeal",
   description: "Лучшие блюда в YourMeal!",
-  icons: "/favicon.svg",
+  icons: "/favicon.ico",
 };
 
 export default function RootLayout({

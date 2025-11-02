@@ -36,7 +36,7 @@ export const translations = {
       ok: "ОK",
       goBack: "Вернуться назад",
       scrollToTopTr: "Наверх",
-      uploadAvatar: "Загрузить аватар",
+      uploadAvatar: "Загрузить",
     },
     sorting: {
       titleSort: "Сортировка:",
@@ -268,7 +268,7 @@ export const translations = {
       ok: "OK",
       goBack: "Go back",
       scrollToTopTr: "Top",
-      uploadAvatar: "Upload avatar",
+      uploadAvatar: "Upload",
     },
     sorting: {
       titleSort: "Sorting:",
