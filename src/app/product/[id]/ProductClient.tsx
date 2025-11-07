@@ -12,6 +12,7 @@ import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
 import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
 
+import ProductImageGallery from "@/components/ProductImageGallery/ProductImageGallery";
 import QuantityControl from "@/components/QuantityControl/QuantityControl";
 import RatingStars from "@/components/RatingStars/RatingStars";
 import NavButtons from "@/components/NavButtons/NavButtons";
@@ -194,12 +195,14 @@ export default function ProductClient() {
                   />
                 </div>
                 <figure>
-                  <Image
-                    src={product.image}
-                    priority
+                  <ProductImageGallery
+                    images={[
+                      product.image,
+                      product.image,
+                      product.image,
+                      product.image,
+                    ]}
                     alt={product.name_ru}
-                    width={500}
-                    height={500}
                   />
                   <figcaption>
                     {lang === "ru" ? product.name_ru : product.name_en}

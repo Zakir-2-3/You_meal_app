@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
 
-interface RateState {
-  rate: number | null;
-  loading: boolean;
-  error: string | null;
-}
-
-export const useExchangeRate = (
-  ttlMinutes = 1440,
-  currency: "rub" | "usd" = "rub"
-) => {
-  const [state, setState] = useState<RateState>({
-    rate: null,
-    loading: true,
-    error: null,
+export const useExchangeRate = (currency: "rub" | "usd" = "rub") => {
+  const [state, setState] = useState({
+    rate: null as number | null,
+    loading: currency === "usd",
+    error: null as string | null,
   });
 
   useEffect(() => {
+    if (currency === "rub") {
+      setState({ rate: null, loading: false, error: null });
+      return;
+    }
+
     let mounted = true;
     const cacheKey = "exchange_rate_rub_usd";
     const cached = localStorage.getItem(cacheKey);
@@ -26,25 +22,27 @@ export const useExchangeRate = (
       try {
         const parsed = JSON.parse(cached);
         const age = (Date.now() - parsed.ts) / 1000 / 60;
-        if (age < ttlMinutes && parsed.rate) {
+        if (age < 1440 && parsed.rate) {
           setState({ rate: parsed.rate, loading: false, error: null });
           return;
         }
       } catch {}
     }
 
+    setState((prev) => ({ ...prev, loading: true }));
+
     const fetchRate = async () => {
       try {
         const res = await fetch("https://open.er-api.com/v6/latest/USD");
-        const json = await res.json();
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
 
+        const json = await res.json();
         const rubPerUsd = json?.rates?.RUB;
 
         if (!rubPerUsd || typeof rubPerUsd !== "number") {
           throw new Error("Invalid data from exchange API");
         }
 
-        // Сохраняем курс и время
         localStorage.setItem(
           cacheKey,
           JSON.stringify({ rate: rubPerUsd, ts: Date.now() })
@@ -54,7 +52,11 @@ export const useExchangeRate = (
       } catch (err: any) {
         console.error("Ошибка получения курса:", err);
         if (mounted)
-          setState({ rate: null, loading: false, error: err.message });
+          setState({
+            rate: null,
+            loading: false,
+            error: "API недоступен",
+          });
       }
     };
 
@@ -63,7 +65,7 @@ export const useExchangeRate = (
     return () => {
       mounted = false;
     };
-  }, [ttlMinutes, currency]);
+  }, [currency]);
 
   return state;
 };

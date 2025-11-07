@@ -19,7 +19,7 @@
     grid-row: span 2;
     & figcaption {
       text-align: center;
-      padding: 10px;
+      margin: 20px auto 0;
       font-style: italic;
     }
   }
@@ -162,8 +162,8 @@ tr:hover {
 
 .product-section__favorite-wrapper {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 4px;
+  right: 0px;
   z-index: 2;
   & > div:first-child {
     transition: filter 0.2s ease;
@@ -172,10 +172,10 @@ tr:hover {
     -ms-transition: filter 0.2s ease;
     -o-transition: filter 0.2s ease;
     position: absolute;
-    top: 12px;
-    right: 12px;
-    filter: contrast(0.1);
-    -webkit-filter: contrast(0.1);
+    top: 0px;
+    right: 0px;
+    filter: contrast(0);
+    -webkit-filter: contrast(0);
     &:hover,
     &.active-fav {
       filter: contrast(2);

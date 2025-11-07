@@ -1,0 +1,110 @@
+.carousel {
+  position: relative;
+  width: 230px;
+  margin: 0 auto;
+
+  &__viewport {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  &__container {
+    display: flex;
+  }
+
+  &__slide {
+    flex: 0 0 180px;
+    position: relative;
+    margin: 0 30px;
+    &:hover {
+      cursor: grab;
+    }
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+
+  &__button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ccc;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+
+    & img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-45%, -50%);
+      -webkit-transform: translate(-45%, -50%);
+      -moz-transform: translate(-45%, -50%);
+      -ms-transform: translate(-45%, -50%);
+      -o-transform: translate(-45%, -50%);
+    }
+
+    &--prev {
+      left: -18px;
+
+      & img {
+        transform: translate(-55%, -50%) rotate(180deg);
+        -webkit-transform: translate(-55%, -50%) rotate(180deg);
+        -moz-transform: translate(-55%, -50%) rotate(180deg);
+        -ms-transform: translate(-55%, -50%) rotate(180deg);
+        -o-transform: translate(-55%, -50%) rotate(180deg);
+      }
+    }
+    &--next {
+      right: -18px;
+    }
+    &--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    &:hover {
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  &__dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+
+    &--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover,
+    &--active {
+      background-color: #999;
+    }
+  }
+}
