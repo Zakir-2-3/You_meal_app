@@ -2,24 +2,27 @@ import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-import { createClient } from "@supabase/supabase-js";
-
-import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { cleanupOldUsers } from "@/lib/user/cleanupOldUsers";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdminClient";
 
 export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+          response_type: "code",
+          scope: "openid email profile",
+        },
+      },
     }),
   ],
   session: {
     strategy: "jwt",
+    maxAge: 60 * 60 * 24 * 30,
   },
   callbacks: {
     async jwt({ token, user, account }) {
@@ -29,7 +32,7 @@ export const authOptions: AuthOptions = {
       // При первом входе через Google
       if (account && user?.email) {
         // Проверяем, есть ли пользователь в Supabase
-        const { data: existingUser, error } = await supabase
+        const { data: existingUser, error } = await supabaseAdmin
           .from("users")
           .select("*")
           .eq("email", user.email)
@@ -37,7 +40,7 @@ export const authOptions: AuthOptions = {
 
         if (!existingUser) {
           // Создаём пользователя вручную
-          const { data: newUser, error: insertError } = await supabase
+          const { data: newUser, error: insertError } = await supabaseAdmin
             .from("users")
             .insert([
               {
@@ -51,13 +54,18 @@ export const authOptions: AuthOptions = {
             .single();
 
           if (insertError) {
-            console.error("Ошибка при создании пользователя:", insertError);
+            console.error("Error creating user:", insertError);
           } else {
             token.id = newUser.id;
+            if (process.env.NODE_ENV === "development") {
+              console.log("New user created:", user.email);
+            }
           }
         } else {
-          console.log("Пользователь уже есть:", existingUser);
           token.id = existingUser.id;
+          if (process.env.NODE_ENV === "development") {
+            console.log("Existing user signed in:", user.email);
+          }
         }
 
         token.email = user.email;

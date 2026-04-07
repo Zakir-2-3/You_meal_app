@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/supabaseClient";
 
-import { DEFAULT_AVATAR } from "@/constants/defaults";
+import { DEFAULT_AVATAR } from "@/constants/user/defaults";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (findErr) {
-      console.error("fetch user error:", findErr);
+      console.error("Fetch user error:", findErr);
       return NextResponse.json(
         { error: "Failed to fetch user" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -38,10 +38,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (insertErr) {
-        console.error("insert user error:", insertErr);
+        console.error("Insert user error:", insertErr);
         return NextResponse.json(
           { error: "Failed to create user" },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -64,10 +64,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(responseData);
   } catch (e) {
-    console.error("sync route error:", e);
+    console.error("Sync route error:", e);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,14 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type SortBy = "default" | "price" | "rating" | "favorites";
-export type SortDir = "asc" | "desc";
-
-export interface ProductMetaState {
-  ratings: Record<string, number>;
-  favorites: string[];
-  sort: { by: SortBy; dir: SortDir };
-  metaSynced: boolean;
-}
+import { ProductMetaState } from "@/types/store/product-meta-slice";
+import { SortBy, SortDir } from "@/types/product/sort";
 
 const initialState: ProductMetaState = {
   ratings: {},

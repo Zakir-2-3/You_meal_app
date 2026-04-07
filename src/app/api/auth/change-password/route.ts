@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
 
-import { supabase } from "@/lib/supabaseClient";
-import { checkPasswordMatch } from "@/lib/checkPasswordMatch";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { checkPasswordMatch } from "@/lib/user/checkPasswordMatch";
 
 export async function POST(req: Request) {
   try {
@@ -16,8 +16,8 @@ export async function POST(req: Request) {
     const isSamePassword = await checkPasswordMatch(email, newPassword);
     if (isSamePassword) {
       return NextResponse.json(
-        { error: "Новый пароль не должен совпадать с текущим" },
-        { status: 400 }
+        { error: "The new password must not match the current one." },
+        { status: 400 },
       );
     }
 
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       .eq("email", email);
 
     if (updateError) {
-      console.error("Ошибка обновления пароля:", updateError.message);
+      console.error("Password update error:", updateError.message);
       return NextResponse.json({ error: "Update failed" }, { status: 500 });
     }
 
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     console.error("Change password error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

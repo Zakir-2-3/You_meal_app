@@ -1,0 +1,42 @@
+.food-categories__list {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.food-categories__item {
+  width: fit-content;
+  font-size: 16px;
+  font-weight: 400;
+  background-color: #fff;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+.food-categories__btn {
+  display: flex;
+  gap: 0 8px;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 7px 14px 8px;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  transition: 0.3s ease;
+  -webkit-transition: 0.3s ease;
+  -moz-transition: 0.3s ease;
+  -ms-transition: 0.3s ease;
+  -o-transition: 0.3s ease;
+  &--active {
+    background-color: #ffab08;
+    color: #fff;
+  }
+  &:hover {
+    box-shadow: inset 0px 0px 0px 2px #ffab08;
+  }
+}

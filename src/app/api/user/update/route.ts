@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/supabaseClient";
 
 export async function POST(req: NextRequest) {
   try {
     const {
       email,
+      name,
       cart,
       balance,
       promoCodes,
@@ -20,6 +21,9 @@ export async function POST(req: NextRequest) {
     }
 
     const updateData: Record<string, any> = {};
+
+    if (typeof name === "string" && name.trim().length > 0)
+      updateData.name = name.trim();
 
     // Основные данные
     if (Array.isArray(cart)) updateData.cart = cart;
@@ -42,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
         { error: "No valid data provided for update" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,16 +56,16 @@ export async function POST(req: NextRequest) {
       .eq("email", email);
 
     if (error) {
-      console.error("Ошибка обновления данных пользователя:", error.message);
+      console.error("Error updating user data:", error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Ошибка сохранения:", err);
+    console.error("Saving error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

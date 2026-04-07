@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
 import notFoundImg from "@/assets/images/not-found-img.png";
 

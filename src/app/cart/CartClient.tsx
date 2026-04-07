@@ -9,19 +9,19 @@ import { AppDispatch, RootState } from "@/store/store";
 import { clearItems } from "@/store/slices/cartSlice";
 import { clearTips } from "@/store/slices/tipsSlice";
 
-import CartPageItem from "@/components/CartPage/CartPageItem/CartPageItem";
-import CartPageCheck from "@/components/CartPage/CartPageCheck/CartPageCheck";
+import CartPageItem from "@/components/cart/CartPageItem/CartPageItem";
+import CartPageCheck from "@/components/cart/CartPageCheck/CartPageCheck";
 
-import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+import { getDiscountedPrice } from "@/utils/cart/getDiscountedPrice";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
-import CartPageItemSkeleton from "@/ui/skeletons/CartPageItemSkeleton";
+import CartPageItemSkeleton from "@/UI/skeletons/CartPageItemSkeleton";
 
 import clearCartIcon from "@/assets/icons/clear-cart-icon.svg";
 import emptyCartImg from "@/assets/images/empty-cart-img.png";
 
-import "./cartPage.scss";
+import "./page.scss";
 
 export default function CartClient() {
   const [isLoading, setIsLoading] = useState(true);
@@ -69,7 +69,7 @@ export default function CartClient() {
       // Чистый счёт (без скидок)
       const rawTotal = items.reduce(
         (sum, item) => sum + item.price_rub * (item.count ?? 0),
-        0
+        0,
       );
 
       // Считаем скидку
@@ -93,9 +93,9 @@ export default function CartClient() {
         body: JSON.stringify({
           email,
           items,
-          rawTotal, // чистый счёт
+          rawTotal,
           discount,
-          savedMoney, // сколько сэкономили
+          savedMoney,
           vat,
           tips,
           tipsPercent: tipsPercent * 100,
@@ -112,10 +112,10 @@ export default function CartClient() {
         dispatch(clearTips());
         setPopup({ type: "success", orderNumber: data.orderNumber });
       } else {
-        console.error("Ошибка заказа:", data.error);
+        console.error("Order Error:", data.error);
       }
     } catch (err) {
-      console.error("Ошибка:", err);
+      console.error("Error:", err);
     }
   };
 
@@ -129,6 +129,7 @@ export default function CartClient() {
         <button
           onClick={onClickClearCart}
           className="cart-page-section__clear-cart"
+          disabled={items.length === 0}
         >
           <Image
             src={clearCartIcon}

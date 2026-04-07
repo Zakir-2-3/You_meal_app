@@ -5,17 +5,17 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import AppProvider from "./AppProvider";
-import Header from "@/components/Header/Header";
+import Header from "@/components/layout/Header/Header";
+import Footer from "@/components/layout/Footer/Footer";
+import ScrollToTop from "@/components/layout/ScrollToTop/ScrollToTop";
 import RegistrationForm from "@/components/auth/RegistrationForm/RegistrationForm";
-import Footer from "@/components/Footer/Footer";
-import ScrollToTop from "@/components/ScrollToTop/ScrollToTop";
 
 import "@/styles/reset.css";
 import "@/styles/globals.scss";
 import "@/styles/toastify.scss";
 
 const nunito = Nunito({
-  weight: ["400", "600", "800"],
+  weight: ["400", "600", "700"],
   subsets: ["latin"],
 });
 

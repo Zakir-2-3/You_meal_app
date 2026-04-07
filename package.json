@@ -1,5 +1,5 @@
 {
-  "name": "you-meal-app",
+  "name": "your-meal-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -37,6 +37,7 @@
     "sass": "^1.83.4"
   },
   "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/lodash.debounce": "^4.0.9",

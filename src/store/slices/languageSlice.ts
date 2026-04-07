@@ -1,10 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type Language = "ru" | "en";
-
-interface LanguageState {
-  current: Language;
-}
+import { Language, LanguageState } from "@/types/store/language-slice";
 
 const initialState: LanguageState = {
   current: "ru",

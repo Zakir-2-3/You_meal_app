@@ -1,12 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { DEFAULT_PROMOS } from "@/constants/defaults";
+import { DEFAULT_PROMOS } from "@/constants/user/defaults";
+import {
+  MAX_CUSTOM_PROMOS,
+  MAX_ACTIVATED_PROMOS,
+} from "@/constants/user/promoLimits";
 
-import { PromoState } from "@/types/promo";
+import { PromoState } from "@/types/store/promo-slice";
 
 const initialState: PromoState = {
   activated: [],
-  available: DEFAULT_PROMOS,
+  customAvailable: [],
 };
 
 const promoSlice = createSlice({
@@ -15,74 +19,81 @@ const promoSlice = createSlice({
   reducers: {
     setPromoCodes(
       state,
-      action: PayloadAction<{ activated: string[]; available: string[] }>
+      action: PayloadAction<{ activated: string[]; customAvailable: string[] }>,
     ) {
-      const activated = Array.isArray(action.payload?.activated)
-        ? action.payload.activated.filter(
-            (c) => typeof c === "string" && c.trim()
-          )
-        : [];
+      const { activated = [], customAvailable = [] } = action.payload;
 
-      const customAvailable = Array.isArray(action.payload?.available)
-        ? action.payload.available.filter(
-            (c) => typeof c === "string" && c.trim()
-          )
-        : [];
+      state.activated = activated
+        .filter((code: string) => code.trim())
+        .slice(0, MAX_ACTIVATED_PROMOS);
 
-      state.activated = activated;
+      state.customAvailable = customAvailable
+        .filter(
+          (code: string) =>
+            code.trim() &&
+            !DEFAULT_PROMOS.includes(code) &&
+            !activated.includes(code),
+        )
+        .slice(0, MAX_CUSTOM_PROMOS);
+    },
 
-      // Добавляем дефолтные, если они ещё не активированы
-      const defaultAvailable = DEFAULT_PROMOS.filter(
-        (code) => !activated.includes(code)
-      );
-
-      state.available = [...defaultAvailable, ...customAvailable];
+    addCustomPromo(state, action: PayloadAction<string>) {
+      const code = action.payload.trim();
+      if (!code) return;
+      state.customAvailable.push(code);
     },
 
     activatePromo(state, action: PayloadAction<string>) {
       const code = action.payload.trim();
       if (!code) return;
 
-      if (!state.activated.includes(code)) {
-        state.activated.push(code);
-      }
+      const isDefault = DEFAULT_PROMOS.includes(code);
+      const isInCustomList = state.customAvailable.includes(code);
 
-      // Удаляем из available
-      state.available = state.available.filter((c) => c !== code);
+      state.activated.push(code);
+
+      if (!isDefault && isInCustomList) {
+        state.customAvailable = state.customAvailable.filter((c) => c !== code);
+      }
     },
 
     removePromo(state, action: PayloadAction<string>) {
       const code = action.payload.trim();
+      if (!code) return;
+
       state.activated = state.activated.filter((c) => c !== code);
 
-      // Только пользовательские попадают обратно в available
-      if (!DEFAULT_PROMOS.includes(code) && !state.available.includes(code)) {
-        state.available.push(code);
+      if (
+        !DEFAULT_PROMOS.includes(code) &&
+        !state.customAvailable.includes(code) &&
+        state.customAvailable.length < MAX_CUSTOM_PROMOS
+      ) {
+        state.customAvailable.push(code);
       }
     },
 
-    // Полностью удаляем промокод из всех списков
     deletePromo(state, action: PayloadAction<string>) {
       const code = action.payload.trim();
+      if (!code) return;
 
       state.activated = state.activated.filter((c) => c !== code);
-      state.available = state.available.filter((c) => c !== code);
+      state.customAvailable = state.customAvailable.filter((c) => c !== code);
     },
 
-    // Очистка промокодов после выхода/удаления аккаунта
     resetPromos(state) {
       state.activated = [];
-      state.available = DEFAULT_PROMOS;
+      state.customAvailable = [];
     },
   },
 });
 
 export const {
+  addCustomPromo,
   activatePromo,
   removePromo,
   deletePromo,
-  resetPromos,
   setPromoCodes,
+  resetPromos,
 } = promoSlice.actions;
 
 export default promoSlice.reducer;

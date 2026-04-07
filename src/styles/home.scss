@@ -1,3 +1,5 @@
+@use "@/styles/mixins";
+
 .main-content-wrapper {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -7,6 +9,21 @@
     "left right";
   gap: 50px 30px;
   margin-bottom: 60px;
+}
+
+.food-categories {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  grid-area: header;
+  gap: 0 30px;
+  transition: gap 0.3s ease 0.3s;
+
+  &--search-open {
+    gap: 0 18px;
+    transition-delay: 0.3s;
+  }
 }
 
 .food-section {
@@ -43,19 +60,9 @@
     height: 40px;
     width: 300px;
     color: #fff;
-    background-color: #ff7020;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 400;
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-    will-change: transform;
-    transition:
-      transform 0.15s ease,
-      background-color 0.2s ease,
-      box-shadow 0.2s ease;
+    @include mixins.btn-box-shadow-hover;
 
     &--nudge {
       animation:

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/supabaseClient";
 
 export async function POST(req: Request) {
   try {
@@ -9,10 +9,10 @@ export async function POST(req: Request) {
     const { email, code, city } = body;
 
     if (!email || !code) {
-      console.log("Нет email или кода в запросе");
+      console.log("There is no email or code in the request");
       return NextResponse.json(
-        { error: "Email и код обязательны" },
-        { status: 400 }
+        { error: "Email and code required" },
+        { status: 400 },
       );
     }
 
@@ -24,27 +24,27 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      console.error("Ошибка поиска в VerificationCode:", error.message);
+      console.error("VerificationCode search error:", error.message);
     }
 
     if (!record) {
-      console.log("Не найдена запись для этой почты");
-      return NextResponse.json({ error: "Неверный код" }, { status: 400 });
+      console.log("No record found for this email");
+      return NextResponse.json({ error: "Invalid code" }, { status: 400 });
     }
 
     if (record.code !== String(code)) {
-      console.log("Код не совпадает", {
+      console.log("The code doesn't match", {
         codeFromDB: record.code,
         codeReceived: code,
       });
-      return NextResponse.json({ error: "Неверный код" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid code" }, { status: 400 });
     }
 
     if (record.expires_at && new Date(record.expires_at) < new Date()) {
-      console.log("Код просрочен");
+      console.log("Code expired");
       return NextResponse.json(
-        { error: "Срок действия кода истёк" },
-        { status: 400 }
+        { error: "The code has expired" },
+        { status: 400 },
       );
     }
 
@@ -62,10 +62,10 @@ export async function POST(req: Request) {
     });
 
     if (insertError) {
-      console.error("Ошибка создания пользователя:", insertError.message);
+      console.error("Error creating user:", insertError.message);
       return NextResponse.json(
-        { error: "Ошибка создания пользователя" },
-        { status: 500 }
+        { error: "Error creating user" },
+        { status: 500 },
       );
     }
 
@@ -76,12 +76,12 @@ export async function POST(req: Request) {
       .eq("email", email);
 
     if (deleteError) {
-      console.error("Ошибка удаления VerificationCode:", deleteError.message);
+      console.error("Error deleting VerificationCode:", deleteError.message);
     }
 
-    return NextResponse.json({ message: "Почта подтверждена, аккаунт создан" });
+    return NextResponse.json({ message: "Email confirmed, account created" });
   } catch (error) {
-    console.error("Ошибка верификации:", error);
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
+    console.error("Verification error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

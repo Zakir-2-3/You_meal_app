@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { DEFAULT_AVATAR } from "@/constants/defaults";
+import { DEFAULT_AVATAR } from "@/constants/user/defaults";
 
-import { UserState } from "@/types/user";
+import { UserState } from "@/types/store/user-slice";
 
 const initialState: UserState = {
   isRegFormOpen: false,
@@ -39,7 +39,7 @@ const userSlice = createSlice({
     setBalance(state, action: PayloadAction<number>) {
       state.balance = action.payload;
     },
-    logoutUser(state) {
+    signOutUser(state) {
       state.isRegFormOpen = false;
       state.isAuth = false;
       state.name = "";
@@ -72,7 +72,7 @@ export const {
   setEmail,
   setAuthStatus,
   setAvatarUrl,
-  logoutUser,
+  signOutUser,
   setBalance,
   resetUser,
   resetUserExceptGeoCity,

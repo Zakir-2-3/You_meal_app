@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 
-import { supabase } from "@/lib/supabaseClient";
-import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { cleanupOldUsers } from "@/lib/user/cleanupOldUsers";
 import { verificationEmailTemplate } from "@/lib/emailTemplates/verificationEmailTemplate";
 
 // Отправка письма
@@ -12,7 +12,7 @@ async function sendVerificationEmail(
   code: string,
   email: string,
   lang: "ru" | "en" = "ru",
-  isResend = false
+  isResend = false,
 ) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -29,8 +29,8 @@ async function sendVerificationEmail(
       ? "Повторное подтверждение регистрации"
       : "Resend registration confirmation"
     : lang === "ru"
-    ? "Код подтверждения регистрации"
-    : "Registration verification code";
+      ? "Код подтверждения регистрации"
+      : "Registration verification code";
 
   const html = verificationEmailTemplate(code, lang);
 
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     const { email, name, password, isResend, lang = "ru" } = body;
 
     if (!email || !name || !password) {
-      return NextResponse.json({ error: "Неверные данные" }, { status: 400 });
+      return NextResponse.json({ error: "Incorrect data" }, { status: 400 });
     }
 
     // Проверка существующего пользователя
@@ -67,20 +67,17 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (userCheckError) {
-      console.error(
-        "Ошибка проверки существующего пользователя:",
-        userCheckError.message
-      );
+      console.error("Error checking existing user:", userCheckError.message);
       return NextResponse.json(
-        { error: "Ошибка проверки пользователя" },
-        { status: 500 }
+        { error: "User verification error" },
+        { status: 500 },
       );
     }
 
     if (existingUser && !existingUser.password) {
       return NextResponse.json(
-        { error: "Этот email уже привязан к Google-аккаунту" },
-        { status: 403 }
+        { error: "This email is already linked to a Google account." },
+        { status: 403 },
       );
     }
 
@@ -101,8 +98,8 @@ export async function POST(req: Request) {
     if (isResend) {
       if (!existingCode) {
         return NextResponse.json(
-          { error: "Не найдена регистрация для повторной отправки" },
-          { status: 404 }
+          { error: "No registration found for resubmission" },
+          { status: 404 },
         );
       }
 
@@ -117,7 +114,7 @@ export async function POST(req: Request) {
                 : "Too many attempts. Resending is unavailable.",
             blockedUntil: existingCode.blockedUntil || null,
           },
-          { status: 429 }
+          { status: 429 },
         );
       }
 
@@ -139,10 +136,10 @@ export async function POST(req: Request) {
         .select("*");
 
       if (updateError) {
-        console.error("Ошибка при обновлении VerificationCode:", updateError);
+        console.error("Error updating VerificationCode:", updateError);
         return NextResponse.json(
-          { error: "Ошибка при повторной отправке кода" },
-          { status: 500 }
+          { error: "Error resending code" },
+          { status: 500 },
         );
       }
 
@@ -156,7 +153,7 @@ export async function POST(req: Request) {
               : "Verification code resent",
           blockedUntil: updatedData?.[0]?.blockedUntil || null,
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -170,7 +167,7 @@ export async function POST(req: Request) {
               : "The code has already been sent. Please enter it or request again.",
           blockedUntil: existingCode.blockedUntil || null,
         },
-        { status: 208 }
+        { status: 208 },
       );
     }
 
@@ -192,10 +189,10 @@ export async function POST(req: Request) {
       ]);
 
     if (insertError) {
-      console.error("Ошибка создания записи:", insertError.message);
+      console.error("Error creating record:", insertError.message);
       return NextResponse.json(
-        { error: "Ошибка создания записи" },
-        { status: 500 }
+        { error: "Error creating record" },
+        { status: 500 },
       );
     }
 
@@ -210,10 +207,10 @@ export async function POST(req: Request) {
             : "Verification code sent to your email",
         blockedUntil: null,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Ошибка регистрации:", error);
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
+    console.error("Registration error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

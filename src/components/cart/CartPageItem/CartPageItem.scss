@@ -1,0 +1,75 @@
+@use "@/styles/mixins";
+
+.cart-page-section__item {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0 22px;
+  width: 100%;
+  padding: 20px 0;
+  box-shadow: 0 1px 0 0px #9a99993d;
+  &:last-child {
+    box-shadow: none;
+  }
+  & .quantity-control {
+    height: 46px;
+    & button:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.cart-page-section__description {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  align-items: end;
+  justify-items: start;
+  width: 70%;
+  & .cart-page-section__name {
+    grid-column: 1 / -1;
+    order: -1;
+    font-size: 22px;
+    @include mixins.product-name-hover;
+  }
+  & .cart-page-section__price {
+    margin-left: auto;
+    font-weight: 600;
+    font-size: 22px;
+    & .old-price {
+      margin-right: 12px;
+      font-size: 22px;
+      position: relative;
+    }
+    & .old-price::before {
+      content: "";
+      transform-origin: center;
+      background: #e53935;
+      width: 101%;
+      height: 2px;
+      position: absolute;
+      top: 52%;
+      left: -1px;
+      transform: translateY(-125%) rotate(10deg);
+    }
+    & .discounted-price {
+      font-size: 23px;
+    }
+  }
+  & .cart-page-section__size {
+    font-weight: normal;
+    font-size: 16px;
+    color: #b1b1b1;
+  }
+}
+
+.cart-page-section__remove-item {
+  border: 3px solid #ff0000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 6px;
+}

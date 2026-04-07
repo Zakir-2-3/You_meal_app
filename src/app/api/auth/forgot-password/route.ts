@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import nodemailer from "nodemailer";
 
-import { supabase } from "@/lib/supabaseClient";
-import { cleanupOldUsers } from "@/lib/cleanupOldUsers";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { cleanupOldUsers } from "@/lib/user/cleanupOldUsers";
 import { passwordRecoveryEmailTemplate } from "@/lib/emailTemplates/passwordRecoveryEmailTemplate";
 
 export async function POST(req: Request) {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const { email, lang = "ru" } = await req.json();
 
     if (!email) {
-      return NextResponse.json({ error: "Email обязателен" }, { status: 400 });
+      return NextResponse.json({ error: "Email required" }, { status: 400 });
     }
 
     // Проверка, есть ли подтверждённый пользователь
@@ -39,9 +39,9 @@ export async function POST(req: Request) {
           error:
             lang === "ru"
               ? "Этот аккаунт использует вход через Google. Сброс пароля недоступен."
-              : "This account uses Google login. Password reset is not available.",
+              : "This account uses Google Sign-in. Password reset is not available.",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
               ? "Почта ещё не подтверждена. Войдите для завершения регистрации."
               : "This email is not confirmed yet. Please complete registration.",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -67,12 +67,12 @@ export async function POST(req: Request) {
               ? "Пользователь с таким email не найден"
               : "User with this email not found",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const verificationCode = Math.floor(
-      100000 + Math.random() * 900000
+      100000 + Math.random() * 900000,
     ).toString();
     const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
     const now = new Date();
@@ -85,8 +85,8 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (findError) {
-      console.error("Ошибка поиска VerificationCode:", findError.message);
-      return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
+      console.error("VerificationCode lookup error:", findError.message);
+      return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 
     const updateData: any = {
@@ -109,13 +109,13 @@ export async function POST(req: Request) {
               : "Too many attempts. The code has already been sent earlier.",
           blockedUntil: existingCode.blockedUntil,
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
     if (updateData.attempts >= 2) {
       updateData.blockedUntil = new Date(
-        now.getTime() + 2 * 60 * 60 * 1000
+        now.getTime() + 2 * 60 * 60 * 1000,
       ).toISOString();
     }
 
@@ -127,14 +127,8 @@ export async function POST(req: Request) {
         .eq("purpose", "recovery");
 
       if (updateError) {
-        console.error(
-          "Ошибка обновления VerificationCode:",
-          updateError.message
-        );
-        return NextResponse.json(
-          { error: "Ошибка обновления" },
-          { status: 500 }
-        );
+        console.error("Error updating VerificationCode:", updateError.message);
+        return NextResponse.json({ error: "Error updating" }, { status: 500 });
       }
     } else {
       const { error: insertError } = await supabase
@@ -148,8 +142,8 @@ export async function POST(req: Request) {
         });
 
       if (insertError) {
-        console.error("Ошибка вставки VerificationCode:", insertError.message);
-        return NextResponse.json({ error: "Ошибка вставки" }, { status: 500 });
+        console.error("Error inserting VerificationCode:", insertError.message);
+        return NextResponse.json({ error: "Insertion error" }, { status: 500 });
       }
     }
 
@@ -181,10 +175,10 @@ export async function POST(req: Request) {
       blockedUntil: updateData.blockedUntil || null,
     });
   } catch (error: any) {
-    console.error("Ошибка восстановления пароля:", error.message || error);
+    console.error("Password recovery error:", error.message || error);
     return NextResponse.json(
-      { error: "Внутренняя ошибка сервера" },
-      { status: 500 }
+      { error: "Internal Server Error" },
+      { status: 500 },
     );
   }
 }

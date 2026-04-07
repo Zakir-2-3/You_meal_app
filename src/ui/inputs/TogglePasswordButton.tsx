@@ -1,16 +1,12 @@
 "use client";
 
 import { FC } from "react";
-
 import Image from "next/image";
+
+import { Props } from "@/types/components/ui/toggle-password-button";
 
 import hidePasswordIcon from "@/assets/icons/hide-password-icon.svg";
 import showPasswordIcon from "@/assets/icons/show-password-icon.svg";
-
-type Props = {
-  visible: boolean;
-  onToggle: () => void;
-};
 
 const TogglePasswordButton: FC<Props> = ({ visible, onToggle }) => {
   return (

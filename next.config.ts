@@ -21,6 +21,62 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  webpack(config) {
+    /**
+     * 1. Находим стандартный loader Next.js,
+     *    который обрабатывает картинки (png, jpg, svg и т.д.)
+     */
+    const fileLoaderRule = config.module.rules.find(
+      (rule: any) => rule.test instanceof RegExp && rule.test.test(".svg"),
+    );
+
+    /**
+     * 2. SVG как React-компонент
+     *    Работает ТОЛЬКО если импорт с ?component
+     */
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      // resourceQuery: /component/,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            svgoConfig: {
+              plugins: [
+                {
+                  name: "preset-default",
+                  params: {
+                    overrides: {
+                      removeViewBox: false, // чтобы width/height работали
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    });
+
+    /**
+     * 3. Исключаем SVG из стандартного file-loader'а
+     */
+    if (fileLoaderRule) {
+      fileLoaderRule.exclude = /\.svg$/i;
+    }
+
+    /**
+     * 4. Все остальные SVG — как обычные файлы (URL)
+     */
+    config.module.rules.push({
+      test: /\.svg$/i,
+      type: "asset/resource",
+    });
+
+    return config;
+  },
+
   experimental: {
     serverActions: {
       allowedOrigins: ["http://localhost:3000"],

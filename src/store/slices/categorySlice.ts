@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { CategoryState } from "@/types/category";
+import { CategoryState } from "@/types/product/category";
 
 const initialState: CategoryState = {
   activeIndex: 0,
@@ -13,7 +13,7 @@ const categorySlice = createSlice({
   reducers: {
     setActiveCategory: (
       state,
-      action: PayloadAction<{ index: number; key: string }>
+      action: PayloadAction<{ index: number; key: string }>,
     ) => {
       state.activeIndex = action.payload.index;
       state.activeKey = action.payload.key;

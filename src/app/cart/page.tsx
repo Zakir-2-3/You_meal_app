@@ -1,9 +1,9 @@
 "use client";
 
 import CartClient from "./CartClient";
-import NavButtons from "@/components/NavButtons/NavButtons";
+import NavButtons from "@/components/layout/NavButtons/NavButtons";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
 export default function CartPage() {
   const { t } = useTranslate();
@@ -14,7 +14,7 @@ export default function CartPage() {
     <section className="cart-page-section">
       <div className="container cart-page-container">
         <h1 className="cart-page-section__title">{title}</h1>
-        <NavButtons customTitle={title} />
+        <NavButtons />
         <CartClient />
       </div>
     </section>

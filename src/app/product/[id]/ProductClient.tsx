@@ -1,10 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-
-import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-
 import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -12,47 +9,40 @@ import { AppDispatch, RootState } from "@/store/store";
 import { addItem, minusItem, removeItem } from "@/store/slices/cartSlice";
 import { setRating, toggleFavorite } from "@/store/slices/productMetaSlice";
 
-import ProductImageGallery from "@/components/ProductImageGallery/ProductImageGallery";
-import QuantityControl from "@/components/QuantityControl/QuantityControl";
-import RatingStars from "@/components/RatingStars/RatingStars";
-import NavButtons from "@/components/NavButtons/NavButtons";
-import { LottieIcon } from "@/components/LottieIcon";
+import NavButtons from "@/components/layout/NavButtons/NavButtons";
+import ProductHeader from "@/components/product/ProductHeader/ProductHeader";
+import FavoriteButton from "@/components/product/ProductActions/FavoriteButton";
+import ProductActions from "@/components/product/ProductActions/ProductActions";
+import ProductDescription from "@/components/product/ProductDescription/ProductDescription";
+import ProductImageGallery from "@/components/product/ProductImageGallery/ProductImageGallery";
+import ProductNutritionTable from "@/components/product/ProductNutritionTable/ProductNutritionTable";
 
-import { getDiscountedPrice } from "@/utils/getDiscountedPrice";
+import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { getDiscountedPrice } from "@/utils/cart/getDiscountedPrice";
 
-import { categories } from "@/constants/categories";
+import { Product } from "@/types/product/product";
+import { ProductWithOriginal } from "@/types/product/product-with-original";
 
-import type { CategoryKey } from "@/types/category";
-import { Product } from "@/types/product";
+import ProductPageSkeleton from "@/UI/skeletons/ProductPageSkeleton";
 
-import ProductPageSkeleton from "@/ui/skeletons/ProductPageSkeleton";
-
-import favoriteAnimation from "@/assets/animations/favorite_animation.json";
-
-import "./productPage.scss";
-
-interface ProductWithOriginal extends Product {
-  originalId: string;
-  instanceId?: string;
-}
+import "./page.scss";
 
 export default function ProductClient() {
   const [product, setProduct] = useState<ProductWithOriginal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const { id } = useParams();
-  const instanceId = String(id); // instanceId ("1-copy-5")
-
-  const dispatch = useDispatch<AppDispatch>();
+  const instanceId = String(id);
   const router = useRouter();
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const meta = useSelector((s: RootState) => s.productMeta);
-  const { activeIndex } = useSelector((state: RootState) => state.category);
   const { items } = useSelector((state: RootState) => state.cart);
   const activatedPromos = useSelector(
-    (state: RootState) => state.promo.activated
+    (state: RootState) => state.promo.activated,
   );
 
   const { t, lang } = useTranslate();
@@ -76,11 +66,7 @@ export default function ProductClient() {
 
   const { addToCart, removeFromCart } = t.buttons;
 
-  const categoryKey = categories[activeIndex]?.key as CategoryKey | undefined;
-
-  const categoryTitle = categoryKey
-    ? (t.categories as Record<CategoryKey, string>)[categoryKey]
-    : "Неизвестно";
+  const { getConvertedPrice } = usePriceFormatter();
 
   const isFav = meta.favorites.includes(instanceId);
   const ratingValue = meta.ratings[instanceId] ?? 0;
@@ -92,7 +78,7 @@ export default function ProductClient() {
   // Парсим originalId для запроса к MockAPI
   let originalId = instanceId;
   if (instanceId.includes("-copy-")) {
-    originalId = instanceId.split("-copy-")[0]; // Из "1-copy-5" получаем "1"
+    originalId = instanceId.split("-copy-")[0];
   }
 
   const handleToggleFavorite = useCallback(() => {
@@ -104,14 +90,14 @@ export default function ProductClient() {
 
     dispatch(
       addItem({
-        id: Number(product.originalId), // Используем originalId для связи с MockAPI
-        instanceId: instanceId, // Используем instanceId со страницы
+        id: Number(product.originalId),
+        instanceId: instanceId,
         name_ru: product.name_ru,
         name_en: product.name_en,
         image: product.image,
         price_rub: product.price_rub,
         size: product.size,
-      })
+      }),
     );
   };
 
@@ -134,28 +120,28 @@ export default function ProductClient() {
           image: product.image,
           price_rub: product.price_rub,
           size: product.size,
-        })
+        }),
       );
     }
   };
 
-  // Получаем данные товара
+  // Загрузка данных товара
   useEffect(() => {
     async function fetchProduct() {
       setIsLoading(true);
       try {
         const { data } = await axios.get<Product>(
-          `https://6794c225aad755a134ea56b6.mockapi.io/items/${originalId}`
+          `https://6794c225aad755a134ea56b6.mockapi.io/items/${originalId}`,
         );
-        // Сохраняем originalId и подменяем id на instanceId
         setProduct({
           ...data,
-          id: instanceId, // Подменяем id на instanceId
-          originalId: data.id, // Сохраняем originalId из MockAPI
-          instanceId: instanceId, // Явно проставляем instanceId
+          id: instanceId,
+          originalId: data.id,
+          instanceId: instanceId,
+          price_usd: (data as any).price_usd,
         });
       } catch (error: any) {
-        console.log("Ошибка загрузки товара", error);
+        console.log("Product loading error", error);
         if (error.response?.status === 404) {
           router.replace("/not-found");
         }
@@ -169,156 +155,110 @@ export default function ProductClient() {
   const { discount, hasDiscount } = product
     ? getDiscountedPrice(activatedPromos, product.price_rub)
     : { discount: 0, hasDiscount: false };
-  const discountedPrice = product?.price_rub
-    ? Math.round(product.price_rub * (1 - discount / 100))
-    : 0;
+
+  const prices = product
+    ? getConvertedPrice(
+        {
+          price_rub: product.price_rub,
+          price_usd: product.price_usd,
+        },
+        discount,
+      )
+    : {
+        formattedCurrent: "",
+        formattedOld: null,
+        hasDiscount: false,
+      };
+
+  if (isLoading) {
+    return <ProductPageSkeleton />;
+  }
+
+  if (!product) {
+    return null;
+  }
 
   return (
     <section className="product-section">
       <div className="container">
-        <NavButtons customTitle={categoryTitle} />
+        <NavButtons />
+
         <div className="content-wrapper">
-          {product ? (
-            <>
-              <div
-                className="product-section__img"
-                style={{ position: "relative" }}
-              >
-                <div className="product-section__favorite-wrapper">
-                  <LottieIcon
-                    animationData={favoriteAnimation}
-                    onToggle={handleToggleFavorite}
-                    trigger="toggleClick"
-                    size={80}
-                    hitBoxSize={34}
-                    activeFav={isFav}
-                  />
-                </div>
-                <figure>
-                  <ProductImageGallery
-                    images={[
-                      product.image,
-                      product.image,
-                      product.image,
-                      product.image,
-                    ]}
-                    alt={product.name_ru}
-                  />
-                  <figcaption>
-                    {lang === "ru" ? product.name_ru : product.name_en}
-                    {imageDescription}
-                  </figcaption>
-                </figure>
-              </div>
-              <div className="product-section__info">
-                <h1 className="product-section__title">
-                  {lang === "ru" ? product.name_ru : product.name_en}
-                </h1>
+          <div className="product-section__img">
+            <FavoriteButton isFav={isFav} onToggle={handleToggleFavorite} />
 
-                <div className="product-section__info-price">
-                  <p>{price}</p>
-                  <p>
-                    {hasDiscount ? (
-                      <>
-                        <span className="old-price">{product.price_rub}₽</span>
-                        <span className="discounted-price">
-                          {discountedPrice}₽
-                        </span>
-                      </>
-                    ) : (
-                      `${product.price_rub}₽`
-                    )}
-                  </p>
-                </div>
-                <div className="product-section__info-rating">
-                  <RatingStars
-                    value={ratingValue}
-                    onChange={(v) => {
-                      if (v !== ratingValue) {
-                        dispatch(setRating({ id: instanceId, value: v }));
-                      }
-                    }}
-                  />
-                </div>
+            <figure>
+              <ProductImageGallery
+                images={[
+                  product.image,
+                  product.image,
+                  product.image,
+                  product.image,
+                ]}
+                alt={product.name_ru}
+              />
+              <figcaption>
+                {lang === "ru" ? product.name_ru : product.name_en}
+                {imageDescription}
+              </figcaption>
+            </figure>
+          </div>
 
-                <div className="product-section__add-cart">
-                  <QuantityControl
-                    count={count}
-                    onClickPlus={onClickPlus}
-                    onClickMinus={onClickMinus}
-                  />
-                  <button
-                    className={`product-section__add-cart-btn ${
-                      isAdded ? "product-section__add-cart-btn--delete" : ""
-                    }`}
-                    onClick={onClickAdd}
-                  >
-                    {isAdded ? removeFromCart : addToCart}
-                  </button>
-                </div>
-                <div className="product-section__info-description">
-                  <p>{descriptionComposition}</p>
-                  <span>
-                    {lang === "ru"
-                      ? product?.description_ru
-                      : product?.description_en}
-                  </span>
-                </div>
-                <div className="product-section__info-size">
-                  <p>
-                    {weightVolume}{" "}
-                    <span>
-                      {product?.size} {grams}
-                    </span>
-                  </p>
-                </div>
-                <div className="product-section__info-nutritional-values">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>{nutritionalValue}</th>
-                        <th>{units}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>{energy}</td>
-                        <td>
-                          <span>{product?.energy}</span> {kj}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>{calories}</td>
-                        <td>
-                          <span>{product?.calories}</span> {kcal}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>{proteins}</td>
-                        <td>
-                          <span>{product?.proteins}</span> {grams}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>{fats}</td>
-                        <td>
-                          <span>{product?.fats}</span> {grams}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>{carbohydrates}</td>
-                        <td>
-                          <span>{product?.carbohydrates}</span> {grams}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
-          ) : (
-            <ProductPageSkeleton />
-          )}
+          <div className="product-section__info">
+            <ProductHeader
+              product={product}
+              prices={prices}
+              ratingValue={ratingValue}
+              instanceId={instanceId}
+              lang={lang}
+              translations={{ price }}
+              onRatingChange={(value) =>
+                dispatch(setRating({ id: instanceId, value }))
+              }
+            />
+
+            <ProductActions
+              count={count}
+              isAdded={!!isAdded}
+              instanceId={instanceId}
+              onClickPlus={onClickPlus}
+              onClickMinus={onClickMinus}
+              onClickAdd={onClickAdd}
+              translations={{ addToCart, removeFromCart }}
+            />
+
+            <ProductDescription
+              description_ru={product.description_ru}
+              description_en={product.description_en}
+              lang={lang}
+              translation={descriptionComposition}
+            />
+
+            <ProductNutritionTable
+              product={{
+                energy: product.energy,
+                calories: product.calories,
+                proteins: product.proteins,
+                fats: product.fats,
+                carbohydrates: product.carbohydrates,
+              }}
+              size={product.size}
+              lang={lang}
+              translations={{
+                weightVolume,
+                grams,
+                nutritionalValue,
+                units,
+                energy,
+                kj,
+                calories,
+                kcal,
+                proteins,
+                fats,
+                carbohydrates,
+              }}
+            />
+          </div>
         </div>
       </div>
     </section>

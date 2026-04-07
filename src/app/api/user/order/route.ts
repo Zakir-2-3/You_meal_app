@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import nodemailer from "nodemailer";
 
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/supabaseClient";
 import { orderEmailTemplate } from "@/lib/emailTemplates/orderEmailTemplate";
+
+import { OrderRequest } from "@/types/api/user/order";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,23 +20,12 @@ export async function POST(req: NextRequest) {
       finalTotal,
       activated,
       lang = "ru",
-    }: {
-      email: string;
-      items: any[];
-      rawTotal: number;
-      discount: number;
-      vat: number;
-      tips: number;
-      tipsPercent: number;
-      finalTotal: number;
-      activated?: string[];
-      lang?: "ru" | "en";
-    } = await req.json();
+    }: OrderRequest = await req.json();
 
     if (!email || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: "Invalid order data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -46,10 +37,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (fetchError) {
-      console.error("Ошибка загрузки пользователя:", fetchError.message);
+      console.error("User loading error:", fetchError.message);
       return NextResponse.json(
         { error: "Failed to fetch user" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -69,10 +60,10 @@ export async function POST(req: NextRequest) {
       .eq("email", email);
 
     if (updateError) {
-      console.error("Ошибка обновления пользователя:", updateError.message);
+      console.error("User update error:", updateError.message);
       return NextResponse.json(
         { error: "Failed to update user" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -110,15 +101,15 @@ export async function POST(req: NextRequest) {
         }),
       });
     } catch (mailError: any) {
-      console.error("Ошибка отправки письма:", mailError);
+      console.error("Error sending email:", mailError);
     }
 
     return NextResponse.json({ success: true, orderNumber: newOrderNumber });
   } catch (err: any) {
-    console.error("Ошибка оформления заказа:", err);
+    console.error("Ordering error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

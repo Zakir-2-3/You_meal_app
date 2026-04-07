@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 
-import NavButtons from "@/components/NavButtons/NavButtons";
+import NavButtons from "@/components/layout/NavButtons/NavButtons";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
 import deliveryPageImg from "@/assets/images/delivery-page-img.png";
 
-import "./deliveryPage.scss";
+import "./page.scss";
 
 export default function DeliveryPage() {
   const { t } = useTranslate();
@@ -20,7 +20,7 @@ export default function DeliveryPage() {
     <section className="delivery-page-section">
       <div className="container">
         <h1 className="delivery-page-section__title">{title}</h1>
-        <NavButtons customTitle={titleNav} />
+        <NavButtons />
         <div className="delivery-page-section__img">
           <Image
             src={deliveryPageImg}

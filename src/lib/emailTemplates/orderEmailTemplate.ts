@@ -1,19 +1,6 @@
-import { DEFAULT_PROMOS } from "@/constants/defaults";
+import { DEFAULT_PROMOS } from "@/constants/user/defaults";
 
-import { Item } from "@/types/item";
-
-type OrderEmailParams = {
-  orderNumber: number;
-  items: Item[];
-  rawTotal: number;
-  discount: number;
-  vat: number;
-  tips: number;
-  tipsPercent: number;
-  finalTotal: number;
-  activated?: string[];
-  lang?: "ru" | "en";
-};
+import { OrderEmailParams } from "@/types/lib/order-email-template";
 
 export const orderEmailTemplate = ({
   orderNumber,
@@ -120,13 +107,15 @@ export const orderEmailTemplate = ({
             <p style="margin:4px 0">${texts.raw}: ${rawTotal}₽</p>
             <p style="margin:4px 0; color:#ff8000;">
               ${texts.discount}${
-    discountLabels.length > 0 ? ` (${discountLabels.join(", ")})` : ""
-  }: -${savedMoney}₽
+                discountLabels.length > 0
+                  ? ` (${discountLabels.join(", ")})`
+                  : ""
+              }: -${savedMoney}₽
             </p>
             <p style="margin:4px 0; color:#ff0000;">${texts.vat}: +${vat}₽</p>
             <p style="margin:4px 0">${texts.tips} (${tipsPercent || 0}%): +${
-    tips || 0
-  }₽</p>
+              tips || 0
+            }₽</p>
             <h3 style="margin:8px 0; color:#28a745;">${
               texts.total
             }: ${finalTotal}₽</h3>

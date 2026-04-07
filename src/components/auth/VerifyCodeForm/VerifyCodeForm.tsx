@@ -2,19 +2,9 @@ import { useFormContext } from "react-hook-form";
 
 import { toast } from "react-toastify";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
-type Props = {
-  email: string;
-  name: string;
-  password: string;
-  attempts: number;
-  canResend: boolean;
-  startTimer: (duration: number) => void;
-  formatTime: () => string;
-  onBack: () => void;
-  onSubmit: () => void;
-};
+import { Props } from "@/types/components/auth/verify-code-form";
 
 export default function VerifyCodeForm({
   email,
@@ -64,7 +54,7 @@ export default function VerifyCodeForm({
         toast.error(result.error || tooManyAttemptsTryLater);
         if (result.blockedUntil) {
           const remaining = Math.ceil(
-            (new Date(result.blockedUntil).getTime() - Date.now()) / 1000
+            (new Date(result.blockedUntil).getTime() - Date.now()) / 1000,
           );
           startTimer(remaining);
         }
@@ -102,9 +92,9 @@ export default function VerifyCodeForm({
         id="code"
         type="text"
         {...registerVerify("code", {
-          required: "Введите код",
+          required: t.user.enterCode,
           validate: (value) =>
-            /^\d{6}$/.test(value) || "Введите 6-значный код из цифр",
+            /^\d{6}$/.test(value) || t.regForm.enterSixDigitCode,
         })}
         className="registration-form__input"
         placeholder={codeFromEmailPlaceholder}
@@ -118,7 +108,7 @@ export default function VerifyCodeForm({
       {!canResend ? (
         <p className="registration-form__label">
           {attempts >= 2
-            ? `Слишком много попыток. ${formatTime()}`
+            ? `${t.toastTr.tooManyAttempts} ${formatTime()}`
             : `${resendVia} ${formatTime()}`}
         </p>
       ) : (

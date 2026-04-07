@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabaseClient";
-import { checkPasswordMatch } from "@/lib/checkPasswordMatch";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { checkPasswordMatch } from "@/lib/user/checkPasswordMatch";
 
 export async function POST(req: Request) {
   try {
@@ -14,10 +14,7 @@ export async function POST(req: Request) {
       .single();
 
     if (error || !user) {
-      return NextResponse.json(
-        { message: "Пользователь не найден" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     const nameSame = newName ? newName === user.name : false;
@@ -28,18 +25,18 @@ export async function POST(req: Request) {
         passwordSame = await checkPasswordMatch(email, newPassword);
       } catch {
         return NextResponse.json(
-          { message: "Ошибка при проверке пароля" },
-          { status: 500 }
+          { message: "Error checking password" },
+          { status: 500 },
         );
       }
     }
 
     return NextResponse.json({ nameSame, passwordSame });
   } catch (err) {
-    console.error("Ошибка проверки данных:", err);
+    console.error("Data validation error:", err);
     return NextResponse.json(
-      { message: "Ошибка проверки данных" },
-      { status: 500 }
+      { message: "Data validation error" },
+      { status: 500 },
     );
   }
 }

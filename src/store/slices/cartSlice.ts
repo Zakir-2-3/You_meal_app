@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { formatDate } from "@/utils/formatDate";
-import { calcTotalPrice } from "@/utils/calcTotalPrice";
+import { formatDate } from "@/utils/common/formatDate";
+import { calcTotalPrice } from "@/utils/cart/calcTotalPrice";
 
-import { CartState, Item } from "@/types/item";
+import { CartState, Item } from "@/types/product/item";
 
 const initialState: CartState = {
   items: [],
@@ -21,12 +21,12 @@ const cartSlice = createSlice({
 
       const totalCount = state.items.reduce(
         (sum, obj) => sum + (obj.count ?? 0),
-        0
+        0,
       );
       if (totalCount >= 99) return;
 
       const findItem = state.items.find(
-        (obj) => (obj.instanceId ?? String(obj.id)) === iid
+        (obj) => (obj.instanceId ?? String(obj.id)) === iid,
       );
 
       if (findItem) {
@@ -47,7 +47,7 @@ const cartSlice = createSlice({
     minusItem(state, action: PayloadAction<string>) {
       const iid = action.payload;
       const findItem = state.items.find(
-        (obj) => (obj.instanceId ?? String(obj.id)) === iid
+        (obj) => (obj.instanceId ?? String(obj.id)) === iid,
       );
 
       if (findItem) {
@@ -55,7 +55,7 @@ const cartSlice = createSlice({
           findItem.count = (findItem.count ?? 1) - 1;
         } else {
           state.items = state.items.filter(
-            (obj) => (obj.instanceId ?? String(obj.id)) !== iid
+            (obj) => (obj.instanceId ?? String(obj.id)) !== iid,
           );
         }
       }
@@ -69,7 +69,7 @@ const cartSlice = createSlice({
     removeItem(state, action: PayloadAction<string>) {
       const iid = action.payload;
       state.items = state.items.filter(
-        (obj) => (obj.instanceId ?? String(obj.id)) !== iid
+        (obj) => (obj.instanceId ?? String(obj.id)) !== iid,
       );
 
       if (state.items.length === 0) {

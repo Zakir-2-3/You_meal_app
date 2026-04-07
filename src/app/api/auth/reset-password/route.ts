@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
 
-import { supabase } from "@/lib/supabaseClient";
-import { checkPasswordMatch } from "@/lib/checkPasswordMatch";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { checkPasswordMatch } from "@/lib/user/checkPasswordMatch";
 
 export async function POST(req: Request) {
   try {
@@ -11,8 +11,8 @@ export async function POST(req: Request) {
 
     if (!email || !code || !newPassword) {
       return NextResponse.json(
-        { message: "Недостаточно данных" },
-        { status: 400 }
+        { message: "Insufficient data" },
+        { status: 400 },
       );
     }
 
@@ -25,15 +25,15 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (findError || !record) {
-      return NextResponse.json({ message: "Неверный код" }, { status: 400 });
+      return NextResponse.json({ message: "Invalid code" }, { status: 400 });
     }
 
     const now = new Date();
     const expiresAt = new Date(record.expires_at);
     if (expiresAt < now) {
       return NextResponse.json(
-        { message: "Срок действия кода истёк" },
-        { status: 400 }
+        { message: "The code has expired" },
+        { status: 400 },
       );
     }
 
@@ -41,8 +41,8 @@ export async function POST(req: Request) {
     const isSame = await checkPasswordMatch(email, newPassword);
     if (isSame) {
       return NextResponse.json(
-        { message: "Новый пароль не должен совпадать с текущим" },
-        { status: 400 }
+        { message: "The new password must not match the current one." },
+        { status: 400 },
       );
     }
 
@@ -56,10 +56,10 @@ export async function POST(req: Request) {
       .eq("email", email);
 
     if (updateError) {
-      console.error("Ошибка обновления пароля:", updateError.message);
+      console.error("Password update error:", updateError.message);
       return NextResponse.json(
-        { message: "Не удалось обновить пароль" },
-        { status: 500 }
+        { message: "Failed to update password" },
+        { status: 500 },
       );
     }
 
@@ -71,12 +71,12 @@ export async function POST(req: Request) {
       .eq("purpose", "recovery");
 
     if (deleteError) {
-      console.warn("Не удалось удалить код:", deleteError.message);
+      console.warn("Failed to remove code:", deleteError.message);
     }
 
-    return NextResponse.json({ message: "Пароль успешно обновлён" });
+    return NextResponse.json({ message: "Password updated successfully" });
   } catch (err) {
-    console.error("Ошибка в reset-password:", err);
-    return NextResponse.json({ message: "Ошибка на сервере" }, { status: 500 });
+    console.error("Error in reset-password:", err);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

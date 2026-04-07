@@ -1,0 +1,144 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { activeRegForm } from "@/store/slices/userSlice";
+
+import LanguageToggle from "../../ui/LanguageToggle/LanguageToggle";
+import CurrencySwitcher from "../../ui/CurrencySwitcher/CurrencySwitcher";
+import UserDropdownMenu from "../../user/dropdown/UserDropdownMenu/UserDropdownMenu";
+import GeoLocationSelector from "../../user/geo/GeoLocationSelector/GeoLocationSelector";
+
+import { validRoutes } from "@/constants/user/validRoutes";
+
+import cartIcon from "@/assets/icons/cart-icon.svg";
+import headerLogo from "@/assets/images/header-logo.png";
+import profileSignInIcon from "@/assets/icons/sign-in-profile-icon.svg";
+import profileSignOutIcon from "@/assets/icons/sign-out-profile-icon.svg";
+
+import "./Header.scss";
+
+const Header = () => {
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
+
+  const pathname = usePathname();
+
+  const { items } = useSelector((state: RootState) => state.cart);
+  const { isAuth } = useSelector((state: RootState) => state.user);
+  const isFormOpen = useSelector(
+    (state: RootState) => state.user.isRegFormOpen,
+  );
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0); // Общее кол-во товаров в корзине
+
+  const handleOpenForm = () => {
+    if (!isFormOpen) {
+      dispatch(activeRegForm(true));
+    }
+  };
+
+  // Проверяем, нужно ли скрывать header
+  const isHidden =
+    !validRoutes.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`),
+    ) ||
+    (pathname === "/user" && !isAuth);
+
+  // Закрытие dropdown при клике вне его области
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Закрываем дропдаун меню при переходе на другие страницы
+  useEffect(() => {
+    setShowDropdown(false);
+  }, [pathname]);
+
+  // Если isHidden = true, возвращаем null (полностью убираем header из DOM)
+  if (isHidden) return null;
+
+  return (
+    <header className="header">
+      <div className="header-container container">
+        <div className="header__logo">
+          <Link href="/">
+            <Image src={headerLogo} alt="header-logo" width={153} height={35} />
+          </Link>
+        </div>
+        <div className="header__geo">
+          <GeoLocationSelector />
+        </div>
+        <div className="header__language">
+          <LanguageToggle />
+        </div>
+        <div className="header__currency">
+          <CurrencySwitcher />
+        </div>
+        <div className="header__profile">
+          {isAuth ? (
+            <div className="header__profile-auth">
+              <button
+                ref={profileButtonRef}
+                type="button"
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="header__profile-button"
+              >
+                <Image
+                  src={profileSignOutIcon}
+                  alt="profile-icon"
+                  width={20}
+                  height={20}
+                />
+              </button>
+            </div>
+          ) : (
+            <button className="header__profile-button" onClick={handleOpenForm}>
+              <Image
+                src={profileSignInIcon}
+                alt="profile-icon"
+                width={20}
+                height={20}
+              />
+            </button>
+          )}
+          <UserDropdownMenu
+            showDropdown={showDropdown}
+            setShowDropdown={setShowDropdown}
+            dropdownRef={dropdownRef}
+          />
+        </div>
+        <div className="header__cart">
+          <Link href="/cart">
+            <Image src={cartIcon} alt="cart-icon" width={20} height={20} />
+            <span className="header__total-items">{totalCount}</span>
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

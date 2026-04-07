@@ -1,17 +1,11 @@
 import { useFormContext } from "react-hook-form";
 
-import { useTranslate } from "@/hooks/useTranslate";
+import { useTranslate } from "@/hooks/app/useTranslate";
 
-type Props = {
-  email: string;
-  onSubmit: (data: { password: string }) => Promise<void>;
-};
+import { Props } from "@/types/components/auth/set-new-password-form";
 
 export default function SetNewPasswordForm({ email, onSubmit }: Props) {
   const { t } = useTranslate();
-
-  const { newPasswordLabel } = t.regForm;
-  const { enterNewPasswordPlaceholder, repeatPasswordPlaceholder } = t.user;
 
   const {
     register,
@@ -26,16 +20,16 @@ export default function SetNewPasswordForm({ email, onSubmit }: Props) {
       onSubmit={handleSubmit(onSubmit)}
     >
       <label className="registration-form__label" htmlFor="reset-password">
-        {newPasswordLabel}
+        {t.regForm.newPasswordLabel}
       </label>
       <input
         id="reset-password"
         type="password"
         className="registration-form__input"
-        placeholder={enterNewPasswordPlaceholder}
+        placeholder={t.user.enterNewPasswordPlaceholder}
         {...register("password", {
-          required: "Введите пароль",
-          minLength: { value: 6, message: "Минимум 6 символов" },
+          required: t.user.passwordPlaceholder,
+          minLength: { value: 6, message: `${t.regForm.minSixChar}` },
         })}
       />
       {typeof errors.password?.message === "string" && (
@@ -45,15 +39,16 @@ export default function SetNewPasswordForm({ email, onSubmit }: Props) {
       )}
 
       <label className="registration-form__label" htmlFor="repeat-password">
-        Повторите пароль:
+        {t.regForm.repeatPasswordLabel}
       </label>
       <input
         id="repeat-password"
         type="password"
         className="registration-form__input"
-        placeholder={repeatPasswordPlaceholder}
+        placeholder={t.user.repeatPasswordPlaceholder}
         {...register("repeatPassword", {
-          validate: (val) => val === watch("password") || "Пароли не совпадают",
+          validate: (val) =>
+            val === watch("password") || t.formErrors.PASSWORDS_NOT_MATCH,
         })}
       />
       {typeof errors.repeatPassword?.message === "string" && (
@@ -67,7 +62,7 @@ export default function SetNewPasswordForm({ email, onSubmit }: Props) {
           type="submit"
           className="registration-form__button registration-form__button--primary"
         >
-          Сбросить пароль и войти
+          {t.regForm.resetPasswordAndSignIn}
         </button>
       </div>
     </form>

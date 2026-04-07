@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface TipsState {
-  percentage: number;
-}
+import { TipsState } from "@/types/store/tips-slice";
 
 const initialState: TipsState = {
   percentage: 0,
