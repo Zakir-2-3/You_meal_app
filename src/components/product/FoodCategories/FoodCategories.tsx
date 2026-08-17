@@ -1,7 +1,6 @@
 "use client";
 
 import React, { FC } from "react";
-import Image from "next/image";
 
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
@@ -43,12 +42,7 @@ const FoodCategories: FC = React.memo(() => {
                 dispatch(setActiveCategory({ index, key: item.key }))
               }
             >
-              <Image
-                src={item.image}
-                alt={translatedTitle}
-                width={24}
-                height={24}
-              />
+              <img src={item.image} alt="" width={24} height={24} />
               {translatedTitle}
             </button>
           </li>

@@ -6,13 +6,14 @@ export const orderEmailTemplate = ({
   orderNumber,
   items,
   rawTotal,
-  discount,
   vat,
   tips,
   tipsPercent,
   finalTotal,
+  savedMoney,
   activated = [],
   lang = "ru",
+  currency = "rub",
 }: OrderEmailParams) => {
   const texts = {
     ru: {
@@ -22,7 +23,7 @@ export const orderEmailTemplate = ({
       price: "Цена",
       raw: "Чистый счёт",
       discount: "Скидка",
-      vat: "НДС (5%)",
+      vat: "НДС(5%)",
       tips: "Чаевые",
       total: "✅ Итого",
       eta: "⏳ Ваш заказ будет готов в течение <b>30 мин</b>.",
@@ -37,7 +38,7 @@ export const orderEmailTemplate = ({
       price: "Price",
       raw: "Subtotal",
       discount: "Discount",
-      vat: "VAT (5%)",
+      vat: "VAT(5%)",
       tips: "Tips",
       total: "✅ Total",
       eta: "⏳ Your order will be ready within <b>30 min</b>.",
@@ -45,6 +46,11 @@ export const orderEmailTemplate = ({
       rights: "All rights reserved.",
     },
   }[lang];
+
+  const currSymbol = currency === "usd" ? "$" : "₽";
+
+  // Функция форматирования чисел
+  const fmt = (value: number) => Number(value).toFixed(2);
 
   // Скидки
   const discountLabels = activated
@@ -57,9 +63,6 @@ export const orderEmailTemplate = ({
       return code;
     })
     .filter(Boolean);
-
-  const discountedTotal = Math.round(rawTotal * (1 - discount / 100));
-  const savedMoney = rawTotal - discountedTotal;
 
   return `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center"
@@ -80,7 +83,13 @@ export const orderEmailTemplate = ({
         <table width="100%" cellpadding="10" cellspacing="0" style="background:#fff;padding:20px">
           ${items
             .map((item) => {
-              const itemTotal = item.price_rub * (item.count ?? 0);
+              // Выбираем цену в зависимости от валюты
+              const price =
+                currency === "usd"
+                  ? (item.price_usd ?? 0)
+                  : (item.price_rub ?? 0);
+              const itemTotal = price * (item.count ?? 0);
+              const itemTotalStr = `${fmt(itemTotal)}${currSymbol}`;
               return `
                 <tr style="border-bottom:1px solid #eee">
                   <td width="80">
@@ -93,7 +102,7 @@ export const orderEmailTemplate = ({
                       lang === "ru" ? item.name_ru : item.name_en
                     }</b></div>
                     <div>${texts.qty}: ${item.count}</div>
-                    <div>${texts.price}: ${itemTotal}₽</div>
+                    <div>${texts.price}: ${itemTotalStr}</div>
                   </td>
                 </tr>
               `;
@@ -104,21 +113,19 @@ export const orderEmailTemplate = ({
         <!-- Summary -->
         <table width="100%" cellpadding="10" style="background:#fff1e6;padding:15px">
           <tr><td>
-            <p style="margin:4px 0">${texts.raw}: ${rawTotal}₽</p>
+            <p style="margin:4px 0">${texts.raw}:&nbsp; ${fmt(rawTotal)}${currSymbol}</p>
             <p style="margin:4px 0; color:#ff8000;">
               ${texts.discount}${
                 discountLabels.length > 0
-                  ? ` (${discountLabels.join(", ")})`
+                  ? `(${discountLabels.join(", ")})`
                   : ""
-              }: -${savedMoney}₽
+              }:&nbsp; -${fmt(savedMoney)}${currSymbol}
             </p>
-            <p style="margin:4px 0; color:#ff0000;">${texts.vat}: +${vat}₽</p>
-            <p style="margin:4px 0">${texts.tips} (${tipsPercent || 0}%): +${
-              tips || 0
-            }₽</p>
+            <p style="margin:4px 0; color:#ff0000;">${texts.vat}:&nbsp; +${fmt(vat)}${currSymbol}</p>
+            <p style="margin:4px 0">${texts.tips}(${tipsPercent || 0}%):&nbsp; +${fmt(tips)}${currSymbol}</p>
             <h3 style="margin:8px 0; color:#28a745;">${
               texts.total
-            }: ${finalTotal}₽</h3>
+            }:&nbsp; ${fmt(finalTotal)}${currSymbol}</h3>
             <p style="margin:8px 0; font-size:14px; color:#555;">
               ${texts.eta}<br/>${texts.notify}
             </p>

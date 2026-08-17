@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 
@@ -19,6 +19,7 @@ const CodeStep: FC<CodeStepProps> = ({
   setShowPassword,
 }) => {
   const { t } = useTranslate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -26,11 +27,11 @@ const CodeStep: FC<CodeStepProps> = ({
     formState: { errors },
     watch,
     trigger,
+    setValue,
   } = form;
 
-  // Следим за изменением пароля для валидации повторного ввода
   useEffect(() => {
-    const subscription = watch((value, { name }) => {
+    const subscription = watch((_, { name }) => {
       if (name === "newPassword") {
         trigger("repeatPassword");
       }
@@ -38,27 +39,57 @@ const CodeStep: FC<CodeStepProps> = ({
     return () => subscription.unsubscribe();
   }, [watch, trigger]);
 
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 6);
+    setValue("code", digits, { shouldValidate: true });
+  };
+
+  const handleFormSubmit = async (
+    e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
+  ) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await handleSubmit(onSubmit)(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRepeatClick = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onResendCode();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <form
       className="registration-form__forgot registration-form__forgot--code"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleFormSubmit}
     >
-      {/* Поле для кода */}
       <label className="registration-form__label" htmlFor="code">
         {t.regForm.codeFromEmailLabel}
       </label>
       <input
         id="code"
         type="text"
+        maxLength={6}
         placeholder={t.regForm.sixDigitCode}
         className="registration-form__input"
         {...register("code", {
-          required: t.user.enterCode,
+          required: t.regForm.enterCodeEmail,
           pattern: {
             value: /^\d{6}$/,
             message: t.regForm.sixDigitCodeMail,
           },
+          onChange: handleCodeChange,
         })}
+        disabled={isSubmitting}
       />
       {errors.code && (
         <p className="registration-form__forgot-error registration-form__forgot-error--code1">
@@ -66,12 +97,12 @@ const CodeStep: FC<CodeStepProps> = ({
         </p>
       )}
 
-      {/* Кнопка повторной отправки */}
       {canResend ? (
         <button
           type="button"
           className="registration-form__button registration-form__button--secondary registration-form__forgot--repeat-btn"
-          onClick={onResendCode}
+          onClick={handleRepeatClick}
+          disabled={isSubmitting}
         >
           {t.regForm.resendCode}
         </button>
@@ -83,7 +114,6 @@ const CodeStep: FC<CodeStepProps> = ({
         </p>
       )}
 
-      {/* Поле нового пароля */}
       <label className="registration-form__label" htmlFor="new-password">
         {t.regForm.newPasswordLabel}
       </label>
@@ -94,6 +124,7 @@ const CodeStep: FC<CodeStepProps> = ({
           className="registration-form__input"
           placeholder={t.user.enterNewPasswordPlaceholder}
           {...register("newPassword", validationRules.passwordValidation)}
+          disabled={isSubmitting}
         />
         <TogglePasswordButton
           visible={showPassword}
@@ -106,7 +137,6 @@ const CodeStep: FC<CodeStepProps> = ({
         </p>
       )}
 
-      {/* Подтверждение пароля */}
       <input
         type={showPassword ? "text" : "password"}
         placeholder={t.user.repeatPasswordPlaceholder}
@@ -115,6 +145,7 @@ const CodeStep: FC<CodeStepProps> = ({
           validate: (val) =>
             val === watch("newPassword") || t.formErrors.PASSWORDS_NOT_MATCH,
         })}
+        disabled={isSubmitting}
       />
       {errors.repeatPassword && (
         <p className="registration-form__forgot-error registration-form__forgot-error--code3">
@@ -122,11 +153,11 @@ const CodeStep: FC<CodeStepProps> = ({
         </p>
       )}
 
-      {/* Кнопки */}
       <div className="registration-form__buttons-group">
         <button
           type="submit"
           className="registration-form__button registration-form__button--primary"
+          disabled={isSubmitting}
         >
           {t.regForm.changePasswordBtn}
         </button>
@@ -134,6 +165,7 @@ const CodeStep: FC<CodeStepProps> = ({
           type="button"
           className="registration-form__button registration-form__button--secondary"
           onClick={onBack}
+          disabled={isSubmitting}
         >
           {t.regForm.backBtn}
         </button>

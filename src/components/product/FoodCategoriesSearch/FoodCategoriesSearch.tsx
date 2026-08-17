@@ -1,7 +1,5 @@
 import { FC, useRef, useCallback, useState, useEffect } from "react";
 
-import Image from "next/image";
-
 import debounce from "lodash.debounce";
 
 import { LottieIcon } from "@/components/ui/LottieIcon";
@@ -13,7 +11,7 @@ import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
 import { FoodCategoriesSearchProps } from "@/types/components/product/food-categories-search";
 
 import searchAnimation from "@/assets/animations/search_animation.json";
-import searchCloseIcon from "@/assets/icons/search-close-icon.svg";
+import searchCloseIcon from "@/assets/icons/search-close-icon.svg?url";
 
 import "./FoodCategoriesSearch.scss";
 
@@ -140,12 +138,7 @@ const FoodCategoriesSearch: FC<FoodCategoriesSearchProps> = ({
         height={24}
       >
         {showCloseIcon ? (
-          <Image
-            src={searchCloseIcon}
-            alt="close-icon"
-            width={20}
-            height={20}
-          />
+          <img src={searchCloseIcon} alt="close-icon" width={20} height={20} />
         ) : (
           <LottieIcon
             animationData={searchAnimation}

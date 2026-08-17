@@ -1,13 +1,13 @@
 import { Category } from "@/types/product/category";
 
-import categoryIcon1 from "@/assets/icons/category-icon-1.svg";
-import categoryIcon2 from "@/assets/icons/category-icon-2.svg";
-import categoryIcon3 from "@/assets/icons/category-icon-3.svg";
-import categoryIcon4 from "@/assets/icons/category-icon-4.svg";
-import categoryIcon5 from "@/assets/icons/category-icon-5.svg";
-import categoryIcon6 from "@/assets/icons/category-icon-6.svg";
-import categoryIcon7 from "@/assets/icons/category-icon-7.svg";
-import categoryIcon8 from "@/assets/icons/category-icon-8.svg";
+import categoryIcon1 from "@/assets/icons/category-icon-1.svg?url";
+import categoryIcon3 from "@/assets/icons/category-icon-3.svg?url";
+import categoryIcon4 from "@/assets/icons/category-icon-4.svg?url";
+import categoryIcon2 from "@/assets/icons/category-icon-2.svg?url";
+import categoryIcon5 from "@/assets/icons/category-icon-5.svg?url";
+import categoryIcon6 from "@/assets/icons/category-icon-6.svg?url";
+import categoryIcon7 from "@/assets/icons/category-icon-7.svg?url";
+import categoryIcon8 from "@/assets/icons/category-icon-8.svg?url";
 
 export const categories: Category[] = [
   { id: 1, key: "burgers", image: categoryIcon1 },

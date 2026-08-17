@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -32,15 +33,10 @@ export const useForgotPassword = ({
   const [emailInput, setEmailInput] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { t } = useTranslate();
+  const { t, lang } = useTranslate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const {
-    canResend,
-    secondsLeft: resendTimer,
-    startTimer,
-    formatTime,
-  } = useResendTimer(10, false);
+  const { canResend, startTimer, formatTime } = useResendTimer(10, false);
 
   const validationRules = createValidationRules(t.formErrors);
 
@@ -54,7 +50,7 @@ export const useForgotPassword = ({
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email }),
+        body: JSON.stringify({ email: data.email, lang }),
       });
 
       const result = await res.json();
@@ -80,10 +76,10 @@ export const useForgotPassword = ({
       }
 
       if (res.status === 404) {
-        toast.error(result.error || t.toastTr.userNotFound);
+        toast.error(t.toastTr.userNotFound);
         emailForm.setError("email", {
           type: "server",
-          message: "Mail not found",
+          message: t.regForm.emailNotFound,
         });
         return;
       }
@@ -132,6 +128,27 @@ export const useForgotPassword = ({
       const result = await res.json();
 
       if (!res.ok) {
+        if (result.message === "INVALID_CODE") {
+          toast.error(t.toastTr.invalidCode);
+        } else if (result.message === "CODE_EXPIRED") {
+          toast.error(t.toastTr.codeExpired);
+        } else if (result.message === "PASSWORD_SAME_AS_CURRENT") {
+          toast.error(t.toastTr.passwordSameAsCurrent);
+        } else {
+          toast.error(result.message || t.toastTr.invalidCode);
+        }
+        return;
+      }
+
+      if (!res.ok) {
+        if (result.message === "CODE_EXPIRED") {
+          toast.error(t.toastTr.codeExpired);
+          return;
+        }
+        if (result.message === "PASSWORD_SAME_AS_CURRENT") {
+          toast.error(t.toastTr.passwordSameAsCurrent);
+          return;
+        }
         toast.error(result.message || t.toastTr.invalidCode);
         return;
       }
@@ -172,7 +189,7 @@ export const useForgotPassword = ({
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailInput }),
+        body: JSON.stringify({ email: emailInput, lang }),
       });
 
       const result = await res.json();
@@ -181,6 +198,9 @@ export const useForgotPassword = ({
         toast.error(result.message || t.toastTr.resendError);
         return;
       }
+
+      // Очищаем поле кода
+      codeForm.setValue("code", "", { shouldValidate: false });
 
       const nextAttempts = attempts + 1;
       setAttempts(nextAttempts);

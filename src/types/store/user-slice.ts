@@ -6,4 +6,7 @@ export interface UserState {
   balance: number;
   avatarUrl: string;
   geoCity?: string;
+  isUserDataLoaded: boolean;
+  isHydrated: boolean;
+  isGoogleSignIn: boolean;
 }

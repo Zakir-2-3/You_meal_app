@@ -29,8 +29,6 @@
     img {
       object-fit: cover;
       border-radius: 16px;
-      width: 100%;
-      height: auto;
     }
   }
 
@@ -38,7 +36,7 @@
   &__next {
     position: absolute;
     top: 40%;
-    background-color: #ccc;
+    background-color: #cccccc8f;
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -47,7 +45,7 @@
     z-index: 10;
 
     &:hover {
-      background: #a0a0a0;
+      background: #bfbfbf;
     }
   }
 
@@ -86,8 +84,8 @@
     transition: all 0.2s ease;
     cursor: pointer;
     background: none;
-    height: 70px;
-    width: 74px;
+    height: 80px;
+    width: 84px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -95,8 +93,8 @@
 
     img {
       border-radius: 8px;
-      width: 65px;
-      height: 65px;
+      width: 75px;
+      height: 75px;
     }
 
     &:hover {

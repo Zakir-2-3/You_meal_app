@@ -22,55 +22,20 @@ const nextConfig: NextConfig = {
   },
 
   webpack(config) {
-    /**
-     * 1. Находим стандартный loader Next.js,
-     *    который обрабатывает картинки (png, jpg, svg и т.д.)
-     */
+    // Находим стандартное правило file-loader для SVG (Next.js добавляет его сам)
     const fileLoaderRule = config.module.rules.find(
       (rule: any) => rule.test instanceof RegExp && rule.test.test(".svg"),
     );
 
-    /**
-     * 2. SVG как React-компонент
-     *    Работает ТОЛЬКО если импорт с ?component
-     */
-    config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
-      // resourceQuery: /component/,
-      use: [
-        {
-          loader: "@svgr/webpack",
-          options: {
-            svgoConfig: {
-              plugins: [
-                {
-                  name: "preset-default",
-                  params: {
-                    overrides: {
-                      removeViewBox: false, // чтобы width/height работали
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
-    });
-
-    /**
-     * 3. Исключаем SVG из стандартного file-loader'а
-     */
+    // Отключаем стандартное правило для всех SVG — будем управлять сами
     if (fileLoaderRule) {
       fileLoaderRule.exclude = /\.svg$/i;
     }
 
-    /**
-     * 4. Все остальные SVG — как обычные файлы (URL)
-     */
+    // все SVG становятся обычными URL (как статические ресурсы)
     config.module.rules.push({
       test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
       type: "asset/resource",
     });
 
@@ -85,6 +50,42 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; " +
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+              "style-src 'self' 'unsafe-inline' fonts.googleapis.com; " +
+              "font-src 'self' fonts.gstatic.com; " +
+              "img-src 'self' data: https: blob:; " +
+              "connect-src 'self' https://hxkhkagppruuaudgtbwt.supabase.co https://6794c225aad755a134ea56b6.mockapi.io https://nominatim.openstreetmap.org https://open.er-api.com; " +
+              "frame-ancestors 'none';",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(self)",
+          },
+        ],
+      },
       {
         source: "/api/:path*",
         headers: [

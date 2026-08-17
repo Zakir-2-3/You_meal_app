@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 
-import Image from "next/image";
-
 import { useTranslate } from "@/hooks/app/useTranslate";
 
-import scrollToTop from "@/assets/icons/scroll-to-top.svg";
+import scrollToTop from "@/assets/icons/scroll-to-top.svg?url";
 
 import "./ScrollToTop.scss";
 
@@ -29,7 +27,24 @@ export default function ScrollToTop() {
   }, []);
 
   const handleClick = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const start = window.scrollY;
+    const duration = 800;
+    const startTime = performance.now();
+
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      window.scrollTo(0, start * (1 - ease));
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+
+    requestAnimationFrame(animateScroll);
   };
 
   const handleKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -47,7 +62,7 @@ export default function ScrollToTop() {
       aria-label="Scroll to top"
       title={scrollToTopTr}
     >
-      <Image src={scrollToTop} alt="scroll-to-top" width={40} height={30} />
+      <img src={scrollToTop} alt="scroll-to-top" width={40} height={30} />
     </button>
   );
 }

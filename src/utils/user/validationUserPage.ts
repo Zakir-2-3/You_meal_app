@@ -1,16 +1,17 @@
 export const createUserValidationRules = (formErrors: any) => {
   return {
     nameEditValidation: {
-      validate: (value: string) => {
-        const trimmed = value.trim();
-
-        if (!value) return true;
-        if (trimmed.length === 0) return formErrors.NAME_INVALID;
-        if (trimmed.length < 2) return formErrors.MIN_2_CHARS;
-        if (!/^[A-Za-zА-Яа-яЁё\s-]+$/.test(trimmed))
-          return formErrors.NAME_INVALID;
-
-        return true;
+      minLength: {
+        value: 2,
+        message: formErrors.NAME_TOO_MIN,
+      },
+      maxLength: {
+        value: 15,
+        message: formErrors.NAME_TOO_LONG,
+      },
+      pattern: {
+        value: /^[A-Za-zА-Яа-яЁё]+$/,
+        message: formErrors.NAME_INVALID,
       },
     },
 

@@ -13,8 +13,7 @@ import "./page.scss";
 export default function DeliveryPage() {
   const { t } = useTranslate();
 
-  const { howToOrder, workingHours, costAndTime, title, titleNav } =
-    t.deliveryPage;
+  const { howToOrder, workingHours, costAndTime, title } = t.deliveryPage;
 
   return (
     <section className="delivery-page-section">
@@ -26,8 +25,9 @@ export default function DeliveryPage() {
             src={deliveryPageImg}
             priority
             alt="delivery-page-img"
-            width={500}
-            height={560}
+            width={450}
+            height={450}
+            unoptimized
           />
         </div>
         <div className="delivery-page-section__info">

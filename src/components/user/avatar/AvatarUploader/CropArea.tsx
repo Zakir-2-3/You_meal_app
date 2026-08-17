@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Cropper from "react-easy-crop";
 
@@ -14,12 +14,21 @@ export default function CropArea({
   onZoomChange,
   onCropComplete,
   onSave,
-  onReset,
+  onChangeImage,
   onZoomAdjust,
+  isUploading = false,
 }: CropAreaProps) {
   const { t } = useTranslate();
   const { save, changeTr } = t.buttons;
+
   const [localZoom, setLocalZoom] = useState(zoom);
+
+  // Сброс кропа и зума при смене изображения
+  useEffect(() => {
+    onCropChange({ x: 0, y: 0 });
+    onZoomChange(1);
+    setLocalZoom(1);
+  }, [imageSrc, onCropChange, onZoomChange]);
 
   const handleZoomChange = (value: number) => {
     setLocalZoom(value);
@@ -77,17 +86,19 @@ export default function CropArea({
         <div className="controls__actions">
           <button
             type="button"
-            className="controls__button controls__button--primary"
-            onClick={onSave}
+            className="controls__button controls__button--secondary"
+            onClick={onChangeImage}
+            disabled={isUploading}
           >
-            {save}
+            {changeTr}
           </button>
           <button
             type="button"
-            className="controls__button controls__button--secondary"
-            onClick={onReset}
+            className="controls__button controls__button--primary"
+            onClick={onSave}
+            disabled={isUploading}
           >
-            {changeTr}
+            {isUploading ? "Загрузка..." : save}
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+
 import { useForm } from "react-hook-form";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -23,6 +24,8 @@ import ActionButtons from "@/components/user/actions/ActionButtons";
 import BalanceSection from "@/components/user/balance/BalanceSection";
 import AvatarSection from "@/components/user/avatar/AvatarSection/AvatarSection";
 
+import LoadingSpinner from "@/UI/loaders/LoadingSpinner";
+
 import "./page.scss";
 
 export default function UserPage() {
@@ -38,6 +41,9 @@ export default function UserPage() {
     (state: RootState) => state.user,
   );
   const currency = useSelector((state: RootState) => state.currency.currency);
+  const isUserDataLoaded = useSelector(
+    (state: RootState) => state.user.isUserDataLoaded,
+  );
 
   const { t, lang } = useTranslate();
 
@@ -54,6 +60,8 @@ export default function UserPage() {
     promoCodeMin,
     namePlaceholder,
     maxActivatedMessage,
+    nameSameErrorTr,
+    passwordSameErrorTr,
   } = t.user;
 
   const { newPasswordUserLabel } = t.user;
@@ -66,7 +74,7 @@ export default function UserPage() {
     deleteTr,
     topUp,
     withdraw,
-    cancelTr,
+    closeTr,
     editTr,
     save,
     uploadAvatar,
@@ -88,7 +96,7 @@ export default function UserPage() {
     accountDeleteError,
   } = t.toastTr;
 
-  const { deleteAccountAlert } = t.buttons;
+  const { deleteAccountAlert, signOutAlert } = t.buttons;
 
   const userValidationRules = createUserValidationRules(t.formErrors);
 
@@ -99,6 +107,7 @@ export default function UserPage() {
     formState: { errors, isValid, isDirty, dirtyFields },
     reset,
     trigger,
+    setValue,
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -128,6 +137,9 @@ export default function UserPage() {
       passwordChangeFailed,
       dataUpdatedSuccess,
       dataValidationError,
+      nameSameErrorTr,
+      passwordSameErrorTr,
+      passwordSameAsCurrentError: t.toastTr.passwordSameAsCurrent,
     },
   });
 
@@ -142,6 +154,7 @@ export default function UserPage() {
   });
 
   const handleSignOut = () => {
+    if (!window.confirm(signOutAlert)) return;
     signOut(
       dispatch,
       {
@@ -173,125 +186,136 @@ export default function UserPage() {
   }
 
   return (
-    <section className="personal-account">
-      <div className="container">
-        <h1 className="personal-account__title">{title}</h1>
-        <NavButtons />
+    <>
+      <section className="personal-account">
+        <div className="container">
+          <h1 className="personal-account__title">{title}</h1>
+          <NavButtons />
 
-        <AvatarSection
-          avatarUrl={avatarUrl}
-          shouldAnimateAvatar={shouldAnimateAvatar}
-          showAvatarUploader={showAvatarUploader}
-          onShowUploader={() => setShowAvatarUploader(true)}
-          onDeleteAvatar={handleDeleteAvatar}
-          onCloseUploader={() => setShowAvatarUploader(false)}
-          translations={{
-            uploadAvatar,
-            changeTr,
-            deleteTr,
-          }}
-        />
+          <AvatarSection
+            avatarUrl={avatarUrl}
+            shouldAnimateAvatar={shouldAnimateAvatar}
+            showAvatarUploader={showAvatarUploader}
+            onShowUploader={() => setShowAvatarUploader(true)}
+            onDeleteAvatar={handleDeleteAvatar}
+            onCloseUploader={() => setShowAvatarUploader(false)}
+            translations={{
+              uploadAvatar,
+              changeTr,
+              deleteTr,
+            }}
+          />
 
-        <div className="personal-account__right">
-          <ProfileForm
-            name={name}
-            email={email || ""}
-            isGoogleUser={!!isGoogleUser}
-            isAuth={isAuth}
-            lang={lang}
-            editMode={editMode}
-            showPassword={showPassword}
-            nameSameError={nameSameError}
-            passwordSameError={passwordSameError}
-            isChecking={isChecking}
-            lastCheckedName={lastCheckedName}
-            lastCheckedPassword={lastCheckedPassword}
-            onSubmit={(data) => handleProfileSubmit(data, dirtyFields)}
-            onToggleEditMode={() => {
-              if (editMode) {
+          <div className="personal-account__right">
+            <ProfileForm
+              name={name}
+              email={email || ""}
+              isGoogleUser={!!isGoogleUser}
+              isAuth={isAuth}
+              lang={lang}
+              editMode={editMode}
+              showPassword={showPassword}
+              nameSameError={nameSameError}
+              passwordSameError={passwordSameError}
+              isChecking={isChecking}
+              lastCheckedName={lastCheckedName}
+              lastCheckedPassword={lastCheckedPassword}
+              onSubmit={(data) => handleProfileSubmit(data, dirtyFields)}
+              onToggleEditMode={() => {
+                if (editMode) {
+                  reset({
+                    name,
+                    email: email || "",
+                    newPassword: "",
+                    repeatPassword: "",
+                  });
+                } else {
+                  reset({
+                    name,
+                    email: email || "",
+                    newPassword: "",
+                    repeatPassword: "",
+                  });
+                }
+                setEditMode(!editMode);
+              }}
+              onToggleShowPassword={() => setShowPassword(!showPassword)}
+              onResetForm={() => {
                 reset({
                   name,
                   email: email || "",
                   newPassword: "",
                   repeatPassword: "",
                 });
-              } else {
-                reset({
-                  name: "",
-                  email: email || "",
-                  newPassword: "",
-                  repeatPassword: "",
-                });
-              }
-              setEditMode(!editMode);
-            }}
-            onToggleShowPassword={() => setShowPassword(!showPassword)}
-            onResetForm={() => {
-              reset({
-                name,
-                email: email || "",
-                newPassword: "",
-                repeatPassword: "",
-              });
-            }}
-            validationRules={userValidationRules}
-            register={register}
-            handleSubmit={handleSubmit}
-            errors={errors}
-            watch={watch}
-            trigger={trigger}
-            isValid={isValid}
-            isDirty={isDirty}
-            dirtyFields={dirtyFields}
-            translations={{
-              nameLabel,
-              emailLabel,
-              passwordLabel,
-              newPasswordUserLabel: newPasswordUserLabel || "",
-              repeatPasswordPlaceholder,
-              namePlaceholder,
-              save,
-              editTr,
-              cancelTr,
-              passwordUnavailableHint: isGoogleUser
-                ? t.user.passwordUnavailableHint
-                : "",
-            }}
-          />
+              }}
+              validationRules={userValidationRules}
+              register={register}
+              handleSubmit={handleSubmit}
+              errors={errors}
+              watch={watch}
+              trigger={trigger}
+              setValue={setValue}
+              isValid={isValid}
+              isDirty={isDirty}
+              dirtyFields={dirtyFields}
+              translations={{
+                nameLabel,
+                emailLabel,
+                passwordLabel,
+                newPasswordUserLabel: newPasswordUserLabel || "",
+                repeatPasswordPlaceholder,
+                namePlaceholder,
+                save,
+                editTr,
+                closeTr,
+                passwordUnavailableHint: isGoogleUser
+                  ? t.user.passwordUnavailableHint
+                  : "",
+              }}
+            />
 
-          <BalanceSection
-            balance={balance}
-            currency={currency}
-            onTopUp={() => alert(topUpAlert)}
-            onWithdraw={() => alert(withdrawFundsAlert)}
-            translations={{
-              balanceLabel,
-              topUp,
-              withdraw,
-            }}
-          />
+            <BalanceSection
+              balance={balance}
+              currency={currency}
+              onTopUp={() => alert(topUpAlert)}
+              onWithdraw={() => alert(withdrawFundsAlert)}
+              translations={{
+                balanceLabel,
+                topUp,
+                withdraw,
+              }}
+            />
 
-          <PromoSection
-            translations={{
-              promoCodeLabel,
-              enterPromoCodePlaceholder,
-              promoCodeMax,
-              promoCodeMin,
-              activateTr,
-              maxActivatedMessage,
-            }}
-          />
+            <PromoSection
+              translations={{
+                promoCodeLabel,
+                enterPromoCodePlaceholder,
+                promoCodeMax,
+                promoCodeMin,
+                activateTr,
+                maxActivatedMessage,
+              }}
+            />
 
-          <ActionButtons
-            onSignOut={handleSignOut}
-            onDeleteAccount={handleDeleteAccount}
-            translations={{
-              signOutAccountTr,
-              deleteAccountTr,
-            }}
-          />
+            <ActionButtons
+              onSignOut={handleSignOut}
+              onDeleteAccount={handleDeleteAccount}
+              translations={{
+                signOutAccountTr,
+                deleteAccountTr,
+              }}
+            />
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      {!isUserDataLoaded && (
+        <>
+          <div className="overlay-loading" />
+          <div className="overlay-spinner">
+            <LoadingSpinner />
+          </div>
+        </>
+      )}
+    </>
   );
 }

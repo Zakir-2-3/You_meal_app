@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
+import { useGeoLocation } from "@/hooks/geo/useGeoLocation";
 
 import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
 
-import { useGeoLocation } from "@/hooks/geo/useGeoLocation";
-
-import locationIcon from "@/assets/icons/location-icon.svg";
+import locationIcon from "@/assets/icons/location-icon.svg?url";
 
 import "./GeoLocationSelector.scss";
 
@@ -14,6 +12,7 @@ const GeoLocationSelector = () => {
   const {
     inputVisible,
     inputValue,
+    initialized,
     city,
     suggestions,
     hasUserTyped,
@@ -40,13 +39,15 @@ const GeoLocationSelector = () => {
       ref={wrapperRef}
     >
       <div className="geo-selector__container">
-        <button
-          className={`geo-selector__icon geo-selector__icon--${iconStatus}`}
-          onClick={inputVisible ? handleCloseInput : handleGeoIconClick}
-          title={iconStatus === "error" ? determineGeo : changeCityGeo}
-        >
-          <Image src={locationIcon} alt="geo" width={16} height={16} />
-        </button>
+        {initialized && (
+          <button
+            className={`geo-selector__icon geo-selector__icon--${iconStatus}`}
+            onClick={inputVisible ? handleCloseInput : handleGeoIconClick}
+            title={iconStatus === "error" ? determineGeo : changeCityGeo}
+          >
+            <img src={locationIcon} alt="geo" width={16} height={16} />
+          </button>
+        )}
 
         <div
           className={`geo-selector__input-wrapper ${
@@ -71,7 +72,7 @@ const GeoLocationSelector = () => {
               <CloseButton
                 className="geo-selector__clear-btn"
                 onClick={handleClearClick}
-                width={11}
+                width={10}
                 height={10}
                 title="Очистить"
               />

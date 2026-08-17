@@ -29,6 +29,7 @@
     position: relative;
     padding: 30px;
     background: #fff;
+    box-shadow: 2px 4px 6px rgb(49 49 49 / 16%);
     & .empty-cart-img {
       margin-top: 25px;
     }
@@ -94,7 +95,7 @@
     grid-row-start: 2;
     position: sticky;
     top: 10px;
-    max-height: 531px;
+    max-height: 519px;
     & .popup {
       position: fixed;
       top: 0;
@@ -145,14 +146,14 @@
     justify-content: flex-start;
     align-items: center;
     width: 350px;
-    max-height: 481px;
+    max-height: 463px;
     height: 100%;
     padding: 20px;
     margin-bottom: 0;
     background-color: #fff;
     border: 2px dashed #00000099;
     font-family: monospace;
-    box-shadow: 2px 4px 6px rgba(49, 49, 49, 0.215);
+    box-shadow: 2px 4px 6px rgb(49 49 49 / 16%);
   }
   &__pay-btn {
     min-height: 36px;
@@ -162,6 +163,11 @@
     font-weight: 400;
     border-radius: 6px;
     @include mixins.btn-box-shadow-hover;
+
+    &:disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
   }
 }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { toast } from "react-toastify";
 
 import { store } from "@/store/store";
@@ -12,7 +13,6 @@ import {
 } from "@/types/hooks/user-avatar";
 
 export const useUserAvatar = ({
-  email,
   avatarUrl,
   dispatch,
   translations,

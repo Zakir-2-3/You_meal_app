@@ -7,5 +7,8 @@ export interface CropAreaProps {
   onCropComplete: (croppedArea: any, croppedAreaPixels: any) => void;
   onSave: () => void;
   onReset: () => void;
+  onChangeImage?: () => void;
   onZoomAdjust: (newZoom: number) => void;
+  isUploading?: boolean;
+  isCropped?: boolean;
 }

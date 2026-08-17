@@ -29,26 +29,30 @@ export const useRegistrationLogic = ({
   ui,
 }: UseRegistrationLogicProps): UseRegistrationLogicReturn => {
   const { t, lang } = useTranslate();
-  const dispatch = useDispatch<AppDispatch>();
 
   const doCleanup = useCleanupOnAuth();
   const { canResend, startTimer, formatTime } = useResendTimer();
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [attempts, setAttempts] = useState(0);
 
   const methods = useForm<RegForm>({ mode: "onChange" });
   const verifyMethods = useForm<{ code: string }>({ mode: "onChange" });
 
   const { setError, reset } = methods;
-  const { reset: resetVerify } = verifyMethods;
 
   const handleSignInError = useCallback(
     (errorData: any) => {
       if (errorData.code === "email_not_found") {
         toast.error(t.toastTr.userNotFound);
-        setError("email", { type: "server", message: "Mail not found" });
+        setError("email", { type: "server", message: t.regForm.emailNotFound });
       } else if (errorData.code === "invalid_password") {
-        setError("password", { type: "server", message: "Invalid password" });
+        setError("password", {
+          type: "server",
+          message: t.formErrors.INVALID_PASSWORD,
+        });
       } else {
         toast.error(errorData.message || t.toastTr.signInErrorTr);
       }
@@ -75,6 +79,11 @@ export const useRegistrationLogic = ({
     async (data: RegForm, res: Response, result: any) => {
       if (res.status === 429) {
         toast.error(result.error || t.toastTr.tooManyAttemptsTryLater);
+        // Переходим на экран верификации, чтобы показать таймер
+        ui.setLocalEmail(data.email);
+        ui.setLocalName(data.name);
+        ui.setLocalPassword(data.password);
+        ui.setStep("verify");
         if (result.blockedUntil) {
           const remaining = Math.ceil(
             (new Date(result.blockedUntil).getTime() - Date.now()) / 1000,
@@ -104,8 +113,30 @@ export const useRegistrationLogic = ({
         return;
       }
 
+      if (result.error === "USER_CHECK_ERROR") {
+        toast.error(t.toastTr.userCheckError);
+        return;
+      }
+      if (result.error === "VERIFICATION_INSERT_ERROR") {
+        toast.error(t.toastTr.verificationInsertError);
+        return;
+      }
+
+      if (result.error === "EMAIL_SEND_FAILED") {
+        toast.error(t.toastTr.emailSendFailed);
+        return;
+      }
+
       if (!res.ok) {
-        toast.error(result.error || t.toastTr.codeSendError);
+        if (result.error === "RESEND_ERROR") {
+          toast.error(t.toastTr.resendError);
+          return;
+        }
+        if (result.error === "VERIFICATION_UPDATE_ERROR") {
+          toast.error(t.toastTr.verificationUpdateError);
+          return;
+        }
+        toast.error(result.error || result.message || t.toastTr.codeSendError);
         return;
       }
 
@@ -132,6 +163,7 @@ export const useRegistrationLogic = ({
 
   const handleSignIn = useCallback(
     async (data: RegForm) => {
+      setIsSubmitting(true);
       try {
         const res = await fetch("/api/auth/sign-in", {
           method: "POST",
@@ -149,6 +181,8 @@ export const useRegistrationLogic = ({
         await handleSuccessfulAuth(user);
       } catch {
         toast.error(t.toastTr.signInOrServerError);
+      } finally {
+        setIsSubmitting(false);
       }
     },
     [handleSignInError, handleSuccessfulAuth, t],
@@ -156,6 +190,7 @@ export const useRegistrationLogic = ({
 
   const handleSignUp = useCallback(
     async (data: RegForm) => {
+      setIsSubmitting(true);
       try {
         // Просто отправляем запрос на регистрацию
         const res = await fetch("/api/auth/register", {
@@ -172,6 +207,8 @@ export const useRegistrationLogic = ({
         await handleRegistrationResponse(data, res, result);
       } catch {
         toast.error(t.toastTr.registrationError);
+      } finally {
+        setIsSubmitting(false);
       }
     },
     [t, ui, lang, reset, handleRegistrationResponse],
@@ -190,6 +227,7 @@ export const useRegistrationLogic = ({
 
   const handleVerifySubmit = useCallback(
     async ({ code }: { code: string }) => {
+      setIsSubmitting(true);
       try {
         const res = await fetch("/api/auth/verify", {
           method: "POST",
@@ -202,6 +240,11 @@ export const useRegistrationLogic = ({
         });
 
         if (!res.ok) {
+          const result = await res.json();
+          if (result.error === "CODE_EXPIRED") {
+            toast.error(t.toastTr.codeExpired);
+            return;
+          }
           setAttempts((prev) => prev + 1);
           throw new Error("Code is incorrect");
         }
@@ -214,6 +257,8 @@ export const useRegistrationLogic = ({
         dispatch(syncUserMetaIfAuth());
       } catch {
         toast.error(t.toastTr.invalidCode);
+      } finally {
+        setIsSubmitting(false);
       }
     },
     [ui.localEmail, ui.geoCity, t, dispatch, loadUserData],
@@ -231,5 +276,6 @@ export const useRegistrationLogic = ({
     setAttempts,
     doCleanup,
     t,
+    isSubmitting,
   };
 };

@@ -3,6 +3,7 @@ export interface Props {
   name: string;
   password: string;
   attempts: number;
+  setAttempts: (value: number) => void;
   canResend: boolean;
   startTimer: (duration: number) => void;
   formatTime: () => string;

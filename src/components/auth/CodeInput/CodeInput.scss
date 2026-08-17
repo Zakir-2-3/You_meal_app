@@ -1,0 +1,25 @@
+.code-input-wrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.code-input-cell {
+  width: 44px;
+  height: 46px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  background: #fff;
+  transition: border-color 0.2s;
+  caret-color: #f86310;
+
+  &:disabled {
+    background: #f5f5f5;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}

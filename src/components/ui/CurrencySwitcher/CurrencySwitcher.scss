@@ -62,4 +62,12 @@
     font-size: 12px;
     font-weight: 600;
   }
+
+  &--open {
+    &:hover {
+      filter: none;
+      -webkit-filter: none;
+      cursor: default;
+    }
+  }
 }

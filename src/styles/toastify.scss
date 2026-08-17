@@ -1,7 +1,13 @@
 .Toastify__toast {
-  width: fit-content;
-  padding-right: 35px;
+  width: fit-content !important;
+  padding-right: 28px !important;
+  min-width: 0;
   font-size: 14px;
+}
+
+.Toastify__toast-container {
+  width: auto;
+  min-width: 0;
 }
 
 .Toastify__toast-container--top-right {

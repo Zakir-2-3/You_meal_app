@@ -1,4 +1,4 @@
-export async function detectGeoCity(lang: "ru" | "en" = "ru"): Promise<string> {
+export async function detectGeoCity(): Promise<string> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
       return resolve("geolocation_not_supported");
@@ -8,7 +8,7 @@ export async function detectGeoCity(lang: "ru" | "en" = "ru"): Promise<string> {
       async ({ coords }) => {
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`,
           );
           const data = await res.json();
           const cityName =
@@ -23,7 +23,7 @@ export async function detectGeoCity(lang: "ru" | "en" = "ru"): Promise<string> {
       },
       () => {
         resolve("geolocation_disabled");
-      }
+      },
     );
   });
 }

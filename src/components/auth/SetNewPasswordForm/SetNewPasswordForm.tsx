@@ -4,7 +4,7 @@ import { useTranslate } from "@/hooks/app/useTranslate";
 
 import { Props } from "@/types/components/auth/set-new-password-form";
 
-export default function SetNewPasswordForm({ email, onSubmit }: Props) {
+export default function SetNewPasswordForm({ onSubmit }: Props) {
   const { t } = useTranslate();
 
   const {

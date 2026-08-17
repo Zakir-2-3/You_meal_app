@@ -47,7 +47,11 @@ const CurrencySwitcher = () => {
   }, []);
 
   return (
-    <div className="currency-switcher" ref={switcherRef} onClick={toggleList}>
+    <div
+      className={`currency-switcher ${isOpen ? "currency-switcher--open" : ""}`}
+      ref={switcherRef}
+      onClick={toggleList}
+    >
       <div className="currency-switcher__current">
         {getCurrencyName(currency)} {currency === "rub" ? "₽" : "$"}
       </div>

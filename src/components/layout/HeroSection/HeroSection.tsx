@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 
-import heroSectionImg_1 from "@/assets/images/hero-section-img-1.png";
+import heroSectionImg_1 from "@/assets/images/hero-section-img-1.webp";
 
 import "./HeroSection.scss";
 
@@ -23,6 +23,7 @@ const HeroSection: FC = React.memo(() => {
           width={255}
           height={291}
           priority
+          fetchPriority="high"
         />
         <div className="hero-section__text">
           <h1 className="hero-section__title">

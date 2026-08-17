@@ -8,6 +8,7 @@ import AppProvider from "./AppProvider";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import ScrollToTop from "@/components/layout/ScrollToTop/ScrollToTop";
+import GlobalSpinner from "@/components/product/GlobalSpinner/GlobalSpinner";
 import RegistrationForm from "@/components/auth/RegistrationForm/RegistrationForm";
 
 import "@/styles/reset.css";
@@ -17,6 +18,8 @@ import "@/styles/toastify.scss";
 const nunito = Nunito({
   weight: ["400", "600", "700"],
   subsets: ["latin"],
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +43,7 @@ export default function RootLayout({
           <RegistrationForm />
           <ToastContainer
             position="top-right" // Позиция тостов
-            autoClose={2500} // Автозакрытие через 2.5 секунды
+            autoClose={3000} // Автозакрытие через 3 секунды
             hideProgressBar={false} // Показывать прогресс-бар
             newestOnTop={false} // Новые тосты снизу
             closeOnClick // Закрывать по клику
@@ -50,6 +53,7 @@ export default function RootLayout({
             pauseOnHover // Пауза при наведении
           />
           <ScrollToTop />
+          <GlobalSpinner />
         </AppProvider>
       </body>
     </html>

@@ -32,4 +32,9 @@ export interface UseRegistrationLogicReturn {
   setAttempts: (attempts: number) => void;
   doCleanup: () => void;
   t: any;
+  isSubmitting: boolean;
+}
+
+export interface GoogleSignInButtonProps {
+  onClose?: () => void;
 }

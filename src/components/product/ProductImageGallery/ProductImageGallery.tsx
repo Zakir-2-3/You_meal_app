@@ -1,14 +1,14 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+
 import Image from "next/image";
 
 import useEmblaCarousel from "embla-carousel-react";
 
-import { useCallback, useEffect, useState } from "react";
-
 import { ProductImageGalleryProps } from "@/types/components/common/product-image-gallery";
 
-import arrowIcon from "@/assets/icons/arrow-icon.svg";
+import arrowIcon from "@/assets/icons/arrow-icon.svg?url";
 
 import "./ProductImageGallery.scss";
 
@@ -17,25 +17,16 @@ const ProductImageGallery = ({ images, alt }: ProductImageGalleryProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const scrollTo = useCallback(
-    (index: number) => {
-      emblaApi?.scrollTo(index);
-    },
+    (index: number) => emblaApi?.scrollTo(index),
     [emblaApi],
   );
 
-  const scrollPrev = useCallback(() => {
-    emblaApi?.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    emblaApi?.scrollNext();
-  }, [emblaApi]);
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
-    const onSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
-    };
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
     emblaApi.on("select", onSelect);
     onSelect();
   }, [emblaApi]);
@@ -49,8 +40,8 @@ const ProductImageGallery = ({ images, alt }: ProductImageGalleryProps) => {
               <Image
                 src={src}
                 alt={`${alt} ${index + 1}`}
-                width={500}
-                height={500}
+                width={480}
+                height={480}
                 priority={index === 0}
               />
             </div>
@@ -58,15 +49,13 @@ const ProductImageGallery = ({ images, alt }: ProductImageGalleryProps) => {
         </div>
       </div>
 
-      {/* Стрелки */}
       <button className="product-gallery__prev" onClick={scrollPrev}>
-        <Image src={arrowIcon} width={18} height={18} alt="arrow-icon" />
+        <img src={arrowIcon} width={18} height={18} alt="arrow-icon" />
       </button>
       <button className="product-gallery__next" onClick={scrollNext}>
-        <Image src={arrowIcon} width={18} height={18} alt="arrow-icon" />
+        <img src={arrowIcon} width={18} height={18} alt="arrow-icon" />
       </button>
 
-      {/* Превьюшки */}
       <div className="product-gallery__thumbs">
         {images.map((src, index) => (
           <button
@@ -76,7 +65,13 @@ const ProductImageGallery = ({ images, alt }: ProductImageGalleryProps) => {
             }`}
             onClick={() => scrollTo(index)}
           >
-            <Image src={src} alt={`${alt} thumbnail`} width={65} height={65} />
+            <Image
+              src={src}
+              alt={`${alt} thumbnail`}
+              width={65}
+              height={65}
+              loading="lazy"
+            />
           </button>
         ))}
       </div>

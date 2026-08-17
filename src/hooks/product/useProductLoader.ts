@@ -22,10 +22,14 @@ export const useProductLoader = (): UseProductLoaderReturn => {
 
   const loadingRef = useRef(false);
   const hasLoadedRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuth } = useSelector((s: RootState) => s.user);
-  const { ratings, metaSynced } = useSelector((s: RootState) => s.productMeta);
+
+  const { isAuth } = useSelector((state: RootState) => state.user);
+  const { ratings, metaSynced } = useSelector(
+    (state: RootState) => state.productMeta,
+  );
 
   const updateBaseDisplayedItems = useCallback(
     (updater: (prev: Item[]) => Item[]) => {
@@ -38,22 +42,24 @@ export const useProductLoader = (): UseProductLoaderReturn => {
     async (categoryKey?: CategoryKey, searchValue?: string) => {
       // Если уже загружены товары и это не поиск/фильтрация - пропускаем
       if (hasLoadedRef.current && originalItems.length > 0 && !searchValue) {
-        // Только если это точно такая же категория (или все товары)
         const isSameCategory = !categoryKey;
         if (isSameCategory) {
           return;
         }
       }
 
-      // Запрещаем повторную загрузку
       if (loadingRef.current) return;
 
-      loadingRef.current = true;
-
-      // Только если реально нет товаров - показываем loading
-      if (originalItems.length === 0 && !hasLoadedRef.current) {
-        setUiPhase("loading");
+      // Отменяем предыдущий запрос, если он ещё не завершён
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
+
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      loadingRef.current = true;
+      setUiPhase("loading");
 
       try {
         let data: Item[] = [];
@@ -63,6 +69,7 @@ export const useProductLoader = (): UseProductLoaderReturn => {
             `https://6794c225aad755a134ea56b6.mockapi.io/items?search=${encodeURIComponent(
               searchValue,
             )}`,
+            { signal: controller.signal },
           );
 
           const searchLower = searchValue.toLowerCase().trim();
@@ -77,11 +84,13 @@ export const useProductLoader = (): UseProductLoaderReturn => {
           )}`;
           const res = await axios.get<Item[]>(
             `https://6794c225aad755a134ea56b6.mockapi.io/items?${categoryParam}`,
+            { signal: controller.signal },
           );
           data = res.data;
         } else {
           const res = await axios.get<Item[]>(
             `https://6794c225aad755a134ea56b6.mockapi.io/items`,
+            { signal: controller.signal },
           );
           data = res.data;
         }
@@ -94,14 +103,12 @@ export const useProductLoader = (): UseProductLoaderReturn => {
         setOriginalItems(prepared);
         setBaseDisplayedItems(prepared);
 
-        // Всегда устанавливаем ready, если есть данные, даже если уже были загружены
         setUiPhase(prepared.length ? "ready" : "empty");
         hasLoadedRef.current = true;
 
         const patch: Record<string, number> = {};
         for (const it of prepared) {
           if (ratings[it.instanceId!] == null) {
-            // Всегда генерируем, если рейтинга нет в Redux
             const newRating = Math.floor(Math.random() * 3) + 3;
             patch[it.instanceId!] = newRating;
           }
@@ -110,7 +117,6 @@ export const useProductLoader = (): UseProductLoaderReturn => {
         if (Object.keys(patch).length) {
           dispatch(setManyRatings(patch));
 
-          // Синхронизация новых рейтингов с БД для авторизованных пользователей
           if (isAuth) {
             try {
               const email = (await import("@/store/store")).store.getState()
@@ -127,15 +133,21 @@ export const useProductLoader = (): UseProductLoaderReturn => {
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
+        // Игнорируем ошибки отмены – это не настоящая ошибка
+        if (e?.name === "AbortError") return;
         console.error("Error loading goods:", e);
         setUiPhase("empty");
         hasLoadedRef.current = true;
       } finally {
         loadingRef.current = false;
+        // Очищаем ссылку на контроллер, если он наш
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+        }
       }
     },
-    [dispatch, isAuth, metaSynced, ratings, originalItems],
+    [dispatch, isAuth, metaSynced, ratings, originalItems.length],
   );
 
   const resetProducts = useCallback(() => {
@@ -144,6 +156,11 @@ export const useProductLoader = (): UseProductLoaderReturn => {
     setOriginalItems([]);
     setBaseDisplayedItems([]);
     setUiPhase("idle");
+    // Отменяем текущий запрос при сбросе
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
   }, []);
 
   return {

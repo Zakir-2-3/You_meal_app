@@ -16,6 +16,9 @@ export interface UseProfileFormProps {
     passwordChangeFailed: string;
     dataUpdatedSuccess: string;
     dataValidationError: string;
+    nameSameErrorTr: string;
+    passwordSameErrorTr: string;
+    passwordSameAsCurrentError: string;
   };
 }
 

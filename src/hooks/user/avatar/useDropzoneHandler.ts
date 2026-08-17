@@ -4,7 +4,7 @@ import { useDropzone } from "react-dropzone";
 export const useDropzoneHandler = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, open } = useDropzone({
     accept: { "image/*": [] },
     multiple: false,
     onDrop: (acceptedFiles) => {
@@ -22,5 +22,6 @@ export const useDropzoneHandler = () => {
     setImageSrc,
     getRootProps,
     getInputProps,
+    open,
   };
 };

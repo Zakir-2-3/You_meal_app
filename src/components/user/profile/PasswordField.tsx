@@ -1,11 +1,9 @@
 "use client";
 
-import Image from "next/image";
-
 import { PasswordFieldProps } from "@/types/components/ui/password-field";
 
-import HidePasswordIcon from "@/assets/icons/hide-password-icon.svg";
-import ShowPasswordIcon from "@/assets/icons/show-password-icon.svg";
+import HidePasswordIcon from "@/assets/icons/hide-password-icon.svg?url";
+import ShowPasswordIcon from "@/assets/icons/show-password-icon.svg?url";
 
 const PasswordField = ({
   editMode,
@@ -46,14 +44,14 @@ const PasswordField = ({
               onClick={onToggleShowPassword}
             >
               {showPassword ? (
-                <Image
+                <img
                   src={ShowPasswordIcon}
                   width={20}
                   height={20}
                   alt="show-password-icon"
                 />
               ) : (
-                <Image
+                <img
                   src={HidePasswordIcon}
                   width={20}
                   height={20}

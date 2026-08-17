@@ -1,8 +1,8 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useState, useEffect } from "react";
 
-import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -18,34 +18,78 @@ import "./NavButtons.scss";
 const NavButtons: FC<NavButtonsProps> = ({ customTitle }) => {
   const { t } = useTranslate();
 
+  const pathname = usePathname();
+  const router = useRouter();
+
   const { homeNav } = t.buttons;
 
-  const activeCategory = useSelector(
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const activeIndex = useSelector(
     (state: RootState) => state.category.activeIndex,
   );
-
-  // Текущая категория
-  const currentCategory = categories[activeCategory];
-
-  // Берем ключ категории
+  const currentCategory = categories[activeIndex];
   const categoryKey = currentCategory?.key as keyof typeof t.categories;
-
-  // Если есть перевод, берем его, иначе оригинал
   const translatedCategoryTitle =
     (categoryKey && t.categories[categoryKey]) ||
     currentCategory?.title ||
     t.product.unknownTitleCategory;
 
-  // Текст для навигации
-  const navTitle = customTitle || translatedCategoryTitle;
+  // Сбрасываем блокировку, если путь изменился (навигация завершена)
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
+
+  // Дополнительный сброс через 2 секунды, если навигация зависла
+  useEffect(() => {
+    if (isNavigating) {
+      const timer = setTimeout(() => setIsNavigating(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isNavigating]);
+
+  if (pathname === "/") return null;
+
+  const goToHome = (category?: string, reset = false) => {
+    if (isNavigating) return; // блокируем повторные клики
+
+    setIsNavigating(true);
+    if (reset) {
+      sessionStorage.setItem("navCategory", "__reset__");
+    } else if (category) {
+      sessionStorage.setItem("navCategory", category);
+    }
+    router.push("/");
+  };
 
   return (
     <nav className="nav-buttons">
       <ol>
         <li>
-          <Link href="/">{homeNav}</Link>
+          <button
+            onClick={() => goToHome("burgers", true)}
+            className="nav-category-btn"
+            disabled={isNavigating}
+          >
+            {homeNav}
+          </button>
         </li>
-        <li>{navTitle}</li>
+        {translatedCategoryTitle && (
+          <li>
+            <button
+              onClick={() => goToHome(categoryKey)}
+              className="nav-category-btn"
+              disabled={isNavigating}
+            >
+              {translatedCategoryTitle}
+            </button>
+          </li>
+        )}
+        {customTitle && (
+          <li>
+            <span>{customTitle}</span>
+          </li>
+        )}
       </ol>
     </nav>
   );

@@ -16,6 +16,7 @@ const ActivePromos = ({
   onRemovePromo,
 }: ActivePromosProps) => {
   const { t } = useTranslate();
+
   const containerRefs = useRef<Array<HTMLDivElement | null>>([]);
   const promoTagRefs = useRef<Array<HTMLDivElement | null>>([]);
 
@@ -32,8 +33,7 @@ const ActivePromos = ({
       const mouseX = e.clientX - rect.left;
       const containerWidth = rect.width;
 
-      // Определяем границы:
-      // - Правые 25% контейнера
+      // Определяем границы: Правые 25% контейнера
       const rightAreaStart = containerWidth * 0.75;
 
       // Снимаем предыдущие классы
@@ -84,6 +84,8 @@ const ActivePromos = ({
     if (length === 11) return 12;
     if (length === 10) return 14;
     if (length === 9) return 15;
+    if (length === 8) return 16;
+    if (length <= 7) return 17;
     return 15;
   };
 

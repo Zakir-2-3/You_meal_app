@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { usePathname } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -16,15 +16,17 @@ import { useTranslate } from "@/hooks/app/useTranslate";
 import { validRoutes } from "@/constants/user/validRoutes";
 
 import footerLogo from "@/assets/images/footer-logo.png";
-import socialIcon_1 from "@/assets/icons/socialIcon_1.svg";
-import socialIcon_2 from "@/assets/icons/socialIcon_2.svg";
-import socialIcon_3 from "@/assets/icons/socialIcon_3.svg";
+import socialIcon_1 from "@/assets/icons/socialIcon_1.svg?url";
+import socialIcon_2 from "@/assets/icons/socialIcon_2.svg?url";
+import socialIcon_3 from "@/assets/icons/socialIcon_3.svg?url";
 import phoneAnimation from "@/assets/animations/phone_animation.json";
 
 import "./Footer.scss";
 
 const Footer = () => {
   const [hovered, setHovered] = useState(false);
+  const [isLogoNavigating, setIsLogoNavigating] = useState(false);
+  const [isPhoneNavigating, setIsPhoneNavigating] = useState(false);
 
   const pathname = usePathname();
 
@@ -33,6 +35,27 @@ const Footer = () => {
   const { t } = useTranslate();
 
   const { design, rights, orderNumber, socialNetworks } = t.footer;
+
+  // Сброс блокировки логотипа при смене пути
+  useEffect(() => {
+    setIsLogoNavigating(false);
+  }, [pathname]);
+
+  // Таймаут-подстраховка для логотипа
+  useEffect(() => {
+    if (isLogoNavigating) {
+      const timer = setTimeout(() => setIsLogoNavigating(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLogoNavigating]);
+
+  // Сброс блокировки телефона через 1.5 секунды
+  useEffect(() => {
+    if (isPhoneNavigating) {
+      const timer = setTimeout(() => setIsPhoneNavigating(false), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isPhoneNavigating]);
 
   // Проверяем, нужно ли скрывать footer
   const isHidden =
@@ -43,14 +66,29 @@ const Footer = () => {
 
   if (isHidden) return null;
 
-  // Проверяем, если мы на странице product (для стилизации footer)
   const isProductPage = pathname.startsWith("/product/");
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/" || isLogoNavigating) {
+      e.preventDefault();
+      return;
+    }
+    setIsLogoNavigating(true);
+  };
+
+  const handlePhoneClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isPhoneNavigating) {
+      e.preventDefault();
+      return;
+    }
+    setIsPhoneNavigating(true);
+  };
 
   return (
     <footer className={`footer ${isProductPage ? "footer-product" : ""}`}>
       <div className="container footer-container">
         <div className="footer__logo">
-          <Link href="/">
+          <Link href="/" onClick={handleLogoClick}>
             <Image src={footerLogo} alt="footer-logo" width={305} height={68} />
           </Link>
         </div>
@@ -59,6 +97,7 @@ const Footer = () => {
           <Link
             className="footer__number-link"
             href="tel:+79333333911"
+            onClick={handlePhoneClick}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
           >
@@ -76,7 +115,7 @@ const Footer = () => {
           <ul className="footer__social-list">
             <li className="footer__social-item">
               <Link href={"https://x.com/"} target="_blank">
-                <Image
+                <img
                   src={socialIcon_1}
                   alt="socialIcon_1"
                   width={24}
@@ -86,7 +125,7 @@ const Footer = () => {
             </li>
             <li className="footer__social-item">
               <Link href={"https://www.instagram.com/"} target="_blank">
-                <Image
+                <img
                   src={socialIcon_2}
                   alt="socialIcon_2"
                   width={24}
@@ -96,7 +135,7 @@ const Footer = () => {
             </li>
             <li className="footer__social-item">
               <Link href={"https://www.facebook.com/"} target="_blank">
-                <Image
+                <img
                   src={socialIcon_3}
                   alt="socialIcon_3"
                   width={32}

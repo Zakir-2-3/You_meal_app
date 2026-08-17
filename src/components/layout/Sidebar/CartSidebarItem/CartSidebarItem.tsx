@@ -1,58 +1,48 @@
 "use client";
 
-import { FC } from "react";
-
 import Image from "next/image";
 
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
 import { addItem, minusItem } from "@/store/slices/cartSlice";
 
 import QuantityControl from "@/components/product/QuantityControl/QuantityControl";
 
-import { getDiscountedPrice } from "@/utils/cart/getDiscountedPrice";
-
 import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
-import { useTranslate } from "@/hooks/app/useTranslate";
 
-import { Item } from "@/types/product/item";
+import { CartSidebarItemProps } from "@/types/components/product/cart-page";
 
 import "./CartSidebarItem.scss";
 
-const CartSidebarItem: FC<Item> = ({
-  id,
-  instanceId,
-  name_ru,
-  name_en,
-  image,
-  price_rub,
-  price_usd,
-  count,
-}) => {
+const CartSidebarItem = ({ item, style }: CartSidebarItemProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const activated = useSelector((state: RootState) => state.promo.activated);
   const { getConvertedPrice } = usePriceFormatter();
-  const { lang } = useTranslate();
 
-  const { discount } = getDiscountedPrice(activated, price_rub);
-  const prices = getConvertedPrice({ price_rub, price_usd }, discount);
-  const iid = instanceId ?? String(id);
+  const discount = 0;
 
-  const onClickPlus = () => dispatch(addItem({ id, instanceId: iid } as Item));
+  const prices = getConvertedPrice(
+    { price_rub: item.price_rub, price_usd: item.price_usd },
+    discount,
+  );
+
+  const iid = item.instanceId;
+
+  const onClickPlus = () =>
+    dispatch(addItem({ id: String(item.id), instanceId: iid }));
+
   const onClickMinus = () => dispatch(minusItem(iid));
 
   return (
-    <li className="cart-sidebar__item">
+    <li className="cart-sidebar__item" style={style}>
       <div className="cart-sidebar__item-img">
-        <Image src={image} alt={name_ru} width={64} height={64} />
+        {item.image?.trim() ? (
+          <Image src={item.image} alt={item.name} width={64} height={64} />
+        ) : null}
       </div>
 
       <div className="cart-sidebar__item-description">
-        <h3 className="cart-sidebar__item-title">
-          {lang === "ru" ? name_ru : name_en}
-        </h3>
-
+        <h3 className="cart-sidebar__item-title">{item.name}</h3>
         <div className="cart-sidebar__item-price">
           {prices.hasDiscount ? (
             <>
@@ -66,9 +56,8 @@ const CartSidebarItem: FC<Item> = ({
           )}
         </div>
       </div>
-
       <QuantityControl
-        count={count}
+        count={item.count}
         onClickPlus={onClickPlus}
         onClickMinus={onClickMinus}
       />

@@ -12,7 +12,7 @@ export const useAvatarUpload = ({ email, onClose }: UseAvatarUploadProps) => {
   const dropzone = useDropzoneHandler();
 
   const showCroppedImage = () => {
-    // Проверяем всё
+    if (upload.isUploading) return;
     if (!dropzone.imageSrc || !crop.croppedAreaPixels || !email) {
       console.error("Missing data for avatar upload");
       return;
@@ -25,9 +25,16 @@ export const useAvatarUpload = ({ email, onClose }: UseAvatarUploadProps) => {
     });
   };
 
+  // Открыть окно выбора файла (старая картинка заменится автоматически при выборе)
+  const changeImage = () => {
+    dropzone.open();
+  };
+
   return {
     ...crop,
     ...dropzone,
     showCroppedImage,
+    changeImage,
+    isUploading: upload.isUploading,
   };
 };

@@ -1,4 +1,6 @@
-import { FC } from "react";
+import { FC, useState } from "react";
+
+import { formatEmail } from "@/utils/auth/formatEmail";
 
 import { EmailStepProps } from "@/types/components/auth/forgot-password-form";
 
@@ -10,16 +12,42 @@ const EmailStep: FC<EmailStepProps> = ({
   validationRules,
   canResend,
 }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = form;
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatEmail(e.target.value);
+    setValue("email", formatted, { shouldValidate: true });
+  };
+
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const formatted = formatEmail(e.target.value);
+    setValue("email", formatted, { shouldValidate: true });
+  };
+
+  const handleFormSubmit = async (
+    e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
+  ) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await handleSubmit(onSubmit)(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <form
       className="registration-form__forgot registration-form__forgot--email"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleFormSubmit}
     >
       <label className="registration-form__label" htmlFor="forgot-email">
         {t.regForm.forgotPasswordLabel}
@@ -29,7 +57,12 @@ const EmailStep: FC<EmailStepProps> = ({
         type="email"
         placeholder={t.user.emailPlaceholder}
         className="registration-form__input"
-        {...register("email", validationRules.emailValidation)}
+        {...register("email", {
+          ...validationRules.emailValidation,
+          onChange: handleEmailChange,
+          onBlur: handleEmailBlur,
+        })}
+        disabled={isSubmitting}
       />
       {errors.email && (
         <p className="registration-form__forgot-error registration-form__forgot-error--email">
@@ -41,7 +74,7 @@ const EmailStep: FC<EmailStepProps> = ({
         <button
           type="submit"
           className="registration-form__button registration-form__button--primary"
-          disabled={!canResend}
+          disabled={!canResend || isSubmitting}
         >
           {t.regForm.sendCodeBtn}
         </button>
@@ -49,6 +82,7 @@ const EmailStep: FC<EmailStepProps> = ({
           type="button"
           className="registration-form__button registration-form__button--secondary"
           onClick={onBack}
+          disabled={isSubmitting}
         >
           {t.regForm.backBtn}
         </button>

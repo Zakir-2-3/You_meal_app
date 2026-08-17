@@ -1,5 +1,9 @@
+import { useFormContext } from "react-hook-form";
+
 import { useTranslate } from "@/hooks/app/useTranslate";
 
+import { formatName } from "@/utils/auth/formatName";
+import { formatEmail } from "@/utils/auth/formatEmail";
 import { createValidationRules } from "@/utils/auth/validationRules";
 
 import TogglePasswordButton from "@/UI/inputs/TogglePasswordButton";
@@ -16,10 +20,13 @@ export default function SignInOrSignUpForm({
   onSubmit,
   onForgotPassword,
   onSwitchMode,
+  isSubmitting,
 }: Props) {
+  const { setValue } = useFormContext();
+
   const { t, lang } = useTranslate();
 
-  const { registerTr, forgotPassword, signInAccountTr, orTr } = t.regForm;
+  const { signUpTr, forgotPassword, signInAccountTr, orTr } = t.regForm;
 
   const {
     nameLabel,
@@ -31,6 +38,21 @@ export default function SignInOrSignUpForm({
   } = t.user;
 
   const validationRules = createValidationRules(t.formErrors);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatName(e.target.value);
+    setValue("name", formatted, { shouldValidate: true });
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatEmail(e.target.value);
+    setValue("email", formatted, { shouldValidate: true });
+  };
+
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const formatted = formatEmail(e.target.value);
+    setValue("email", formatted, { shouldValidate: true });
+  };
 
   return (
     <form
@@ -49,7 +71,10 @@ export default function SignInOrSignUpForm({
           <input
             id="name"
             type="text"
-            {...register("name", validationRules.nameValidation)}
+            {...register("name", {
+              ...validationRules.nameValidation,
+              onChange: handleNameChange,
+            })}
             className="registration-form__input"
             placeholder={namePlaceholder}
           />
@@ -72,7 +97,11 @@ export default function SignInOrSignUpForm({
         <input
           id="email"
           type="email"
-          {...register("email", validationRules.emailValidation)}
+          {...register("email", {
+            ...validationRules.emailValidation,
+            onChange: handleEmailChange,
+            onBlur: handleEmailBlur,
+          })}
           className="registration-form__input"
           placeholder={emailPlaceholder}
         />
@@ -135,15 +164,16 @@ export default function SignInOrSignUpForm({
           onClick={onSwitchMode}
           className="registration-form__button--secondary"
         >
-          {isSignUpMode ? signInAccountTr : registerTr}
+          {isSignUpMode ? signInAccountTr : signUpTr}
         </button>
       </div>
 
       <button
         type="submit"
         className="registration-form__button registration-form__button--primary"
+        disabled={isSubmitting}
       >
-        {isSignUpMode ? registerTr : signInAccountTr}
+        {isSignUpMode ? signUpTr : signInAccountTr}
       </button>
 
       <div className="registration-form__divider">

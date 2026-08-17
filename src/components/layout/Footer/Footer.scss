@@ -27,14 +27,14 @@
       flex-flow: row nowrap;
       align-items: flex-end;
       gap: 0 4px;
-      font-size: 16px;
+      font-size: 19px;
       font-weight: 400;
       transition: 0.3s ease;
       -webkit-transition: 0.3s ease;
       -moz-transition: 0.3s ease;
       -ms-transition: 0.3s ease;
       -o-transition: 0.3s ease;
-      line-height: 15px;
+      line-height: 1;
       & > div {
         filter: brightness(0.8);
       }

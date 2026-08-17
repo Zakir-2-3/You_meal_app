@@ -1,5 +1,7 @@
 import { useCallback } from "react";
 
+import { toast } from "react-toastify";
+
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState, store } from "@/store/store";
 import { setItems } from "@/store/slices/cartSlice";
@@ -59,13 +61,14 @@ export const useUserDataLoader = () => {
         // Синхронизация корзины
         await syncCart(email, data.cart);
 
-        // Синхронизация города - передаем t.geo
+        // Синхронизация города
         await syncCity(email, data.city, t.geo);
 
         // Обновление остальных данных
         updateUserData(data);
       } catch (err) {
         console.error("Error loading user data:", err);
+        toast.error(t.toastTr.dataLoadError);
       }
     },
     [dispatch, t],

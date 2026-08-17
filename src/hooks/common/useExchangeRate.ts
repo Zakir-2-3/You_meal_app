@@ -45,7 +45,7 @@ export const useExchangeRate = (currency: "rub" | "usd" = "rub") => {
 
         localStorage.setItem(
           cacheKey,
-          JSON.stringify({ rate: rubPerUsd, ts: Date.now() })
+          JSON.stringify({ rate: rubPerUsd, ts: Date.now() }),
         );
 
         if (mounted) setState({ rate: rubPerUsd, loading: false, error: null });

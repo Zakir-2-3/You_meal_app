@@ -2,6 +2,8 @@
 
 import PasswordField from "./PasswordField";
 
+import { formatName } from "@/utils/auth/formatName";
+
 import { ProfileFormProps } from "@/types/user/form";
 
 const ProfileForm = ({
@@ -26,7 +28,18 @@ const ProfileForm = ({
   handleSubmit,
   isDirty,
   translations,
+  setValue,
 }: ProfileFormProps) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatName(e.target.value);
+    setValue("name", formatted, { shouldValidate: true });
+  };
+
+  const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const formatted = formatName(e.target.value);
+    setValue("name", formatted, { shouldValidate: true });
+  };
+
   return (
     <form
       className={`personal-account__user-info ${
@@ -46,7 +59,11 @@ const ProfileForm = ({
               type="text"
               placeholder={translations.namePlaceholder}
               className="personal-account__input personal-account__input--edit"
-              {...register("name", validationRules.nameEditValidation)}
+              {...register("name", {
+                ...validationRules.nameEditValidation,
+                onChange: handleNameChange,
+                onBlur: handleNameBlur,
+              })}
             />
             {errors.name && (
               <p
@@ -144,7 +161,7 @@ const ProfileForm = ({
             onToggleEditMode();
           }}
         >
-          {editMode ? translations.cancelTr : translations.editTr}
+          {editMode ? translations.closeTr : translations.editTr}
         </button>
       </div>
     </form>

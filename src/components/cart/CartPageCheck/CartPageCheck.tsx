@@ -1,36 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { setTips } from "@/store/slices/tipsSlice";
+import { useDispatch } from "react-redux";
+import { clearTips } from "@/store/slices/tipsSlice";
 
-import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
 import { useTranslate } from "@/hooks/app/useTranslate";
-
-import { getDiscountedPrice } from "@/utils/cart/getDiscountedPrice";
-
-import { DEFAULT_PROMOS } from "@/constants/user/defaults";
+import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
 
 import TotalPriceItemListSkeleton from "@/UI/skeletons/TotalPriceItemListSkeleton";
 
+import { CartPageCheckProps } from "@/types/components/product/cart-page";
+
 import "./CartPageCheck.scss";
 
-const CartPageCheck = () => {
-  const dispatch = useDispatch<AppDispatch>();
+const CartPageCheck = ({
+  enrichedItems,
+  savedDate,
+  rawTotal,
+  discountLabels,
+  savedMoney,
+  vat,
+  baseTotalWithVat,
+  selectedTipPercentage,
+  discountedTotalWithTips,
+  onTipChange,
+  isLoading,
+}: CartPageCheckProps) => {
+  const { t } = useTranslate();
 
-  const { items, savedDate } = useSelector((state: RootState) => state.cart);
-  const activated = useSelector((state: RootState) => state.promo.activated);
-  const currency = useSelector((state: RootState) => state.currency.currency);
-  const selectedTipPercentage = useSelector(
-    (s: RootState) => s.tips.percentage,
-  );
-
-  const [isLoading, setIsLoading] = useState(() => items.length > 0);
-
-  const { t, lang } = useTranslate();
   const { getConvertedPrice } = usePriceFormatter();
+
+  const dispatch = useDispatch();
 
   const {
     subtotal,
@@ -45,59 +46,18 @@ const CartPageCheck = () => {
 
   const roundUp = (num: number) => Math.round(num);
 
-  // Общая сумма без скидок
-  const rawTotal = items.reduce((sum, item) => {
-    return sum + item.price_rub * (item.count ?? 0);
-  }, 0);
-
-  const discountLabels = activated
-    .map((code) => {
-      if (DEFAULT_PROMOS.includes(code)) {
-        if (code === "PromoFirst10") return "10%";
-        if (code === "PromoFrom2020" && rawTotal >= 2000) return "20%";
-        return null; // дефолтный промокод не подошёл
-      }
-      return code; // если ручной, показываем его название
-    })
-    .filter(Boolean);
-
-  // Получаем скидку в процентах
-  const { discount } = getDiscountedPrice(activated, rawTotal);
-
-  // Применяем скидку
-  const discountedTotal = roundUp(rawTotal * (1 - discount / 100));
-
-  const savedMoney = rawTotal - discountedTotal;
-
-  // НДС
-  const vat = roundUp(discountedTotal * 0.05);
-
-  // Чаевые
-  const baseTotalWithVat = discountedTotal + vat;
-  const discountedSelectedTip = roundUp(
-    baseTotalWithVat * selectedTipPercentage,
-  );
-
-  // Общая сумма со скидкой, НДС и чаевыми
-  const discountedTotalWithTips = baseTotalWithVat + discountedSelectedTip;
-
-  // Форматируем все цены с помощью хука
+  // Форматируем все суммы
   const rawTotalFormatted = getConvertedPrice({ price_rub: rawTotal });
   const savedMoneyFormatted = getConvertedPrice({ price_rub: savedMoney });
   const vatFormatted = getConvertedPrice({ price_rub: vat });
   const discountedTotalWithTipsFormatted = getConvertedPrice({
     price_rub: discountedTotalWithTips,
   });
-
-  useEffect(() => {
-    if (items.length > 0) {
-      setTimeout(() => setIsLoading(false), 1000);
-    }
-  }, []);
+  const zeroFormatted = getConvertedPrice({ price_rub: 0 });
 
   useEffect(() => {
     if (rawTotal === 0) {
-      dispatch(setTips(0));
+      dispatch(clearTips());
     }
   }, [rawTotal, dispatch]);
 
@@ -105,14 +65,14 @@ const CartPageCheck = () => {
     <>
       <h3 className="total-price-title">{checkReceipt}</h3>
       <span className="total-price-date">
-        {checkDate} {savedDate}
+        {enrichedItems.length > 0 ? `${checkDate} ${savedDate}` : checkDate}
       </span>
       <div className="total-price-item-list">
         {isLoading ? (
           <TotalPriceItemListSkeleton />
         ) : (
           <ul>
-            {items.map((item) => {
+            {enrichedItems.map((item) => {
               const itemTotal = item.price_rub * (item.count ?? 0);
               const itemTotalFormatted = getConvertedPrice({
                 price_rub: itemTotal,
@@ -121,7 +81,7 @@ const CartPageCheck = () => {
               return (
                 <li key={item.instanceId}>
                   <span>{item.count}</span>
-                  <span>{lang === "ru" ? item.name_ru : item.name_en}</span>
+                  <span>{item.name}</span>
                   <span>{itemTotalFormatted.formattedCurrent}</span>
                 </li>
               );
@@ -134,15 +94,25 @@ const CartPageCheck = () => {
           {subtotal}
           <span>{rawTotalFormatted.formattedCurrent}</span>
         </p>
-        <p>
-          {discountTr}
-          {rawTotal > 0 && discountLabels.length > 0
-            ? `(${discountLabels.join(",")})`
-            : ""}
-          <span>
+        <p className="discount-row">
+          <span className="discount-label">
+            {discountTr}
+            {rawTotal > 0 && discountLabels.length > 0 ? (
+              <>
+                (
+                <span className="discount-codes">
+                  {discountLabels.join(",")}
+                </span>
+                )
+              </>
+            ) : (
+              ""
+            )}
+          </span>
+          <span className="discount-value">
             {savedMoney > 0
               ? `-${savedMoneyFormatted.formattedCurrent}`
-              : `0${currency === "rub" ? "₽" : "$"}`}
+              : zeroFormatted.formattedCurrent}
           </span>
         </p>
         <p>
@@ -161,9 +131,7 @@ const CartPageCheck = () => {
       <div className="total-price-tips">
         <p>{tipsTr}</p>
         {[0.05, 0.1, 0.15].map((tip) => {
-          const tipBase = activated
-            ? baseTotalWithVat
-            : roundUp(rawTotal * 1.05);
+          const tipBase = rawTotal > 0 ? baseTotalWithVat : 0;
           const tipAmount = roundUp(tipBase * tip);
           const tipAmountFormatted = getConvertedPrice({
             price_rub: tipAmount,
@@ -176,7 +144,7 @@ const CartPageCheck = () => {
                 selectedTipPercentage === tip ? "tip-option--active" : ""
               }`}
               onClick={() =>
-                dispatch(setTips(selectedTipPercentage === tip ? 0 : tip))
+                onTipChange(selectedTipPercentage === tip ? 0 : tip)
               }
               disabled={rawTotal === 0}
             >

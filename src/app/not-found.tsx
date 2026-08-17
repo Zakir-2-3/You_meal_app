@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
@@ -11,15 +13,19 @@ import notFoundImg from "@/assets/images/not-found-img.png";
 import "@/styles/NotFoundPage.scss";
 
 export default function NotFoundPage() {
-  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const router = useRouter();
   const { t } = useTranslate();
 
   const { goBack } = t.buttons;
   const { pageNotFound } = t.product;
 
   const handleClick = () => {
-    router.replace("/"); // Запрещаем возвращение на страницу 404
+    if (isRedirecting) return;
+    setIsRedirecting(true);
+    // Запрещаем возвращение на страницу 404
+    router.replace("/");
   };
 
   return (
@@ -36,7 +42,11 @@ export default function NotFoundPage() {
         <b>4</b>
       </h1>
       <p className="not-found-wrapper__description">{pageNotFound}</p>
-      <button className="not-found-wrapper__btn" onClick={handleClick}>
+      <button
+        className="not-found-wrapper__btn"
+        onClick={handleClick}
+        disabled={isRedirecting}
+      >
         {goBack}
       </button>
     </div>

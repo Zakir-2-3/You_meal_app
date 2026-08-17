@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -23,7 +23,7 @@
     "lodash.debounce": "^4.0.8",
     "lottie-react": "^2.4.1",
     "next": "^15.3.1",
-    "next-auth": "^4.24.13",
+    "next-auth": "^4.24.14",
     "nodemailer": "^7.0.10",
     "react": "^19.0.0",
     "react-content-loader": "^7.0.2",

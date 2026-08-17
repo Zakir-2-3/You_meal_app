@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
+
 import { toast } from "react-toastify";
 
 import { useDispatch } from "react-redux";
@@ -18,6 +19,7 @@ import {
 
 export const useSupabaseUpload = ({ email, onClose }: UseAvatarUploadProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  const [isUploading, setIsUploading] = useState(false);
 
   const uploadAvatar = useCallback(
     async (
@@ -25,6 +27,9 @@ export const useSupabaseUpload = ({ email, onClose }: UseAvatarUploadProps) => {
       croppedAreaPixels: any,
       translations: AvatarUploadTranslations,
     ) => {
+      if (isUploading) return;
+      setIsUploading(true);
+
       let tempUrl: string | null = null;
       let previousAvatarUrl: string | null = null;
 
@@ -37,7 +42,18 @@ export const useSupabaseUpload = ({ email, onClose }: UseAvatarUploadProps) => {
 
         onClose();
 
-        // Создаем blob для мгновенного отображения
+        // 1. Удаляем все старые аватарки пользователя в Storage
+        try {
+          await fetch("/api/avatar/clear", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+        } catch (clearError) {
+          console.warn("Failed to clear old avatars:", clearError);
+        }
+
+        // 2. Создаем blob для мгновенного отображения
         const croppedBlob = (await getCroppedImg(
           imageSrc,
           croppedAreaPixels,
@@ -55,7 +71,7 @@ export const useSupabaseUpload = ({ email, onClose }: UseAvatarUploadProps) => {
 
         const fileName = `${email}_${Date.now()}.jpg`;
 
-        // Загружаем на Supabase
+        // 3. Загружаем на Supabase
         const { error: uploadError } = await supabase.storage
           .from("avatars")
           .upload(fileName, croppedBlob, {
@@ -81,14 +97,21 @@ export const useSupabaseUpload = ({ email, onClose }: UseAvatarUploadProps) => {
           tempUrl = null;
         }
 
-        // Сохраняем в базу
+        // Если по какой-то причине publicUrl остался blob-URL, не сохраняем его
+        if (publicUrl.startsWith("blob:")) {
+          throw new Error("Invalid avatar URL (blob)");
+        }
+
+        // 4. Сохраняем в базу
         const state = store.getState();
         await fetch("/api/user/update", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email,
-            avatar: publicUrl,
+            avatar: publicUrl.startsWith("blob:")
+              ? previousAvatarUrl
+              : publicUrl,
             cart: state.cart.items,
             promoCodes: {
               activated: state.promo.activated,
@@ -109,10 +132,12 @@ export const useSupabaseUpload = ({ email, onClose }: UseAvatarUploadProps) => {
         if (tempUrl) {
           URL.revokeObjectURL(tempUrl);
         }
+      } finally {
+        setIsUploading(false);
       }
     },
-    [email, dispatch, onClose],
+    [email, dispatch, onClose, isUploading],
   );
 
-  return { uploadAvatar };
+  return { uploadAvatar, isUploading };
 };

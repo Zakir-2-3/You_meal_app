@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { toast } from "react-toastify";
 
 import { setName } from "@/store/slices/userSlice";
@@ -13,7 +14,6 @@ import {
 
 export const useProfileForm = ({
   email,
-  name: currentName,
   dispatch,
   watch,
   trigger,
@@ -30,7 +30,7 @@ export const useProfileForm = ({
 
   // Эффект для watch (очистка ошибок при изменении)
   useEffect(() => {
-    const subscription = watch((value, { name }) => {
+    const subscription = watch(({ name }) => {
       if (name === "newPassword") {
         trigger("repeatPassword");
         setPasswordSameError("");
@@ -95,9 +95,9 @@ export const useProfileForm = ({
       const nameSame = checkData.nameSame && data.name.trim() !== "";
       const passwordSame = checkData.passwordSame && data.newPassword !== "";
 
-      setNameSameError(nameSame ? "The name matches the current one" : "");
+      setNameSameError(nameSame ? translations.nameSameErrorTr : "");
       setPasswordSameError(
-        passwordSame ? "The password matches the current one" : "",
+        passwordSame ? translations.passwordSameErrorTr : "",
       );
 
       setLastCheckedName(data.name.trim());
@@ -137,7 +137,17 @@ export const useProfileForm = ({
             body: JSON.stringify({ email, newPassword: data.newPassword }),
           });
 
-          if (!res.ok) throw new Error("Error changing password");
+          const result = await res.json();
+
+          if (!res.ok) {
+            // Проверяем код ошибки
+            if (result.error === "PASSWORD_SAME_AS_CURRENT") {
+              toast.error(translations.passwordSameAsCurrentError);
+            } else {
+              throw new Error(result.error || "Error changing password");
+            }
+            return;
+          }
 
           updated = true;
         } catch (err) {

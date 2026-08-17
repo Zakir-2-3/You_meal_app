@@ -1,15 +1,18 @@
 "use client";
 
 import { signOut as nextAuthSignOut } from "next-auth/react";
+
 import { toast } from "react-toastify";
 
+import { AppDispatch, RootState, store, persistor } from "@/store/store";
 import { resetCart } from "@/store/slices/cartSlice";
 import { resetPromos } from "@/store/slices/promoSlice";
-import { resetMeta } from "@/store/slices/productMetaSlice";
+import { setLanguage } from "@/store/slices/languageSlice";
 import { resetUser, setGeoCity } from "@/store/slices/userSlice";
-import { AppDispatch, RootState, store, persistor } from "@/store/store";
 
 import { detectGeoCity } from "@/utils/common/geo";
+
+import { STORAGE_LANG } from "@/constants/app/storageKeys";
 
 export const signOut = async (
   dispatch: AppDispatch,
@@ -49,7 +52,7 @@ export const signOut = async (
       });
     }
 
-    await persistor.pause();
+    // await persistor.pause();
     await nextAuthSignOut({ redirect: false });
 
     const currentCity = geoCity || localStorage.getItem("city");
@@ -57,16 +60,20 @@ export const signOut = async (
     dispatch(resetCart());
     dispatch(resetPromos());
     dispatch(resetUser());
-    dispatch(resetMeta());
 
     await persistor.flush();
-    await persistor.purge();
+
+    // Восстанавливаем язык из localStorage после сброса persist
+    const savedLang = localStorage.getItem(STORAGE_LANG);
+    if (savedLang === "en" || savedLang === "ru") {
+      dispatch(setLanguage(savedLang));
+    }
 
     if (currentCity) {
       dispatch(setGeoCity(currentCity));
       localStorage.setItem("city", currentCity);
     } else {
-      const detectedCity = await detectGeoCity("ru");
+      const detectedCity = await detectGeoCity();
       dispatch(setGeoCity(detectedCity || ""));
       localStorage.setItem("city", detectedCity || "");
     }

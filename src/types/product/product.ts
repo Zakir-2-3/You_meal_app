@@ -12,4 +12,5 @@ export interface Product {
   proteins: number;
   fats: number;
   carbohydrates: number;
+  nothingFound: string;
 }

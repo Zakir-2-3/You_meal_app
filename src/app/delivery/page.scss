@@ -1,15 +1,15 @@
 .delivery-page-section {
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   color: #444444;
   &__title {
     margin: 20px 0 0;
     font-size: 36px;
   }
   &__img {
-    max-width: 500px;
     width: 100%;
+    max-width: 450px;
     height: auto;
-    margin: 20px 0;
+    margin: 40px 0;
   }
   &__info {
     max-width: 870px;

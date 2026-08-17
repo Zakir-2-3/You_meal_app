@@ -1,5 +1,6 @@
-import { Item } from "../product/item";
 import { UIItem } from "../utils/insert-sorted";
+
+import { Item } from "../product/item";
 
 export interface UseProductPaginationProps {
   originalItems: Item[];

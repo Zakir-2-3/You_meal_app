@@ -1,13 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { formatDate } from "@/utils/common/formatDate";
-import { calcTotalPrice } from "@/utils/cart/calcTotalPrice";
 
-import { CartState, Item } from "@/types/product/item";
+import { CartState, CartItem } from "@/types/product/item";
 
 const initialState: CartState = {
   items: [],
-  totalPrice: 0,
   savedDate: null,
 };
 
@@ -15,7 +13,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addItem(state, action: PayloadAction<Item>) {
+    addItem(state, action: PayloadAction<CartItem>) {
       const payload = action.payload;
       const iid = payload.instanceId ?? String(payload.id);
 
@@ -34,14 +32,12 @@ const cartSlice = createSlice({
         findItem.count = (findItem.count ?? 1) + 1;
       } else {
         state.items.push({
-          ...payload,
+          id: payload.id,
           instanceId: iid,
           count: 1,
         });
         if (!state.savedDate) state.savedDate = formatDate();
       }
-
-      state.totalPrice = calcTotalPrice(state.items);
     },
 
     minusItem(state, action: PayloadAction<string>) {
@@ -63,7 +59,6 @@ const cartSlice = createSlice({
       if (state.items.length === 0) {
         state.savedDate = null;
       }
-      state.totalPrice = calcTotalPrice(state.items);
     },
 
     removeItem(state, action: PayloadAction<string>) {
@@ -75,24 +70,20 @@ const cartSlice = createSlice({
       if (state.items.length === 0) {
         state.savedDate = null;
       }
-      state.totalPrice = calcTotalPrice(state.items);
     },
 
     clearItems(state) {
       state.items = [];
-      state.totalPrice = 0;
       state.savedDate = null;
     },
 
-    setItems(state, action: PayloadAction<Item[]>) {
+    setItems(state, action: PayloadAction<CartItem[]>) {
       state.items = action.payload;
-      state.totalPrice = calcTotalPrice(state.items);
       state.savedDate = state.items.length > 0 ? formatDate() : null;
     },
 
     resetCart(state) {
       state.items = [];
-      state.totalPrice = 0;
       state.savedDate = null;
     },
   },

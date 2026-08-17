@@ -29,5 +29,6 @@ export const useImageCrop = () => {
     onCropComplete,
     handleZoomChange,
     handleResetImage,
+    hasCroppedArea: croppedAreaPixels !== null,
   };
 };

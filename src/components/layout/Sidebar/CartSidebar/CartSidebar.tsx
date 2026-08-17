@@ -1,6 +1,10 @@
-import { FC, useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -8,55 +12,129 @@ import { RootState } from "@/store/store";
 import { LottieIcon } from "@/components/ui/LottieIcon";
 import CartSidebarItem from "../CartSidebarItem/CartSidebarItem";
 
-import { getDiscountedPrice } from "@/utils/cart/getDiscountedPrice";
-
-import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
 import { useTranslate } from "@/hooks/app/useTranslate";
+import { useCartItems } from "@/hooks/cart/useCartItems";
+import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
 
 import CartSidebarItemSkeleton from "@/UI/skeletons/CartSidebarItemSkeleton";
-
-import { CartSidebarProps } from "@/types/components/product/cart-sidebar";
 
 import deliveryAnimation from "@/assets/animations/delivery_animation.json";
 
 import "./CartSidebar.scss";
 
-const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
+const CartSidebar = () => {
   const [hovered, setHovered] = useState(false);
+  const [isCartNavigating, setIsCartNavigating] = useState(false);
+  const [isDeliveryNavigating, setIsDeliveryNavigating] = useState(false);
+
+  const pathname = usePathname();
+
+  // Сброс блокировок при смене пути
+  useEffect(() => {
+    setIsCartNavigating(false);
+    setIsDeliveryNavigating(false);
+  }, [pathname]);
+
+  // Таймауты подстраховки
+  useEffect(() => {
+    if (isCartNavigating) {
+      const timer = setTimeout(() => setIsCartNavigating(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isCartNavigating]);
+
+  useEffect(() => {
+    if (isDeliveryNavigating) {
+      const timer = setTimeout(() => setIsDeliveryNavigating(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isDeliveryNavigating]);
 
   const { items } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
-  const { getConvertedPrice, formatPrice } = usePriceFormatter();
+  const tipsPercent = useSelector((state: RootState) => state.tips.percentage);
 
-  const { t } = useTranslate();
+  const isHydrated = useSelector((state: RootState) => state.user.isHydrated);
+  const { status: sessionStatus } = useSession();
+  const isUserDataLoaded = useSelector(
+    (state: RootState) => state.user.isUserDataLoaded,
+  );
+
+  const { t, lang: currentLang } = useTranslate();
+  const { getConvertedPrice } = usePriceFormatter();
+
+  const {
+    enrichedItems,
+    isLoading: cartLoading,
+    rawTotal,
+    rawTotalUSD,
+    savedMoney,
+    savedMoneyUSD,
+  } = useCartItems(items, activated, tipsPercent, currentLang);
+
+  // Если данные пользователя ещё загружаются, считаем корзину пустой
+  const effectiveItems = !isUserDataLoaded ? [] : enrichedItems;
+
+  const showSkeletons =
+    !isHydrated ||
+    sessionStatus === "loading" ||
+    !isUserDataLoaded ||
+    cartLoading;
+
+  // Итоговая сумма без учёта НДС и чаевых
+  const discountedTotal = rawTotal - savedMoney;
+  const discountedTotalUSD = rawTotalUSD - savedMoneyUSD;
+
+  const rawTotalFormatted = getConvertedPrice({
+    price_rub: rawTotal,
+    price_usd: rawTotalUSD,
+  });
+  const discountedTotalFormatted = getConvertedPrice({
+    price_rub: discountedTotal,
+    price_usd: discountedTotalUSD,
+  });
 
   const { checkout } = t.buttons;
   const { freeShipping, freeShipping2 } = t.deliveryPage;
-  const { title, emptyCart, total2, discount2Tr } = t.cart;
+  const { title, emptyCart, total2 } = t.cart;
 
-  const totalCount = items.reduce((sum, item) => sum + (item.count ?? 0), 0);
+  const totalCount = effectiveItems.reduce(
+    (sum, item) => sum + (item.count ?? 0),
+    0,
+  );
 
-  // Общая сумма без скидок
-  const rawTotal = items.reduce((sum, item) => {
-    return sum + item.price_rub * (item.count ?? 0);
-  }, 0);
-
-  // Фильтрация промокодов
-  const effectivePromos = [...activated];
-  if (effectivePromos.includes("PromoFrom2020") && rawTotal < 2000) {
-    const index = effectivePromos.indexOf("PromoFrom2020");
-    effectivePromos.splice(index, 1);
+  // Вычисляем количество скелетонов (0 товаров -> 1, 1-2 -> столько же, >=3 -> 3)
+  let skeletonCount = 1;
+  if (showSkeletons) {
+    const preLoginCount = sessionStorage.getItem("preLoginCartCount");
+    if (preLoginCount !== null) {
+      skeletonCount = Math.min(Math.max(parseInt(preLoginCount, 10), 1), 3);
+    } else {
+      skeletonCount = Math.min(Math.max(items.length, 1), 3);
+    }
   }
 
-  // Финальная сумма со скидкой (общая скидка на всю корзину)
-  const { discount } = getDiscountedPrice(effectivePromos, rawTotal);
-  const discountedTotal = rawTotal * (1 - discount / 100);
+  const handleDeliveryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/delivery" || isDeliveryNavigating) {
+      e.preventDefault();
+      return;
+    }
+    setIsDeliveryNavigating(true);
+  };
 
-  // Используем хук для форматирования итоговых сумм
-  const rawTotalFormatted = getConvertedPrice({ price_rub: rawTotal });
-  const discountedTotalFormatted = getConvertedPrice({
-    price_rub: discountedTotal,
-  });
+  const handleCheckoutClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Если корзина пуста – отменяем
+    if (effectiveItems.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    // Уже на странице корзины или идёт навигация – блокируем
+    if (pathname === "/cart" || isCartNavigating) {
+      e.preventDefault();
+      return;
+    }
+    setIsCartNavigating(true);
+  };
 
   return (
     <aside className="cart-sidebar">
@@ -67,19 +145,29 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
         </span>
       </div>
 
-      <div className="cart-sidebar__description-orders">
+      <div
+        className={`cart-sidebar__description-orders ${effectiveItems.length >= 3 ? "cart-sidebar__description-orders--has-scroll" : ""}`}
+      >
         <ul className="cart-sidebar__list">
-          {isLoading ? (
-            [...new Array(3)].map((_, index) => (
+          {showSkeletons ? (
+            [...new Array(skeletonCount)].map((_, index) => (
               <CartSidebarItemSkeleton key={index} />
             ))
-          ) : items.length === 0 ? (
+          ) : !cartLoading && effectiveItems.length === 0 ? (
             <li className="cart-sidebar__item cart-sidebar__item--empty">
               {emptyCart}
             </li>
           ) : (
-            items.map((item) => (
-              <CartSidebarItem key={item.instanceId} {...item} />
+            effectiveItems.map((item, index) => (
+              <CartSidebarItem
+                key={item.instanceId}
+                item={item}
+                style={
+                  {
+                    "--animation-delay": `${index * 0.05}s`,
+                  } as React.CSSProperties
+                }
+              />
             ))
           )}
         </ul>
@@ -87,21 +175,20 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
 
       <div className="cart-sidebar__total-price">
         <p>{total2}</p>
-
         <div className="cart-sidebar__total-price-wrapper">
-          {items.length > 0 && rawTotal !== discountedTotal && (
+          {effectiveItems.length > 0 && rawTotal !== discountedTotal && (
             <span
               className="old-price"
-              title={`${discount2Tr} ${activated.join(", ")}`}
+              title={activated
+                .map((code) => (t.user as any)[code] || code)
+                .join(", ")}
             >
               {rawTotalFormatted.formattedCurrent}
             </span>
           )}
           <span
             className={
-              activated.length > 0 &&
-              items.length > 0 &&
-              rawTotal !== discountedTotal
+              effectiveItems.length > 0 && rawTotal !== discountedTotal
                 ? "discounted-price"
                 : "no-discount"
             }
@@ -112,7 +199,14 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
       </div>
 
       <div className="cart-sidebar__place-order">
-        <Link href="/cart">{checkout}</Link>
+        <Link
+          href="/cart"
+          className={effectiveItems.length === 0 ? "disabled" : ""}
+          aria-disabled={effectiveItems.length === 0}
+          onClick={handleCheckoutClick}
+        >
+          {checkout}
+        </Link>
       </div>
 
       <div className="cart-sidebar__delivery">
@@ -120,6 +214,14 @@ const CartSidebar: FC<CartSidebarProps> = ({ isLoading }) => {
           href="/delivery"
           className="cart-sidebar__delivery-link"
           title={freeShipping2}
+          onClick={handleDeliveryClick}
+          style={{
+            pointerEvents:
+              pathname === "/delivery" || isDeliveryNavigating
+                ? "none"
+                : "auto",
+            opacity: pathname === "/delivery" || isDeliveryNavigating ? 0.6 : 1,
+          }}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >

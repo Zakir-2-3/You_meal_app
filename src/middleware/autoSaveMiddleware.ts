@@ -44,13 +44,14 @@ export const autoSaveMiddleware: Middleware<
   }
 
   const state = store.getState();
-  const { isAuth, email, balance, avatarUrl, geoCity } = state.user;
+  const { isAuth, email, balance, avatarUrl, geoCity, isUserDataLoaded } =
+    state.user;
   const cart = state.cart.items;
   const promoActivated = state.promo.activated;
   const promoAvailable = state.promo.customAvailable;
   const { ratings, favorites, metaSynced } = state.productMeta;
 
-  if (!isAuth || !email || !metaSynced) {
+  if (!isAuth || !email || !metaSynced || !isUserDataLoaded) {
     return result;
   }
 

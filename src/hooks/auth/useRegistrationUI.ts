@@ -18,6 +18,7 @@ export const useRegistrationUI = () => {
     useState<ForgotOrigin>("sign-in");
   const [signInError, setSignInError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [closing, setClosing] = useState(false);
 
   const isFormOpen = useSelector(
     (state: RootState) => state.user.isRegFormOpen,
@@ -26,6 +27,14 @@ export const useRegistrationUI = () => {
 
   const handleCloseForm = useCallback(() => {
     dispatch(activeRegForm(false));
+    setIsSignUpMode(true);
+    setStep("form");
+    setForgotMode(false);
+    setLocalEmail("");
+    setLocalName("");
+    setLocalPassword("");
+    setSignInError("");
+    setPasswordError("");
   }, [dispatch]);
 
   const togglePassword = useCallback(() => {
@@ -35,6 +44,10 @@ export const useRegistrationUI = () => {
   const switchMode = useCallback(() => {
     setIsSignUpMode((prev) => !prev);
     setSignInError("");
+  }, []);
+
+  const startClosing = useCallback(() => {
+    setClosing(true);
   }, []);
 
   const enterForgotMode = useCallback((origin: ForgotOrigin) => {
@@ -76,5 +89,7 @@ export const useRegistrationUI = () => {
     switchMode,
     enterForgotMode,
     exitForgotMode,
+    closing,
+    startClosing,
   };
 };

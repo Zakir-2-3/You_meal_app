@@ -1,3 +1,4 @@
+// Полный тип товара (с mockapi)
 export interface Item {
   id: number;
   instanceId?: string;
@@ -10,8 +11,13 @@ export interface Item {
   count?: number;
 }
 
+export interface CartItem {
+  id: string;
+  instanceId?: string;
+  count?: number;
+}
+
 export interface CartState {
-  items: Item[];
-  totalPrice: number;
+  items: CartItem[];
   savedDate: null | string;
 }

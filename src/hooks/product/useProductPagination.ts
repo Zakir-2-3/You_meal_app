@@ -4,9 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { setManyRatings } from "@/store/slices/productMetaSlice";
 
-import { insertSorted } from "@/utils/cart/insertSorted";
+import { sortItemsWithAnimation } from "@/utils/cart/insertSorted";
 
-import { UIItem } from "@/types/utils/insert-sorted";
 import { Item } from "@/types/product/item";
 import {
   UseProductPaginationProps,
@@ -23,17 +22,39 @@ export const useProductPagination = ({
   const LOAD_MORE_COUNT = 6;
 
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuth } = useSelector((s: RootState) => s.user);
+
+  const { isAuth } = useSelector((state: RootState) => state.user);
   const { ratings, favorites, sort } = useSelector(
-    (s: RootState) => s.productMeta,
+    (state: RootState) => state.productMeta,
   );
-  const metaSynced = useSelector((s: RootState) => s.productMeta.metaSynced);
 
   const pageCountRef = useRef(1);
   const isLoadMoreRef = useRef(false);
+  const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const blockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [noMorePulse, setNoMorePulse] = useState(false);
 
-  // Функция для создания стабильного instanceId для копии
+  const clearTimers = () => {
+    if (cleanupTimerRef.current) clearTimeout(cleanupTimerRef.current);
+    if (blockTimerRef.current) clearTimeout(blockTimerRef.current);
+  };
+
+  const scheduleCleanup = (callback: () => void, delay = 600) => {
+    if (cleanupTimerRef.current) clearTimeout(cleanupTimerRef.current);
+    cleanupTimerRef.current = setTimeout(() => {
+      callback();
+      cleanupTimerRef.current = null;
+    }, delay);
+  };
+
+  const scheduleUnblock = (delay = 400) => {
+    if (blockTimerRef.current) clearTimeout(blockTimerRef.current);
+    blockTimerRef.current = setTimeout(() => {
+      isLoadMoreRef.current = false;
+      blockTimerRef.current = null;
+    }, delay);
+  };
+
   const generateCopyInstanceId = useCallback(
     (originalId: number | string, copyNumber: number): string => {
       return `${originalId}-copy-${copyNumber}`;
@@ -41,153 +62,183 @@ export const useProductPagination = ({
     [],
   );
 
-  // Функция создания копий с стабильными ID
   const makeStableCopies = useCallback(
     (originals: Item[], count: number): Item[] => {
       const copies: Item[] = [];
-
       for (let i = 0; i < count; i++) {
         const original = originals[i % originals.length];
         const originalId = original.id;
-
-        // Определяем, сколько копий этого товара уже было создано
         const existingCopies = baseDisplayedItems.filter(
           (item) =>
             item.instanceId !== String(originalId) &&
             item.instanceId?.startsWith(`${originalId}-copy-`),
         ).length;
-
-        // Номер следующей копии этого товара
         const copyNumber = existingCopies + 1;
         const instanceId = generateCopyInstanceId(originalId, copyNumber);
-
-        copies.push({
-          ...original,
-          instanceId: instanceId,
-        });
+        copies.push({ ...original, instanceId: instanceId });
       }
       return copies;
     },
     [baseDisplayedItems, generateCopyInstanceId],
   );
 
-  // Вспомогательная функция для обновления displayedItems с очисткой _justAdded
   const updateDisplayedWithCleanup = useCallback(
-    (newItems: UIItem[]) => {
-      setDisplayedItems((prev) => [...prev, ...newItems]);
+    (newItems: Item[]) => {
+      const animatedNewItems = newItems.map((item, idx) => ({
+        ...item,
+        _justAdded: true,
+        _animationDelay: `${idx * 0.2}s`,
+      }));
+      setDisplayedItems((prev) => [...prev, ...animatedNewItems]);
 
-      setTimeout(() => {
+      scheduleCleanup(() => {
         setDisplayedItems((curr) =>
           curr.map((i) => ({ ...i, _justAdded: false })),
         );
-        isLoadMoreRef.current = false;
-      }, 450);
+      }, 600);
+      scheduleUnblock(400);
     },
-    [setDisplayedItems],
+    [setDisplayedItems, scheduleCleanup, scheduleUnblock],
   );
 
-  // Логика загрузки для избранного
   const loadMoreFavorites = useCallback((): boolean => {
-    const favs = baseDisplayedItems.filter((it) =>
-      favorites.includes(it.instanceId!),
-    );
+    const favSet = new Set(favorites);
+    const allFavItems = originalItems
+      .filter((it) => favSet.has(String(it.id)))
+      .map((it) => ({ ...it, instanceId: String(it.id) }));
 
-    if (displayedItems.length < favs.length) {
-      const nextCount = Math.min(
-        displayedItems.length + LOAD_MORE_COUNT,
-        favs.length,
-      );
-      const nextSlice = favs
-        .slice(displayedItems.length, nextCount)
-        .map((it, idx) => ({
-          ...it,
+    for (const iid of favSet) {
+      if (!allFavItems.some((it) => it.instanceId === iid)) {
+        const originalId = iid.includes("-copy-")
+          ? iid.split("-copy-")[0]
+          : iid;
+        const original = originalItems.find(
+          (it) => String(it.id) === originalId,
+        );
+        if (original) {
+          allFavItems.push({ ...original, instanceId: iid });
+        }
+      }
+    }
+
+    if (allFavItems.length === 0) {
+      setNoMorePulse(true);
+      scheduleCleanup(() => setNoMorePulse(false), 350);
+      isLoadMoreRef.current = false;
+      return false;
+    }
+
+    if (displayedItems.length < allFavItems.length) {
+      // Очищаем текущие товары
+      setDisplayedItems([]);
+
+      // Через 50 мс показываем все избранные с анимацией
+      scheduleCleanup(() => {
+        const animated = allFavItems.map((item, idx) => ({
+          ...item,
           _justAdded: true,
           _animationDelay: `${idx * 0.1}s`,
         }));
+        setDisplayedItems(animated);
 
-      updateDisplayedWithCleanup(nextSlice);
+        // Сброс флага _justAdded через 600 мс
+        scheduleCleanup(() => {
+          setDisplayedItems((curr) =>
+            curr.map((i) => ({ ...i, _justAdded: false })),
+          );
+        }, 600);
+        scheduleUnblock(400);
+      }, 50);
+
       return true;
     }
 
     setNoMorePulse(true);
-    setTimeout(() => setNoMorePulse(false), 350);
+    scheduleCleanup(() => setNoMorePulse(false), 350);
     isLoadMoreRef.current = false;
     return false;
   }, [
-    baseDisplayedItems,
+    originalItems,
     favorites,
     displayedItems,
-    updateDisplayedWithCleanup,
+    setDisplayedItems,
+    scheduleCleanup,
+    scheduleUnblock,
   ]);
 
-  // Логика загрузки для сортировки по умолчанию
   const loadMoreDefault = useCallback(
     (newCopies: Item[]) => {
-      const newItems = newCopies.map((it, idx) => ({
-        ...it,
-        _justAdded: true,
-        _animationDelay: `${idx * 0.1}s`,
-      }));
-
-      updateDisplayedWithCleanup(newItems);
+      updateDisplayedWithCleanup(newCopies);
     },
     [updateDisplayedWithCleanup],
   );
 
-  // Логика загрузки для сортировки по цене/рейтингу
   const loadMoreSorted = useCallback(
     (newCopies: Item[], patch: Record<string, number>) => {
-      setDisplayedItems((prev) => {
-        const updated = insertSorted(
-          prev,
-          newCopies,
-          { by: sort.by, dir: sort.dir },
-          { ...ratings, ...patch },
-          favorites,
-        );
+      const allItems = [...baseDisplayedItems, ...newCopies];
+      const sorted = sortItemsWithAnimation(
+        allItems,
+        { by: sort.by, dir: sort.dir },
+        { ...ratings, ...patch },
+        favorites,
+      );
 
-        setTimeout(() => {
+      // Очищаем текущие товары
+      setDisplayedItems([]);
+
+      // Через 50 мс показываем отсортированный список с анимацией
+      scheduleCleanup(() => {
+        const animated = sorted.map((item, idx) => ({
+          ...item,
+          _justAdded: true,
+          _animationDelay: `${idx * 0.1}s`,
+        }));
+        setDisplayedItems(animated);
+
+        // Сброс флага _justAdded через 600 мс
+        scheduleCleanup(() => {
           setDisplayedItems((curr) =>
             curr.map((i) => ({ ...i, _justAdded: false })),
           );
-          isLoadMoreRef.current = false;
-        }, 400);
-
-        return updated;
-      });
+        }, 600);
+        scheduleUnblock(400);
+      }, 50);
     },
-    [sort.by, sort.dir, ratings, favorites, setDisplayedItems],
+    [
+      sort.by,
+      sort.dir,
+      ratings,
+      favorites,
+      baseDisplayedItems,
+      setDisplayedItems,
+      scheduleCleanup,
+      scheduleUnblock,
+    ],
   );
 
-  // Основная функция загрузки
   const handleLoadMore = useCallback(async () => {
     if (isLoadMoreRef.current) return;
     isLoadMoreRef.current = true;
 
-    // Обработка избранного
     if (sort.by === "favorites") {
       loadMoreFavorites();
       return;
     }
 
-    // Создаем новые копии
     const nextPage = pageCountRef.current + 1;
     const newCopies = makeStableCopies(originalItems, LOAD_MORE_COUNT);
 
-    // Обновляем рейтинги для новых копий
     const patch: Record<string, number> = {};
     for (const copy of newCopies) {
       if (ratings[copy.instanceId!] == null) {
-        const newRating = Math.floor(Math.random() * 3) + 3;
-        patch[copy.instanceId!] = newRating;
+        patch[copy.instanceId!] = Math.floor(Math.random() * 3) + 3;
       }
     }
 
     if (Object.keys(patch).length) {
       dispatch(setManyRatings(patch));
-
-      // Синхронизация с БД для авторизованных пользователей
       if (isAuth) {
+        console.time("sync-ratings");
         try {
           const email = (await import("@/store/store")).store.getState().user
             .email;
@@ -201,32 +252,25 @@ export const useProductPagination = ({
         } catch (err) {
           console.error("Failed to sync ratings with DB:", err);
         }
+        console.timeEnd("sync-ratings");
       }
     }
 
-    // Добавляем новые копии в базовый список
     updateBaseDisplayedItems((prev) => [...prev, ...newCopies]);
     pageCountRef.current = nextPage;
 
-    // Выбираем стратегию отображения
     if (sort.by === "default") {
       loadMoreDefault(newCopies);
-      return;
-    }
-
-    if (sort.by === "price" || sort.by === "rating") {
+    } else if (sort.by === "price" || sort.by === "rating") {
       loadMoreSorted(newCopies, patch);
-      return;
+    } else {
+      loadMoreDefault(newCopies);
     }
-
-    // Fallback
-    loadMoreDefault(newCopies);
   }, [
     sort.by,
     originalItems,
     ratings,
     isAuth,
-    metaSynced,
     dispatch,
     updateBaseDisplayedItems,
     makeStableCopies,
@@ -235,11 +279,11 @@ export const useProductPagination = ({
     loadMoreSorted,
   ]);
 
-  // Сброс пагинации
   const resetPagination = useCallback(() => {
     pageCountRef.current = 1;
     isLoadMoreRef.current = false;
-  }, []);
+    clearTimers();
+  }, [clearTimers]);
 
   return {
     handleLoadMore,

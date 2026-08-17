@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import nodemailer from "nodemailer";
 
-import { supabase } from "@/lib/supabase/supabaseClient";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdminClient";
 import { orderEmailTemplate } from "@/lib/emailTemplates/orderEmailTemplate";
 
 import { OrderRequest } from "@/types/api/user/order";
@@ -17,9 +17,11 @@ export async function POST(req: NextRequest) {
       vat,
       tips,
       tipsPercent,
+      savedMoney,
       finalTotal,
       activated,
       lang = "ru",
+      currency = "rub",
     }: OrderRequest = await req.json();
 
     if (!email || !Array.isArray(items) || items.length === 0) {
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Загружаем пользователя
-    const { data: user, error: fetchError } = await supabase
+    const { data: user, error: fetchError } = await supabaseAdmin
       .from("users")
       .select("id, ordercount")
       .eq("email", email)
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
     const newOrderNumber = (user.ordercount ?? 0) + 1;
 
     // Обновляем корзину и orderCount
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from("users")
       .update({
         cart: [],
@@ -76,11 +78,20 @@ export async function POST(req: NextRequest) {
     // Отправляем письмо
     try {
       const transporter = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          minVersion: "TLSv1.2",
+        },
+        family: 4,
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 30000,
       });
 
       await transporter.sendMail({
@@ -95,9 +106,11 @@ export async function POST(req: NextRequest) {
           vat,
           tips,
           tipsPercent,
+          savedMoney,
           finalTotal,
           activated,
           lang,
+          currency,
         }),
       });
     } catch (mailError: any) {

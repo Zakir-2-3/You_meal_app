@@ -1,39 +1,63 @@
 "use client";
 
+import { useState } from "react";
+
 import { signIn } from "next-auth/react";
 
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { setGoogleSignIn } from "@/store/slices/userSlice";
 
-import { useCleanupOnAuth } from "@/hooks/app/useCleanupOnAuth";
 import { useTranslate } from "@/hooks/app/useTranslate";
+import { useCleanupOnAuth } from "@/hooks/app/useCleanupOnAuth";
+
+import { GoogleSignInButtonProps } from "@/types/auth/registration";
 
 import "./GoogleSignInButton.scss";
 
-const GoogleSignInButton = () => {
+const GoogleSignInButton = ({ onClose }: GoogleSignInButtonProps) => {
   const doCleanup = useCleanupOnAuth();
-
   const cart = useSelector((state: RootState) => state.cart.items);
 
   const { t } = useTranslate();
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleClick = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
     try {
-      // Сохраняем корзину в отдельное место
       if (cart.length > 0) {
         sessionStorage.setItem("googleAuthCart", JSON.stringify(cart));
       }
 
-      doCleanup();
+      sessionStorage.setItem("googleAuthPending", "true");
 
-      await signIn("google", { prompt: "select_account", callbackUrl: "/" });
+      doCleanup();
+      onClose?.();
+      dispatch(setGoogleSignIn(true));
+
+      setTimeout(() => {
+        signIn("google", { prompt: "select_account", callbackUrl: "/" });
+      }, 300);
     } catch (error) {
       console.error("Google Sign-In error:", error);
+      sessionStorage.removeItem("googleAuthPending");
+      dispatch(setGoogleSignIn(false));
+      setIsLoading(false);
     }
   };
 
   return (
-    <button className="sign-in-btn-google" type="button" onClick={handleClick}>
+    <button
+      className={`sign-in-btn-google ${isLoading ? "sign-in-btn-google--loading" : ""}`}
+      type="button"
+      onClick={handleClick}
+      disabled={isLoading}
+    >
       <svg
         className="google-icon"
         xmlns="http://www.w3.org/2000/svg"

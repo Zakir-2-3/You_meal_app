@@ -7,11 +7,7 @@ import { PriceData, FormattedPrice } from "@/types/hooks/use-price-formatter";
 
 export const usePriceFormatter = () => {
   const currency = useSelector((state: RootState) => state.currency.currency);
-  const {
-    rate,
-    loading: rateLoading,
-    error: rateError,
-  } = useExchangeRate(currency);
+  const { rate, error: rateError } = useExchangeRate(currency);
   const activated = useSelector((state: RootState) => state.promo.activated);
 
   const formatPrice = (value: number, currency: "rub" | "usd"): string => {
@@ -42,7 +38,7 @@ export const usePriceFormatter = () => {
     // Для долларов - используем статичную цену только если есть ошибка
     if (rateError) {
       // API недоступен - используем статичную цену из mockapi
-      const staticPriceUSD = price_usd || price_rub / 90;
+      const staticPriceUSD = price_usd || 0;
       return {
         current: staticPriceUSD,
         old: null,

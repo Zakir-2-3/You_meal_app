@@ -2,7 +2,11 @@
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 
+import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
+
 import { PromoInputProps } from "@/types/user/promo";
+
+import searchCloseIcon from "@/assets/icons/search-close-icon.svg?url";
 
 const PromoInput = ({
   value,
@@ -22,11 +26,22 @@ const PromoInput = ({
   const { t } = useTranslate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    let filtered = e.target.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9\s\-.]/g, "");
+
+    if (/^[\s.-]+$/.test(filtered)) {
+      filtered = "";
+    } else if (filtered.length > 0) {
+      const firstChar = filtered.charAt(0);
+      if (/[a-zA-Zа-яА-ЯёЁ]/.test(firstChar)) {
+        filtered = firstChar.toUpperCase() + filtered.slice(1);
+      }
+    }
+
+    onChange(filtered);
   };
 
-  const handleActivateClick = () => {
-    onActivate();
+  const handleClear = () => {
+    onChange("");
   };
 
   const trimmedValue = value.trim();
@@ -65,11 +80,22 @@ const PromoInput = ({
         disabled={disabled}
         maxLength={13}
       />
+      {trimmedValue.length > 0 && (
+        <CloseButton
+          onClick={handleClear}
+          className="personal-account__promo-clear-btn"
+          ariaLabel={t.buttons.clearPromoInputAriaLabel || "clear"}
+          width={20}
+          height={20}
+        >
+          <img src={searchCloseIcon} alt="clear" width={14} height={14} />
+        </CloseButton>
+      )}
 
       {message && <p className="personal-account__promo-error">{message}</p>}
 
       <button
-        onClick={handleActivateClick}
+        onClick={onActivate}
         className="personal-account__button personal-account__button--primary"
         disabled={isActivateDisabled}
       >

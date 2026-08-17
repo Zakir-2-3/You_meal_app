@@ -33,6 +33,7 @@ const PromoSection = ({ translations }: PromoSectionProps) => {
   const [removingPromo, setRemovingPromo] = useState<string | null>(null);
 
   const promoListRef = useRef<HTMLDivElement | null>(null);
+
   const dispatch = useDispatch<AppDispatch>();
 
   const { customAvailable, activated } = useSelector(

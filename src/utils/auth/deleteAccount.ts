@@ -1,9 +1,11 @@
 import { signOut } from "next-auth/react";
+
 import { toast } from "react-toastify";
 
 import { persistor, AppDispatch } from "@/store/store";
 import { resetCart } from "@/store/slices/cartSlice";
 import { resetPromos } from "@/store/slices/promoSlice";
+import { setLanguage } from "@/store/slices/languageSlice";
 import {
   setAuthStatus,
   setEmail,
@@ -11,6 +13,7 @@ import {
   setAvatarUrl,
 } from "@/store/slices/userSlice";
 
+import { STORAGE_LANG } from "@/constants/app/storageKeys";
 import { DEFAULT_AVATAR } from "@/constants/user/defaults";
 
 import { DeleteAccountTranslations } from "@/types/utils/delete-account";
@@ -47,7 +50,7 @@ export const deleteAccount = async (
       return;
     }
 
-    // Полностью чистим клиентское состояние
+    // Сбрасываем только данные пользователя, корзину и промокоды
     dispatch(resetCart());
     dispatch(resetPromos());
     dispatch(setAuthStatus(false));
@@ -55,10 +58,14 @@ export const deleteAccount = async (
     dispatch(setName(""));
     dispatch(setAvatarUrl(DEFAULT_AVATAR));
 
-    await persistor.pause();
+    // Сохраняем изменения (productMeta и другие persist-слайсы остаются нетронутыми)
     await persistor.flush();
-    await persistor.purge();
-    localStorage.removeItem("persist:root");
+
+    // Восстанавливаем язык
+    const savedLang = localStorage.getItem(STORAGE_LANG);
+    if (savedLang === "en" || savedLang === "ru") {
+      dispatch(setLanguage(savedLang));
+    }
 
     toast.success(accountDeleted);
 

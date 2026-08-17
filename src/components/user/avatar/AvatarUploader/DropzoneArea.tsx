@@ -1,23 +1,17 @@
-import Image from "next/image";
-
 import { useTranslate } from "@/hooks/app/useTranslate";
 
 import { DropzoneAreaProps } from "@/types/components/user/dropzone-area";
 
-import uploadFileIcon from "@/assets/icons/upload-file-icon.svg";
+import uploadFileIcon from "@/assets/icons/upload-file-icon.svg?url";
 
-export default function DropzoneArea({
-  getRootProps,
-  getInputProps,
-}: DropzoneAreaProps) {
+export default function DropzoneArea({ getRootProps }: DropzoneAreaProps) {
   const { t } = useTranslate();
   const { avatarUploadText } = t.user;
 
   return (
     <div className="dropzone" {...getRootProps()}>
-      <input className="crop__input" {...getInputProps()} />
       <div className="crop__content">
-        <Image
+        <img
           src={uploadFileIcon}
           className="crop__icon"
           width={100}

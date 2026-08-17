@@ -1,3 +1,5 @@
+@use "@/styles/mixins";
+
 .nav-buttons {
   margin-bottom: 20px;
   padding: 8px 0;
@@ -23,18 +25,26 @@
         border-right: 1px solid #555;
         border-bottom: 1px solid #555;
         transform: rotate(-45deg) translateY(-50%);
-        -webkit-transform: rotate(-45deg) translateY(-50%);
-        -moz-transform: rotate(-45deg) translateY(-50%);
-        -ms-transform: rotate(-45deg) translateY(-50%);
-        -o-transform: rotate(-45deg) translateY(-50%);
       }
-      &:hover {
-        cursor: pointer;
-        color: rgba(55, 91, 162, 0.716);
+      &:last-child::after {
+        content: none;
       }
     }
     & li:nth-child(1) {
       padding-left: 0;
     }
+  }
+}
+
+.nav-category-btn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  color: #555;
+  &:hover {
+    @include mixins.product-name-hover;
   }
 }

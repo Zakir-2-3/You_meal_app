@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
+
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -13,9 +14,9 @@ import { DEFAULT_AVATAR } from "@/constants/user/defaults";
 
 import { UserDropdownMenuProps } from "@/types/components/user/user-dropdown-menu";
 
-import dropdownMenuUserIcon from "@/assets/icons/dropdown-menu-user-icon.svg";
-import dropdownMenuSettingsIcon from "@/assets/icons/dropdown-menu-settings-icon.svg";
-import dropdownMenuSignOutIcon from "@/assets/icons/dropdown-menu-sign-out-icon.svg";
+import dropdownMenuUserIcon from "@/assets/icons/dropdown-menu-user-icon.svg?url";
+import dropdownMenuSignOutIcon from "@/assets/icons/dropdown-menu-sign-out-icon.svg?url";
+import dropdownMenuSettingsIcon from "@/assets/icons/dropdown-menu-settings-icon.svg?url";
 
 import "./UserDropdownMenu.scss";
 
@@ -27,15 +28,36 @@ const UserDropdownMenu = ({
   const { avatarUrl, name, email } = useSelector(
     (state: RootState) => state.user,
   );
+
   const dispatch = useDispatch<AppDispatch>();
+
   const pathname = usePathname();
 
   const { t } = useTranslate();
 
   const { profile, settings, signOutTr } = t.headerDropdownMenu;
+  const { signOutAlert } = t.buttons;
+
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // Сброс блокировки при смене пути
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
+
+  // Таймаут-подстраховка
+  useEffect(() => {
+    if (isNavigating) {
+      const timer = setTimeout(() => setIsNavigating(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isNavigating]);
 
   const handleSangOut = () => {
-    // Сначала закрываем дропдаун
+    // Подтверждение выхода
+    if (!window.confirm(signOutAlert)) return;
+
+    // Закрываем дропдаун
     setShowDropdown(false);
 
     // Передаем переводы в функцию Sign-out
@@ -46,6 +68,20 @@ const UserDropdownMenu = ({
         window.location.replace("/"); // иначе перейти на главную
       }
     });
+  };
+
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    // Если уже на этой странице или идёт навигация — отменяем
+    if (pathname === href || isNavigating) {
+      e.preventDefault();
+      return;
+    }
+    // Закрываем дропдаун и ставим блокировку
+    setShowDropdown(false);
+    setIsNavigating(true);
   };
 
   return (
@@ -66,6 +102,8 @@ const UserDropdownMenu = ({
           width={24}
           height={24}
           className="user-dropdown__avatar"
+          referrerPolicy="no-referrer"
+          crossOrigin="anonymous"
         />
         <div className="user-dropdown__info">
           <p className="user-dropdown__name">{name}</p>
@@ -76,11 +114,12 @@ const UserDropdownMenu = ({
         href="/user"
         className="user-dropdown__item"
         style={{
-          pointerEvents: pathname === "/user" ? "none" : "auto",
-          opacity: pathname === "/user" ? 0.6 : 1,
+          pointerEvents: pathname === "/user" || isNavigating ? "none" : "auto",
+          opacity: pathname === "/user" || isNavigating ? 0.6 : 1,
         }}
+        onClick={(e) => handleLinkClick(e, "/user")}
       >
-        <Image
+        <img
           src={dropdownMenuUserIcon}
           className="user-dropdown__icon"
           width={24}
@@ -93,11 +132,12 @@ const UserDropdownMenu = ({
         href="/user"
         className="user-dropdown__item"
         style={{
-          pointerEvents: pathname === "/user" ? "none" : "auto",
-          opacity: pathname === "/user" ? 0.6 : 1,
+          pointerEvents: pathname === "/user" || isNavigating ? "none" : "auto",
+          opacity: pathname === "/user" || isNavigating ? 0.6 : 1,
         }}
+        onClick={(e) => handleLinkClick(e, "/user")}
       >
-        <Image
+        <img
           src={dropdownMenuSettingsIcon}
           width={24}
           height={24}
@@ -111,7 +151,7 @@ const UserDropdownMenu = ({
         className="user-dropdown__item user-dropdown__item--sign-out"
         onClick={handleSangOut}
       >
-        <Image
+        <img
           src={dropdownMenuSignOutIcon}
           className="user-dropdown__icon"
           width={24}

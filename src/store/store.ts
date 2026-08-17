@@ -1,5 +1,6 @@
-import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
 import storage from "redux-persist/lib/storage";
+
+import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
 import {
   combineReducers,
   configureStore,
@@ -15,6 +16,7 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
+  createTransform,
 } from "redux-persist";
 
 import cartReducer from "./slices/cartSlice";
@@ -27,6 +29,23 @@ import categoryReducer from "./slices/categorySlice";
 import productMetaReducer from "./slices/productMetaSlice";
 
 import { autoSaveMiddleware } from "../middleware/autoSaveMiddleware";
+
+// Сбрасываем isUserDataLoaded при восстановлении, чтобы избежать мерцания
+const userTransform = createTransform(
+  (inboundState: any, key) => {
+    if (key === "user") {
+      return {
+        ...inboundState,
+        isUserDataLoaded: false,
+        isRegFormOpen: false,
+        isGoogleSignIn: false,
+      };
+    }
+    return inboundState;
+  },
+  (outboundState) => outboundState,
+  { whitelist: ["user"] },
+);
 
 const rootReducer = combineReducers({
   cart: cartReducer,
@@ -50,10 +69,12 @@ const persistConfig = {
     "tips",
     "currency",
     "language",
+    "category",
   ],
+  transforms: [userTransform],
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer as any);
 
 export const store = configureStore({
   reducer: persistedReducer,

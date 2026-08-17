@@ -8,7 +8,7 @@ import useEmblaCarousel from "embla-carousel-react";
 
 import { ProductImageCarouselProps } from "@/types/components/common/product-image-carousel";
 
-import arrowIcon from "@/assets/icons/arrow-icon.svg";
+import arrowIcon from "@/assets/icons/arrow-icon.svg?url";
 
 import "./ProductImageCarousel.scss";
 
@@ -18,36 +18,22 @@ const ProductImageCarousel = ({
   showControls = false,
 }: ProductImageCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Отслеживаем изменение слайда
   useEffect(() => {
     if (!emblaApi) return;
-
-    const onSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
-    };
-
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
     emblaApi.on("select", onSelect);
     return () => {
       emblaApi.off("select", onSelect);
     };
   }, [emblaApi]);
 
-  const scrollPrev = useCallback(
-    () => emblaApi && emblaApi.scrollPrev(),
-    [emblaApi],
-  );
-
-  const scrollNext = useCallback(
-    () => emblaApi && emblaApi.scrollNext(),
-    [emblaApi],
-  );
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
     <div className="carousel">
-      {/* Основная обёртка */}
       <div className="carousel__viewport" ref={emblaRef}>
         <div className="carousel__container">
           {images.map((src, index) => (
@@ -55,23 +41,23 @@ const ProductImageCarousel = ({
               <Image
                 src={src}
                 alt={`${alt} ${index + 1}`}
-                width={180}
-                height={180}
+                width={170}
+                height={170}
                 className="carousel__image"
+                priority={index === 0} // первое изображение загружается сразу
               />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Стрелки */}
       <button
         className={`carousel__button carousel__button--prev ${
           showControls ? "carousel__button--visible" : ""
         }`}
         onClick={scrollPrev}
       >
-        <Image src={arrowIcon} width={16} height={16} alt="arrow-icon" />
+        <img src={arrowIcon} width={16} height={16} alt="arrow-icon" />
       </button>
       <button
         className={`carousel__button carousel__button--next ${
@@ -79,10 +65,9 @@ const ProductImageCarousel = ({
         }`}
         onClick={scrollNext}
       >
-        <Image src={arrowIcon} width={16} height={16} alt="arrow-icon" />
+        <img src={arrowIcon} width={16} height={16} alt="arrow-icon" />
       </button>
 
-      {/* Индикаторы */}
       <div
         className={`carousel__dots ${
           showControls ? "carousel__dots--visible" : ""

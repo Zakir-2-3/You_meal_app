@@ -2,14 +2,20 @@ import { NextResponse } from "next/server";
 
 import nodemailer from "nodemailer";
 
-import { supabase } from "@/lib/supabase/supabaseClient";
 import { cleanupOldUsers } from "@/lib/user/cleanupOldUsers";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdminClient";
 import { passwordRecoveryEmailTemplate } from "@/lib/emailTemplates/passwordRecoveryEmailTemplate";
 
 export async function POST(req: Request) {
   try {
     // Удаляем старых пользователей (старше 1 месяца)
     await cleanupOldUsers();
+
+    // Удаляем временные данные из VerificationCode, если им >2 часов
+    await supabaseAdmin
+      .from("VerificationCode")
+      .delete()
+      .lt("createdAt", new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString());
 
     const { email, lang = "ru" } = await req.json();
 
@@ -18,14 +24,14 @@ export async function POST(req: Request) {
     }
 
     // Проверка, есть ли подтверждённый пользователь
-    const { data: user } = await supabase
+    const { data: user } = await supabaseAdmin
       .from("users")
       .select("id, password")
       .eq("email", email)
       .maybeSingle();
 
     // Проверка, есть ли непотверждённый пользователь в VerificationCode
-    const { data: pending } = await supabase
+    const { data: pending } = await supabaseAdmin
       .from("VerificationCode")
       .select("email")
       .eq("email", email)
@@ -77,7 +83,7 @@ export async function POST(req: Request) {
     const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
     const now = new Date();
 
-    const { data: existingCode, error: findError } = await supabase
+    const { data: existingCode, error: findError } = await supabaseAdmin
       .from("VerificationCode")
       .select("*")
       .eq("email", email)
@@ -120,7 +126,7 @@ export async function POST(req: Request) {
     }
 
     if (existingCode) {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from("VerificationCode")
         .update(updateData)
         .eq("email", email)
@@ -131,7 +137,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Error updating" }, { status: 500 });
       }
     } else {
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseAdmin
         .from("VerificationCode")
         .insert({
           email,
@@ -149,12 +155,20 @@ export async function POST(req: Request) {
 
     // Отправляем письмо с учётом языка
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      tls: {
+        minVersion: "TLSv1.2",
+      },
+      family: 4,
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 30000,
     });
 
     const subject =

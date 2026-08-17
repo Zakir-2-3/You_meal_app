@@ -13,9 +13,7 @@ export async function DELETE(req: NextRequest) {
     // Находим все аватарки пользователя
     const { data: files, error: listError } = await supabaseAdmin.storage
       .from("avatars")
-      .list("", {
-        search: email,
-      });
+      .list();
 
     if (listError) {
       console.error("Avatar list error:", listError.message);

@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 
 import nodemailer from "nodemailer";
+
 import bcrypt from "bcryptjs";
 
-import { supabase } from "@/lib/supabase/supabaseClient";
 import { cleanupOldUsers } from "@/lib/user/cleanupOldUsers";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdminClient";
 import { verificationEmailTemplate } from "@/lib/emailTemplates/verificationEmailTemplate";
+
+import {
+  checkResendBlock,
+  generateVerificationCode,
+  localizedResponse,
+  upsertVerificationCode,
+} from "@/utils/auth/verificationHelpers";
 
 // Отправка письма
 async function sendVerificationEmail(
@@ -15,15 +23,34 @@ async function sendVerificationEmail(
   isResend = false,
 ) {
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    tls: { minVersion: "TLSv1.2" },
+    family: 4,
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000,
   });
 
-  // Выбираем тему письма в зависимости от языка
+  // Проверка SMTP-Сервера
+  try {
+    await Promise.race([
+      transporter.verify(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("SMTP_VERIFY_TIMEOUT")), 5000),
+      ),
+    ]);
+  } catch (verifyError) {
+    console.error("SMTP verify failed:", verifyError);
+    throw new Error("SMTP_UNAVAILABLE");
+  }
+
+  // Сервер доступен – отправляем письмо
   const subject = isResend
     ? lang === "ru"
       ? "Повторное подтверждение регистрации"
@@ -46,13 +73,12 @@ export async function POST(req: Request) {
   try {
     await cleanupOldUsers();
 
-    await supabase
+    await supabaseAdmin
       .from("VerificationCode")
       .delete()
       .lt("createdAt", new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString());
 
     const body = await req.json();
-
     const { email, name, password, isResend, lang = "ru" } = body;
 
     if (!email || !name || !password) {
@@ -60,7 +86,7 @@ export async function POST(req: Request) {
     }
 
     // Проверка существующего пользователя
-    const { data: existingUser, error: userCheckError } = await supabase
+    const { data: existingUser, error: userCheckError } = await supabaseAdmin
       .from("users")
       .select("id, password")
       .eq("email", email)
@@ -68,24 +94,31 @@ export async function POST(req: Request) {
 
     if (userCheckError) {
       console.error("Error checking existing user:", userCheckError.message);
-      return NextResponse.json(
-        { error: "User verification error" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "USER_CHECK_ERROR" }, { status: 500 });
     }
 
     if (existingUser && !existingUser.password) {
-      return NextResponse.json(
-        { error: "This email is already linked to a Google account." },
-        { status: 403 },
+      return localizedResponse(
+        lang,
+        "Этот email уже привязан к Google-аккаунту.",
+        "This email is already linked to a Google account.",
+        403,
+      );
+    }
+
+    if (existingUser && existingUser.password) {
+      return localizedResponse(
+        lang,
+        "Пользователь с таким email уже зарегистрирован. Войдите.",
+        "User with this email already registered. Please sign in.",
+        409,
       );
     }
 
     const now = new Date();
-    const expires_at = new Date(now.getTime() + 10 * 60 * 1000).toISOString();
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { data: existingCodeRow } = await supabase
+    const { data: existingCodeRow } = await supabaseAdmin
       .from("VerificationCode")
       .select("*")
       .eq("email", email)
@@ -103,111 +136,166 @@ export async function POST(req: Request) {
         );
       }
 
-      const attempts = existingCode.attempts || 0;
-
-      if (attempts >= 2) {
-        return NextResponse.json(
-          {
-            message:
-              lang === "ru"
-                ? "Слишком много попыток. Повторная отправка недоступна."
-                : "Too many attempts. Resending is unavailable.",
-            blockedUntil: existingCode.blockedUntil || null,
-          },
-          { status: 429 },
+      const blockResult = checkResendBlock(existingCode, now);
+      if (blockResult.error) {
+        return localizedResponse(
+          lang,
+          blockResult.error.messageRu,
+          blockResult.error.messageEn,
+          blockResult.error.status,
+          { blockedUntil: existingCode.blockedUntil },
         );
       }
 
-      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const effectiveAttempts = blockResult.effectiveAttempts;
+      const { code: newCode, expires_at } = generateVerificationCode(now);
 
-      const { error: updateError, data: updatedData } = await supabase
-        .from("VerificationCode")
-        .update({
-          code: newCode,
-          expires_at,
-          attempts: attempts + 1,
-          blockedUntil:
-            attempts + 1 >= 2
-              ? new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
-              : null,
-        })
-        .eq("email", email)
-        .eq("purpose", "register")
-        .select("*");
+      const { error: updateError, data: updatedData } =
+        await upsertVerificationCode(
+          supabaseAdmin,
+          email,
+          "register",
+          {
+            code: newCode,
+            expires_at,
+            attempts: effectiveAttempts + 1,
+            blockedUntil:
+              effectiveAttempts + 1 >= 3
+                ? new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString()
+                : null,
+          },
+          true,
+        );
 
       if (updateError) {
         console.error("Error updating VerificationCode:", updateError);
-        return NextResponse.json(
-          { error: "Error resending code" },
-          { status: 500 },
-        );
+        return NextResponse.json({ error: "RESEND_ERROR" }, { status: 500 });
       }
 
       await sendVerificationEmail(newCode, email, lang, true);
 
-      return NextResponse.json(
+      return localizedResponse(
+        lang,
+        "Код повторно отправлен",
+        "Verification code resent",
+        200,
         {
-          message:
-            lang === "ru"
-              ? "Код повторно отправлен"
-              : "Verification code resent",
           blockedUntil: updatedData?.[0]?.blockedUntil || null,
+          attempts: effectiveAttempts + 1,
         },
-        { status: 200 },
       );
     }
 
-    // Если код уже есть и активен
+    // Код уже есть и активен
     if (existingCode && new Date(existingCode.expires_at) > now) {
-      return NextResponse.json(
-        {
-          message:
-            lang === "ru"
-              ? "Код уже был отправлен. Введите его или запросите повторно."
-              : "The code has already been sent. Please enter it or request again.",
-          blockedUntil: existingCode.blockedUntil || null,
-        },
-        { status: 208 },
+      return localizedResponse(
+        lang,
+        "Код уже был отправлен. Введите его или запросите повторно.",
+        "The code has already been sent. Please enter it or request again.",
+        208,
+        { blockedUntil: existingCode.blockedUntil || null },
       );
     }
 
-    // Первая регистрация
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Код истёк
+    if (existingCode && new Date(existingCode.expires_at) <= now) {
+      const blockResult = checkResendBlock(existingCode, now);
+      if (blockResult.error) {
+        return localizedResponse(
+          lang,
+          blockResult.error.messageRu,
+          blockResult.error.messageEn,
+          blockResult.error.status,
+          { blockedUntil: existingCode.blockedUntil },
+        );
+      }
 
-    const { error: insertError } = await supabase
-      .from("VerificationCode")
-      .insert([
+      const effectiveAttempts = blockResult.effectiveAttempts;
+      const { code: newCode, expires_at: newExpiresAt } =
+        generateVerificationCode(now);
+
+      const { error: updateError } = await upsertVerificationCode(
+        supabaseAdmin,
+        email,
+        "register",
         {
-          email,
-          name,
-          password: hashedPassword,
-          code,
-          expires_at,
-          purpose: "register",
-          attempts: 0,
+          code: newCode,
+          expires_at: newExpiresAt,
+          attempts: effectiveAttempts + 1,
+          blockedUntil:
+            effectiveAttempts + 1 >= 3
+              ? new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString()
+              : null,
         },
-      ]);
+        true,
+      );
 
-    if (insertError) {
-      console.error("Error creating record:", insertError.message);
+      if (updateError) {
+        console.error("Error updating expired code:", updateError);
+        return NextResponse.json(
+          { error: "VERIFICATION_UPDATE_ERROR" },
+          { status: 500 },
+        );
+      }
+
+      await sendVerificationEmail(newCode, email, lang);
+
+      return localizedResponse(
+        lang,
+        "Код отправлен на почту",
+        "Verification code sent to your email",
+        200,
+        {
+          blockedUntil:
+            effectiveAttempts + 1 >= 3
+              ? new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString()
+              : null,
+          attempts: effectiveAttempts + 1,
+        },
+      );
+    }
+
+    // Первая регистрация (нет existingCode)
+    const { code, expires_at } = generateVerificationCode(now);
+
+    // 1. Сначала пытаемся отправить письмо (без предварительного сохранения)
+    try {
+      await sendVerificationEmail(code, email, lang);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // Письмо не ушло – ничего не сохраняем
+      return NextResponse.json({ error: "EMAIL_SEND_FAILED" }, { status: 500 });
+    }
+
+    // 2. Письмо успешно отправлено – теперь сохраняем код
+    const { error: upsertError } = await upsertVerificationCode(
+      supabaseAdmin,
+      email,
+      "register",
+      {
+        name,
+        password: hashedPassword,
+        code,
+        expires_at,
+        attempts: 1,
+      },
+      false,
+    );
+
+    if (upsertError) {
+      console.error("Error upserting record:", upsertError.message);
       return NextResponse.json(
-        { error: "Error creating record" },
+        { error: "VERIFICATION_INSERT_ERROR" },
         { status: 500 },
       );
     }
 
-    // Отправляем письмо с учётом языка
-    await sendVerificationEmail(code, email, lang);
-
-    return NextResponse.json(
-      {
-        message:
-          lang === "ru"
-            ? "Код отправлен на почту"
-            : "Verification code sent to your email",
-        blockedUntil: null,
-      },
-      { status: 200 },
+    return localizedResponse(
+      lang,
+      "Код отправлен на почту",
+      "Verification code sent to your email",
+      200,
+      { blockedUntil: null },
     );
   } catch (error) {
     console.error("Registration error:", error);

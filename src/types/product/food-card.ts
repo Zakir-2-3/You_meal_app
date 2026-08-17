@@ -7,4 +7,11 @@ export interface FoodCardProps {
   price_usd?: number;
   size: number;
   instanceId?: string;
+  isFavoritesMode?: boolean;
+}
+
+export interface ExtendedFoodCardProps extends FoodCardProps {
+  onRemoveFromFavorites?: (instanceId: string) => void;
+  isProductNavigating?: boolean;
+  onNavigate?: () => void;
 }

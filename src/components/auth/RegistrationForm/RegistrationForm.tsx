@@ -12,11 +12,7 @@ import { FormProvider } from "react-hook-form";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { setItems } from "@/store/slices/cartSlice";
-import {
-  setAuthStatus,
-  setEmail,
-  setAvatarUrl,
-} from "@/store/slices/userSlice";
+import { setAuthStatus, setEmail } from "@/store/slices/userSlice";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 import { useUserDataLoader } from "@/hooks/auth/useUserDataLoader";
@@ -30,8 +26,6 @@ import ForgotPasswordForm from "../ForgotPasswordForm/ForgotPasswordForm";
 import SetNewPasswordForm from "../SetNewPasswordForm/SetNewPasswordForm";
 
 import { syncUserMetaIfAuth } from "@/utils/user/syncUserMeta";
-
-import { DEFAULT_AVATAR } from "@/constants/user/defaults";
 
 import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
 
@@ -73,15 +67,29 @@ const RegistrationForm = () => {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!ui.isFormOpen) return;
+    if (!ui.isFormOpen || ui.closing) return;
     const handler = (e: MouseEvent) => {
       if (formRef.current && !formRef.current.contains(e.target as Node)) {
-        ui.handleCloseForm();
+        // Проверяем все текстовые поля в форме
+        const inputs = formRef.current.querySelectorAll(
+          'input:not([type="hidden"])',
+        );
+        let hasValue = false;
+        for (const input of inputs) {
+          if ((input as HTMLInputElement).value.trim() !== "") {
+            hasValue = true;
+            break;
+          }
+        }
+        // Если ни в одном поле нет текста — закрываем
+        if (!hasValue) {
+          ui.handleCloseForm();
+        }
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [ui.isFormOpen, ui.handleCloseForm]);
+  }, [ui.isFormOpen, ui.handleCloseForm, ui.closing]);
 
   useEffect(() => {
     ui.handleCloseForm();
@@ -92,6 +100,17 @@ const RegistrationForm = () => {
       logic.methods.reset();
     }
   }, [ui.isFormOpen, logic.methods]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "EmailAlreadyRegistered") {
+      toast.error("Этот email уже зарегистрирован");
+      // Убираем параметр из URL, чтобы тост не показывался повторно
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     if (
@@ -112,11 +131,8 @@ const RegistrationForm = () => {
         sessionStorage.removeItem("googleAuthCart");
       }
 
-      dispatch(setAuthStatus(true));
-      dispatch(setEmail(session.user.email));
-      dispatch(setAvatarUrl(session.user.image || DEFAULT_AVATAR));
-      loadUserData(session.user.email);
       dispatch(syncUserMetaIfAuth());
+      ui.handleCloseForm();
     }
   }, [session, isGoogleUser, isAuth, dispatch, loadUserData]);
 
@@ -145,12 +161,18 @@ const RegistrationForm = () => {
     dispatch(syncUserMetaIfAuth());
   };
 
-  if (!ui.isFormOpen) return null;
+  if (!ui.isFormOpen && !ui.closing) return null;
 
   return (
     <>
-      <div className={`overlay ${ui.isFormOpen ? "overlay--visible" : ""}`} />
-      <div className="registration-form" ref={formRef}>
+      <div
+        className={`overlay ${ui.isFormOpen ? "overlay--visible" : ""} ${ui.closing ? "overlay--fade-out" : ""}`}
+      />
+      <div
+        className={`registration-form ${ui.closing ? "registration-form--closing" : ""}`}
+        ref={formRef}
+        style={ui.step === "verify" ? { height: "350px" } : {}}
+      >
         <div className="registration-form__image-container">
           <Image
             src={notFoundImg}
@@ -206,6 +228,7 @@ const RegistrationForm = () => {
                 }}
                 onSwitchMode={ui.switchMode}
                 onSubmit={logic.methods.handleSubmit(logic.handleSubmitForm)}
+                isSubmitting={logic.isSubmitting}
               />
             </FormProvider>
           ) : ui.step === "verify" ? (
@@ -218,6 +241,7 @@ const RegistrationForm = () => {
                 onSubmit={logic.verifyMethods.handleSubmit(
                   logic.handleVerifySubmit,
                 )}
+                setAttempts={logic.setAttempts}
                 onBack={() => {
                   ui.setStep("form");
                   logic.methods.reset();
@@ -235,7 +259,9 @@ const RegistrationForm = () => {
             />
           ) : null}
 
-          {ui.step === "form" && !ui.forgotMode && <GoogleSignInButton />}
+          {ui.step === "form" && !ui.forgotMode && (
+            <GoogleSignInButton onClose={ui.handleCloseForm} />
+          )}
         </div>
 
         <CloseButton

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
 import debounce from "lodash.debounce";
 
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { setGeoCity } from "@/store/slices/userSlice";
 
@@ -13,8 +14,10 @@ import { GEO_STATUS } from "@/constants/user/geoStatus";
 
 export const useGeoLocation = () => {
   const dispatch = useDispatch<AppDispatch>();
+
   const savedCity = useSelector((state: RootState) => state.user.geoCity);
   const email = useSelector((state: RootState) => state.user.email);
+
   const { t, lang } = useTranslate();
 
   const [inputVisible, setInputVisible] = useState(false);
@@ -22,7 +25,6 @@ export const useGeoLocation = () => {
   const [city, setCity] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [hasUserTyped, setHasUserTyped] = useState(false);
-  const [iconStatus, setIconStatus] = useState<"success" | "error">("success");
   const [initialized, setInitialized] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -48,20 +50,21 @@ export const useGeoLocation = () => {
     [disabledGeo, notSupportedGeo, geoNotDefined],
   );
 
-  const updateIconStatus = useCallback(
-    (cityName: string) => {
-      setIconStatus(isGeoError(cityName) ? "error" : "success");
-    },
-    [isGeoError],
-  );
-
   const saveCity = useCallback(
     async (selectedCity: string) => {
+      // Не отправляем, если город не изменился
+      if (selectedCity === savedCity) {
+        dispatch(setGeoCity(selectedCity));
+        localStorage.setItem("city", selectedCity);
+        setCity(selectedCity);
+        setInputValue(getDisplayCity(selectedCity));
+        return;
+      }
+
       dispatch(setGeoCity(selectedCity));
       localStorage.setItem("city", selectedCity);
       setCity(selectedCity);
       setInputValue(getDisplayCity(selectedCity));
-      updateIconStatus(selectedCity);
 
       if (email) {
         try {
@@ -75,11 +78,11 @@ export const useGeoLocation = () => {
         }
       }
     },
-    [dispatch, email, getDisplayCity, updateIconStatus],
+    [dispatch, email, getDisplayCity, savedCity],
   );
 
   const tryGeoDetect = useCallback(async (): Promise<boolean> => {
-    const cityName = await detectGeoCity(lang);
+    const cityName = await detectGeoCity();
 
     let status = cityName;
     if (cityName === disabledGeo) status = GEO_STATUS.DISABLED;
@@ -129,6 +132,20 @@ export const useGeoLocation = () => {
 
     initializeCity();
   }, [savedCity, isGeoError, saveCity, tryGeoDetect, initialized]);
+
+  // Обновление города, если savedCity изменился после загрузки данных
+  useEffect(() => {
+    if (
+      initialized &&
+      savedCity &&
+      savedCity !== "" &&
+      !isGeoError(savedCity)
+    ) {
+      const display = getDisplayCity(savedCity);
+      setCity(savedCity);
+      setInputValue(display);
+    }
+  }, [savedCity, initialized, isGeoError, getDisplayCity]);
 
   // Загрузка подсказок
   useEffect(() => {
@@ -187,6 +204,9 @@ export const useGeoLocation = () => {
     }
   }, [inputVisible]);
 
+  // Иконка красная/зелёная вычисляется на основе текущего города
+  const iconStatus = city ? (isGeoError(city) ? "error" : "success") : "error";
+
   return {
     inputVisible,
     inputValue,
@@ -194,6 +214,7 @@ export const useGeoLocation = () => {
     suggestions,
     hasUserTyped,
     iconStatus,
+    initialized,
     wrapperRef,
     inputRef,
     t,

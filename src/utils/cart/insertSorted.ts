@@ -68,38 +68,35 @@ export function sortItemsWithAnimation(
   if (!items || items.length === 0) return [];
 
   if (sort.by === "default") {
-    // Сортируем по умолчанию с учетом структуры ID
-    const sorted = [...items].sort(
-      (a, b) =>
-        parseInstanceId(keyOf(a)).sortKey - parseInstanceId(keyOf(b)).sortKey,
-    );
-    return sorted.map((item, i) => ({
-      ...item,
-      _animationDelay: `${i * 0.15}s`,
-    }));
+    return items as UIItem[];
   }
+
+  let sorted: Item[] = [];
 
   if (sort.by === "favorites") {
     const favSet = new Set(favorites);
     const favs = items.filter((it) => favSet.has(keyOf(it)));
-    // Сортируем избранные по тому же принципу
-    const sortedFavs = [...favs].sort(
+    sorted = [...favs].sort(
       (a, b) =>
         parseInstanceId(keyOf(a)).sortKey - parseInstanceId(keyOf(b)).sortKey,
     );
-    return sortedFavs.map((item, i) => ({
-      ...item,
-      _animationDelay: `${i * 0.15}s`,
-    }));
+  } else {
+    sorted = [...items].sort((a, b) =>
+      compareForSort(a, b, sort, ratings, favorites),
+    );
   }
 
-  const sorted = [...items].sort((a, b) =>
-    compareForSort(a, b, sort, ratings, favorites),
-  );
-  return sorted.map((item, i) => ({
-    ...item,
-    _animationDelay: `${i * 0.15}s`,
-  }));
+  // Добавляем анимацию "лесенкой" для ВСЕХ элементов с нуля
+  const result = sorted.map((item, i) => {
+    const delay = i * 0.15;
+    return {
+      ...item,
+      _animationDelay: `${delay}s`,
+      _justAdded: false,
+    };
+  });
+
+  return result;
 }
 
 export function insertSorted(

@@ -4,6 +4,7 @@ import {
   UseFormWatch,
   UseFormTrigger,
   UseFormHandleSubmit,
+  UseFormSetValue,
 } from "react-hook-form";
 
 export interface UserFormData {
@@ -29,9 +30,7 @@ export interface ProfileFormProps {
   email: string;
   isGoogleUser: boolean;
   isAuth: boolean;
-
   lang: string;
-
   editMode: boolean;
   showPassword: boolean;
   nameSameError: string;
@@ -55,6 +54,7 @@ export interface ProfileFormProps {
   isValid: boolean;
   isDirty: boolean;
   dirtyFields: Partial<Record<keyof UserFormData, boolean>>;
+  setValue: UseFormSetValue<UserFormData>;
 
   translations: {
     nameLabel: string;
@@ -65,7 +65,7 @@ export interface ProfileFormProps {
     namePlaceholder: string;
     save: string;
     editTr: string;
-    cancelTr: string;
+    closeTr: string;
     passwordUnavailableHint: string;
   };
 }

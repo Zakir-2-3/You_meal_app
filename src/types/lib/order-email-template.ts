@@ -9,6 +9,8 @@ export type OrderEmailParams = {
   tips: number;
   tipsPercent: number;
   finalTotal: number;
+  savedMoney: number;
   activated?: string[];
   lang?: "ru" | "en";
+  currency?: "rub" | "usd";
 };

@@ -7,8 +7,10 @@ export interface OrderRequest {
   discount: number;
   vat: number;
   tips: number;
+  savedMoney: number;
   tipsPercent: number;
   finalTotal: number;
   activated?: string[];
   lang?: "ru" | "en";
+  currency?: "rub" | "usd";
 }

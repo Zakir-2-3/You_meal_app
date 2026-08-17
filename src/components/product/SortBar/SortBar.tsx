@@ -6,12 +6,13 @@ import { useTranslate } from "@/hooks/app/useTranslate";
 
 import { SORT_OPTIONS } from "@/constants/user/sortOptions";
 
-import { Props, SortBy } from "@/types/components/ui/sort-bar";
+import { SortBarProps, SortBy } from "@/types/components/ui/sort-bar";
 
 import "./SortBar.scss";
 
-export default function SortBar({ by, dir, onChange }: Props) {
+export default function SortBar({ by, dir, onChange }: SortBarProps) {
   const [isOpen, setIsOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslate();
@@ -22,6 +23,8 @@ export default function SortBar({ by, dir, onChange }: Props) {
     priceSort,
     ratingSort,
     favoritesSort,
+    sortAsc,
+    sortDesc,
   } = t.sorting;
 
   const canUseDir = by !== "default" && by !== "favorites";
@@ -87,21 +90,27 @@ export default function SortBar({ by, dir, onChange }: Props) {
       </div>
 
       <div className="sort-bar__dir">
-        <button
-          onClick={() => canUseDir && onChange({ by, dir: "desc" })}
-          disabled={!canUseDir}
-          className={`sort-bar__dir-btn ${
-            dir === "desc" && canUseDir ? "sort-bar__dir-btn--active" : ""
-          }`}
-        >
-          ⇑
-        </button>
+        {/* Кнопка "По возрастанию" – стрелка вверх */}
         <button
           onClick={() => canUseDir && onChange({ by, dir: "asc" })}
           disabled={!canUseDir}
           className={`sort-bar__dir-btn ${
             dir === "asc" && canUseDir ? "sort-bar__dir-btn--active" : ""
           }`}
+          aria-label={sortAsc}
+          title={sortAsc}
+        >
+          ⇑
+        </button>
+        {/* Кнопка "По убыванию" – стрелка вниз */}
+        <button
+          onClick={() => canUseDir && onChange({ by, dir: "desc" })}
+          disabled={!canUseDir}
+          className={`sort-bar__dir-btn ${
+            dir === "desc" && canUseDir ? "sort-bar__dir-btn--active" : ""
+          }`}
+          aria-label={sortDesc}
+          title={sortDesc}
         >
           ⇓
         </button>

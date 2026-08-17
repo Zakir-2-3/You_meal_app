@@ -17,9 +17,11 @@ const LottieIcon = ({
   activeFav = false,
   enabled = true,
 }: LottieIconProps) => {
-  const lottieRef = useRef<LottieRefCurrentProps>(null);
   const [isActive, setIsActive] = useState<boolean>(activeFav);
   const [hasMounted, setHasMounted] = useState(false);
+
+  const lottieRef = useRef<LottieRefCurrentProps>(null);
+  const prevActiveFav = useRef(activeFav);
 
   const containerSize = hitBoxSize || size;
 
@@ -27,6 +29,7 @@ const LottieIcon = ({
     if (trigger !== "toggleClick" || !lottieRef.current) return;
 
     if (!hasMounted) {
+      // Первичная инициализация без анимации
       if (activeFav) {
         const duration = lottieRef.current?.getDuration(true);
         if (typeof duration === "number") {
@@ -35,19 +38,23 @@ const LottieIcon = ({
       } else {
         lottieRef.current?.goToAndStop(0, true);
       }
-
       setHasMounted(true);
+      prevActiveFav.current = activeFav;
       return;
     }
 
-    if (activeFav) {
-      lottieRef.current.stop();
-      lottieRef.current.play();
-      setIsActive(true);
-    } else {
-      lottieRef.current.stop();
-      lottieRef.current.goToAndStop(0, true);
-      setIsActive(false);
+    // После инициализации реагируем только на реальное изменение
+    if (activeFav !== prevActiveFav.current) {
+      if (activeFav) {
+        lottieRef.current.stop();
+        lottieRef.current.play();
+        setIsActive(true);
+      } else {
+        lottieRef.current.stop();
+        lottieRef.current.goToAndStop(0, true);
+        setIsActive(false);
+      }
+      prevActiveFav.current = activeFav;
     }
   }, [activeFav, trigger, hasMounted]);
 

@@ -1,7 +1,7 @@
 "use client";
 
-import CartClient from "./CartClient";
 import NavButtons from "@/components/layout/NavButtons/NavButtons";
+import CartClient from "./CartClient";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 

@@ -31,6 +31,9 @@ export default function AvatarUploader({ onClose }: AvatarUploaderProps) {
     handleZoomChange,
     setCrop,
     setZoom,
+    changeImage,
+    isUploading,
+    hasCroppedArea,
   } = useAvatarUpload({ email, onClose });
 
   const { closing, modalRef, handleRequestClose } = useModalClose({
@@ -52,12 +55,11 @@ export default function AvatarUploader({ onClose }: AvatarUploaderProps) {
           ariaLabel={closeAvatarUploadWindowAriaLabel}
         />
 
+        <input {...getInputProps()} hidden />
+
         <div className="crop-wrapper">
           {!imageSrc ? (
-            <DropzoneArea
-              getRootProps={getRootProps}
-              getInputProps={getInputProps}
-            />
+            <DropzoneArea getRootProps={getRootProps} />
           ) : (
             <CropArea
               imageSrc={imageSrc}
@@ -69,6 +71,9 @@ export default function AvatarUploader({ onClose }: AvatarUploaderProps) {
               onSave={showCroppedImage}
               onReset={handleResetImage}
               onZoomAdjust={handleZoomChange}
+              onChangeImage={changeImage}
+              isUploading={isUploading}
+              isCropped={hasCroppedArea}
             />
           )}
         </div>

@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
 
-import { supabase } from "@/lib/supabase/supabaseClient";
+import { cleanupOldUsers } from "@/lib/user/cleanupOldUsers";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdminClient";
 import { checkPasswordMatch } from "@/lib/user/checkPasswordMatch";
 
 export async function POST(req: Request) {
   try {
+    await cleanupOldUsers();
+
     const { email, code, newPassword } = await req.json();
 
     if (!email || !code || !newPassword) {
@@ -16,7 +19,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: record, error: findError } = await supabase
+    const { data: record, error: findError } = await supabaseAdmin
       .from("VerificationCode")
       .select("*")
       .eq("email", email)
@@ -25,23 +28,20 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (findError || !record) {
-      return NextResponse.json({ message: "Invalid code" }, { status: 400 });
+      return NextResponse.json({ message: "INVALID_CODE" }, { status: 400 });
     }
 
     const now = new Date();
     const expiresAt = new Date(record.expires_at);
     if (expiresAt < now) {
-      return NextResponse.json(
-        { message: "The code has expired" },
-        { status: 400 },
-      );
+      return NextResponse.json({ message: "CODE_EXPIRED" }, { status: 400 });
     }
 
     // Проверка, новый пароль не совпадает с текущим
     const isSame = await checkPasswordMatch(email, newPassword);
     if (isSame) {
       return NextResponse.json(
-        { message: "The new password must not match the current one." },
+        { message: "PASSWORD_SAME_AS_CURRENT" },
         { status: 400 },
       );
     }
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Обновляем пароль
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from("users")
       .update({ password: hashedPassword })
       .eq("email", email);
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     }
 
     // Удаляем VerificationCode
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from("VerificationCode")
       .delete()
       .eq("email", email)

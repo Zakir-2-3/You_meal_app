@@ -106,6 +106,21 @@
       @include mixins.light-dark-filter-mouse-hover;
     }
   }
+
+  & > .personal-account__promo-clear-btn {
+    position: absolute;
+    left: 144px;
+    top: calc(50% - 10px);
+
+    & > img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  & > .personal-account__input {
+    height: 35px;
+  }
 }
 
 .personal-account__promo-select {
@@ -134,7 +149,7 @@
   top: 112%;
   left: 0;
   width: 166px;
-  max-height: 157px;
+  max-height: 146px;
   overflow-y: auto;
   background: white;
   border: 1px solid #d1d5db;
@@ -150,6 +165,21 @@
   overflow-x: hidden;
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  opacity: 0;
+  visibility: hidden;
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease-in-out,
+    visibility 0.2s;
+
+  &--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: scaleY(1);
   }
 }
 
@@ -171,6 +201,14 @@
   color: #28a745;
   box-shadow: inset 0px -1px 0px 0px #cefbbc;
   letter-spacing: 0.3px;
+
+  max-height: 57px;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease,
+    margin 0.3s ease,
+    padding 0.3s ease;
 
   & .personal-account__promo-remove {
     background: none !important;
@@ -208,6 +246,17 @@
     color: #ffab08;
     box-shadow: inset 0px -1px 0px 0px #fbe5bc;
   }
+  &:last-child {
+    box-shadow: none;
+  }
+  &.removing {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 }
 
 .personal-account__promo-active {
@@ -216,13 +265,6 @@
   gap: 18px;
   grid-column: 1 / -1;
   grid-row: 2;
-}
-
-.personal-account__input {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 166px;
 }
 
 .personal-account__button {
@@ -241,7 +283,7 @@
 
 .personal-account__promo-error {
   position: absolute;
-  top: -19px;
+  top: -18px;
   left: 0;
   color: red;
   font-size: 13px;
@@ -347,7 +389,6 @@
     }
 
     & > p {
-      line-height: 100%;
       text-align: center;
       white-space: nowrap;
     }

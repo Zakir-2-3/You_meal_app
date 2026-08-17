@@ -18,4 +18,5 @@ export interface Props {
   onSubmit: (e?: React.BaseSyntheticEvent) => void;
   onForgotPassword: () => void;
   onSwitchMode: () => void;
+  isSubmitting: boolean;
 }

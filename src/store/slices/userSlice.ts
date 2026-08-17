@@ -12,12 +12,18 @@ const initialState: UserState = {
   balance: 0,
   avatarUrl: DEFAULT_AVATAR,
   geoCity: "",
+  isUserDataLoaded: false,
+  isHydrated: false,
+  isGoogleSignIn: false,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    setHydrated(state, action: PayloadAction<boolean>) {
+      state.isHydrated = action.payload;
+    },
     activeRegForm(state, action: PayloadAction<boolean>) {
       state.isRegFormOpen = action.payload;
     },
@@ -39,6 +45,9 @@ const userSlice = createSlice({
     setBalance(state, action: PayloadAction<number>) {
       state.balance = action.payload;
     },
+    setUserDataLoaded(state, action: PayloadAction<boolean>) {
+      state.isUserDataLoaded = action.payload;
+    },
     signOutUser(state) {
       state.isRegFormOpen = false;
       state.isAuth = false;
@@ -46,6 +55,7 @@ const userSlice = createSlice({
       state.email = "";
       state.balance = 0;
       state.avatarUrl = DEFAULT_AVATAR;
+      state.isUserDataLoaded = true;
     },
     resetUser: (state) => {
       state.name = "";
@@ -53,6 +63,7 @@ const userSlice = createSlice({
       state.avatarUrl = DEFAULT_AVATAR;
       state.isAuth = false;
       state.balance = 0;
+      state.isUserDataLoaded = true;
     },
     resetUserExceptGeoCity: (state) => {
       state.isRegFormOpen = false;
@@ -61,6 +72,10 @@ const userSlice = createSlice({
       state.email = "";
       state.balance = 0;
       state.avatarUrl = DEFAULT_AVATAR;
+      state.isUserDataLoaded = true;
+    },
+    setGoogleSignIn(state, action: PayloadAction<boolean>) {
+      state.isGoogleSignIn = action.payload;
     },
   },
 });
@@ -76,6 +91,9 @@ export const {
   setBalance,
   resetUser,
   resetUserExceptGeoCity,
+  setUserDataLoaded,
+  setHydrated,
+  setGoogleSignIn,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -16,6 +16,16 @@
     grid-template-rows: auto auto;
     gap: 0px 100px;
     align-items: start;
+    &--error {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      & > P {
+        font-size: 26px;
+        margin-top: 25%;
+        text-align: center;
+      }
+    }
   }
   &__img {
     position: relative;
@@ -126,7 +136,6 @@
 
 tr:not(thead tr):hover {
   background: #9f9e9e1a;
-  cursor: pointer;
 }
 
 .product-section__info-rating {

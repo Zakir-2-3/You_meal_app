@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const isSamePassword = await checkPasswordMatch(email, newPassword);
     if (isSamePassword) {
       return NextResponse.json(
-        { error: "The new password must not match the current one." },
+        { error: "PASSWORD_SAME_AS_CURRENT" },
         { status: 400 },
       );
     }

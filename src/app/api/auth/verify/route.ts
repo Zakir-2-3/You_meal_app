@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase/supabaseClient";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdminClient";
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: record, error } = await supabase
+    const { data: record, error } = await supabaseAdmin
       .from("VerificationCode")
       .select("*")
       .eq("email", email)
@@ -42,14 +42,11 @@ export async function POST(req: Request) {
 
     if (record.expires_at && new Date(record.expires_at) < new Date()) {
       console.log("Code expired");
-      return NextResponse.json(
-        { error: "The code has expired" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "CODE_EXPIRED" }, { status: 400 });
     }
 
     // Создаём пользователя
-    const { error: insertError } = await supabase.from("users").insert({
+    const { error: insertError } = await supabaseAdmin.from("users").insert({
       email: record.email,
       name: record.name,
       password: record.password,
@@ -70,7 +67,7 @@ export async function POST(req: Request) {
     }
 
     // Удаляем временную запись
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from("VerificationCode")
       .delete()
       .eq("email", email);

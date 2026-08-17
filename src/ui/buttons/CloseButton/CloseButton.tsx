@@ -1,9 +1,8 @@
 import React from "react";
-import Image from "next/image";
 
 import { CloseButtonProps } from "@/types/components/common/close-button";
 
-import closeButtonIcon from "@/assets/icons/close-button.svg";
+import closeButtonIcon from "@/assets/icons/close-button.svg?url";
 
 import "./CloseButton.scss";
 
@@ -29,7 +28,7 @@ const CloseButton: React.FC<CloseButtonProps> = ({
       style={{ width, height }}
     >
       {children || (
-        <Image
+        <img
           src={closeButtonIcon}
           width={width}
           height={height}
