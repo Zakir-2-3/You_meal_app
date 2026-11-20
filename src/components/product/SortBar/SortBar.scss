@@ -8,13 +8,13 @@
   flex-wrap: wrap;
 
   &__label {
-    font-size: 14px;
+    font-size: 15px;
     color: #444;
   }
 
   &__dropdown {
     position: relative;
-    min-width: 160px;
+    min-width: 170px;
   }
 
   &__toggle {
@@ -29,13 +29,11 @@
     justify-content: space-between;
     align-items: center;
     transition: 0.3s ease;
-    -webkit-transition: 0.3s ease;
-    -moz-transition: 0.3s ease;
-    -ms-transition: 0.3s ease;
-    -o-transition: 0.3s ease;
 
-    &:hover {
-      @include mixins.light-dark-filter-mouse-hover;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        @include mixins.light-dark-filter-mouse-hover;
+      }
     }
   }
 
@@ -64,22 +62,6 @@
       max-height 0.35s ease,
       transform 0.35s ease,
       opacity 0.25s ease 0.1s;
-    -webkit-transition:
-      max-height 0.35s ease,
-      transform 0.35s ease,
-      opacity 0.25s ease 0.1s;
-    -moz-transition:
-      max-height 0.35s ease,
-      transform 0.35s ease,
-      opacity 0.25s ease 0.1s;
-    -ms-transition:
-      max-height 0.35s ease,
-      transform 0.35s ease,
-      opacity 0.25s ease 0.1s;
-    -o-transition:
-      max-height 0.35s ease,
-      transform 0.35s ease,
-      opacity 0.25s ease 0.1s;
     pointer-events: none;
     &--open {
       max-height: 500px;
@@ -90,24 +72,28 @@
         transform 0.35s ease,
         opacity 0.2s ease;
       pointer-events: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
   }
 
   &__option {
-    padding: 8px 12px;
+    padding: 8px 10px;
     cursor: pointer;
     transition: background 0.2s;
 
-    &:hover {
-      background: #fafafa;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: #fafafa;
+      }
+
+      &--active:hover {
+        background: #f5f5f5;
+      }
     }
 
     &--active {
       font-weight: 600;
       background: #f5f5f5;
-      &:hover {
-        background: #f5f5f5;
-      }
     }
 
     &:not(:last-child) {
@@ -122,7 +108,9 @@
   }
 
   &__dir-btn {
-    padding: 6px 10px;
+    width: 39px;
+    height: 39px;
+    font-size: 20px;
     border-radius: 6px;
     border: 1px solid #ddd;
     cursor: pointer;
@@ -140,6 +128,61 @@
 
     &--active {
       @include mixins.light-dark-filter-mouse-hover;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .sort-bar {
+    &__dropdown {
+      min-width: 145px;
+    }
+    &__option {
+      font-size: 15px;
+    }
+    &__arrow {
+      font-size: 16px;
+    }
+    &__toggle {
+      padding: 0px 10px;
+      height: 32px;
+      font-size: 14px;
+    }
+    &__dir-btn {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .sort-bar {
+    &__dir-btn {
+      font-size: 18px;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .sort-bar {
+    &__dropdown {
+      min-width: 125px;
+    }
+    &__toggle {
+      padding: 0 8px;
+      font-size: 13px;
+      height: 28px;
+    }
+    &__arrow {
+      font-size: 13px;
+    }
+    &__option--active {
+      padding: 8px;
+      font-size: 13px;
+    }
+    &__dir-btn {
+      width: 28px;
+      height: 28px;
     }
   }
 }

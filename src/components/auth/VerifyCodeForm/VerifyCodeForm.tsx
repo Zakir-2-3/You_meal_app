@@ -21,7 +21,7 @@ export default function VerifyCodeForm({
   onSubmit,
   setAttempts,
 }: Props) {
-  const { t } = useTranslate();
+  const { t, lang } = useTranslate();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,6 +51,7 @@ export default function VerifyCodeForm({
           name,
           password,
           isResend: true,
+          lang,
         }),
       });
 
@@ -141,7 +142,11 @@ export default function VerifyCodeForm({
         disabled={isSubmitting}
       />
       {typeof verifyErrors.code?.message === "string" && (
-        <p className="registration-form__input--error">
+        <p
+          className={`registration-form__input--error ${
+            lang === "en" ? "registration-form__input--error--en" : ""
+          }`}
+        >
           {verifyErrors.code.message}
         </p>
       )}

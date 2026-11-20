@@ -7,6 +7,7 @@ import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
 import { PromoInputProps } from "@/types/user/promo";
 
 import searchCloseIcon from "@/assets/icons/search-close-icon.svg?url";
+import promocodeCheckMarkIcon from "@/assets/icons/promocode-check-mark-icon.svg";
 
 const PromoInput = ({
   value,
@@ -15,7 +16,6 @@ const PromoInput = ({
   disabled,
   placeholder,
   onActivate,
-  activateText,
   canAddNewCustomPromo = true,
   isDefaultPromo = false,
   maxLengthReached,
@@ -99,7 +99,12 @@ const PromoInput = ({
         className="personal-account__button personal-account__button--primary"
         disabled={isActivateDisabled}
       >
-        {activateText}
+        <img
+          src={promocodeCheckMarkIcon}
+          alt="activate"
+          width={34}
+          height={34}
+        />
       </button>
     </>
   );

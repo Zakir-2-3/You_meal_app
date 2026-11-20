@@ -2,6 +2,8 @@ import { FC, useEffect, useState } from "react";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 
+import CodeInput from "@/components/auth/CodeInput/CodeInput";
+
 import TogglePasswordButton from "@/UI/inputs/TogglePasswordButton";
 
 import { CodeStepProps } from "@/types/components/auth/forgot-password-form";
@@ -18,7 +20,7 @@ const CodeStep: FC<CodeStepProps> = ({
   showPassword,
   setShowPassword,
 }) => {
-  const { t } = useTranslate();
+  const { t, lang } = useTranslate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -38,11 +40,6 @@ const CodeStep: FC<CodeStepProps> = ({
     });
     return () => subscription.unsubscribe();
   }, [watch, trigger]);
-
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digits = e.target.value.replace(/\D/g, "").slice(0, 6);
-    setValue("code", digits, { shouldValidate: true });
-  };
 
   const handleFormSubmit = async (
     e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
@@ -75,24 +72,31 @@ const CodeStep: FC<CodeStepProps> = ({
       <label className="registration-form__label" htmlFor="code">
         {t.regForm.codeFromEmailLabel}
       </label>
+
       <input
-        id="code"
-        type="text"
-        maxLength={6}
-        placeholder={t.regForm.sixDigitCode}
-        className="registration-form__input"
+        type="hidden"
         {...register("code", {
           required: t.regForm.enterCodeEmail,
           pattern: {
             value: /^\d{6}$/,
-            message: t.regForm.sixDigitCodeMail,
+            message: t.regForm.enterCodeEmail,
           },
-          onChange: handleCodeChange,
         })}
+      />
+
+      <CodeInput
+        id="code"
+        value={watch("code") || ""}
+        onChange={(val) => setValue("code", val, { shouldValidate: true })}
         disabled={isSubmitting}
       />
+
       {errors.code && (
-        <p className="registration-form__forgot-error registration-form__forgot-error--code1">
+        <p
+          className={`registration-form__forgot-error registration-form__forgot-error--code1 ${
+            lang === "en" ? "registration-form__forgot-error--code1--en" : ""
+          }`}
+        >
           {errors.code.message}
         </p>
       )}
@@ -132,7 +136,11 @@ const CodeStep: FC<CodeStepProps> = ({
         />
       </div>
       {errors.newPassword && (
-        <p className="registration-form__forgot-error registration-form__forgot-error--code2">
+        <p
+          className={`registration-form__forgot-error registration-form__forgot-error--code2 ${
+            lang === "en" ? "registration-form__forgot-error--en" : ""
+          }`}
+        >
           {errors.newPassword.message}
         </p>
       )}

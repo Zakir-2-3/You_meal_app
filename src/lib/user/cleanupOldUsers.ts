@@ -17,7 +17,6 @@ export async function cleanupOldUsers() {
   }
 
   if (!oldUsers || oldUsers.length === 0) {
-    console.log("Cleanup: no old users found");
     return;
   }
 

@@ -8,5 +8,7 @@ export interface ProductActionsProps {
   translations: {
     addToCart: string;
     removeFromCart: string;
+    addToCartShort: string;
+    removeFromCartShort: string;
   };
 }

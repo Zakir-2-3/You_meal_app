@@ -52,7 +52,6 @@ export const signOut = async (
       });
     }
 
-    // await persistor.pause();
     await nextAuthSignOut({ redirect: false });
 
     const currentCity = geoCity || localStorage.getItem("city");

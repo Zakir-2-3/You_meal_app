@@ -37,6 +37,7 @@ export default function ProductClient() {
   const [product, setProduct] = useState<ProductWithOriginal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+
   const toastShown = useRef(false);
 
   const { id } = useParams();
@@ -71,7 +72,8 @@ export default function ProductClient() {
     nothingFound,
   } = t.product;
 
-  const { addToCart, removeFromCart } = t.buttons;
+  const { addToCart, removeFromCart, addToCartShort, removeFromCartShort } =
+    t.buttons;
 
   const { getConvertedPrice } = usePriceFormatter();
 
@@ -195,8 +197,6 @@ export default function ProductClient() {
         ) : (
           <div className="content-wrapper">
             <div className="product-section__img">
-              <FavoriteButton isFav={isFav} onToggle={handleToggleFavorite} />
-
               <figure>
                 <ProductImageGallery
                   images={[
@@ -204,9 +204,14 @@ export default function ProductClient() {
                     product.image,
                     product.image,
                     product.image,
+                    product.image,
+                    product.image,
+                    product.image,
+                    product.image,
                   ]}
                   alt={product.name_ru}
                 />
+                <FavoriteButton isFav={isFav} onToggle={handleToggleFavorite} />
                 <figcaption>
                   {lang === "ru" ? product.name_ru : product.name_en}
                   {imageDescription}
@@ -234,7 +239,12 @@ export default function ProductClient() {
                 onClickPlus={onClickPlus}
                 onClickMinus={onClickMinus}
                 onClickAdd={onClickAdd}
-                translations={{ addToCart, removeFromCart }}
+                translations={{
+                  addToCart,
+                  removeFromCart,
+                  addToCartShort,
+                  removeFromCartShort,
+                }}
               />
 
               <ProductDescription

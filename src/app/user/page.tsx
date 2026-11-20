@@ -69,7 +69,6 @@ export default function UserPage() {
   const {
     signOutAccountTr,
     deleteAccountTr,
-    activateTr,
     changeTr,
     deleteTr,
     topUp,
@@ -292,7 +291,6 @@ export default function UserPage() {
                 enterPromoCodePlaceholder,
                 promoCodeMax,
                 promoCodeMin,
-                activateTr,
                 maxActivatedMessage,
               }}
             />

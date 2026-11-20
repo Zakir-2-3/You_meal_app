@@ -29,6 +29,8 @@ export interface CartPageItemProps {
   item: EnrichedCartItem;
   discount: number;
   hasDiscount: boolean;
+  isProductNavigating?: boolean;
+  onNavigate?: () => void;
 }
 
 export interface CartSidebarItemProps {

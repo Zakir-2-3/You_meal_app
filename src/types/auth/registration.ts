@@ -37,4 +37,5 @@ export interface UseRegistrationLogicReturn {
 
 export interface GoogleSignInButtonProps {
   onClose?: () => void;
+  disabled?: boolean;
 }

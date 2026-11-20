@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
@@ -19,7 +18,7 @@ import GeoLocationSelector from "../../user/geo/GeoLocationSelector/GeoLocationS
 import { validRoutes } from "@/constants/user/validRoutes";
 
 import cartIcon from "@/assets/icons/cart-icon.svg?url";
-import headerLogo from "@/assets/images/header-logo.png";
+import headerLogo from "@/assets/images/header-logo.svg";
 import profileSignInIcon from "@/assets/icons/sign-in-profile-icon.svg?url";
 import profileSignOutIcon from "@/assets/icons/sign-out-profile-icon.svg?url";
 
@@ -129,7 +128,7 @@ const Header = () => {
       <div className="header-container container">
         <div className="header__logo">
           <Link href="/" onClick={handleLogoClick}>
-            <Image src={headerLogo} alt="header-logo" width={153} height={35} />
+            <img src={headerLogo} alt="header-logo" width={153} height={35} />
           </Link>
         </div>
         <div className="header__geo">

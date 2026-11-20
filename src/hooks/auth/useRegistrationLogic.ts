@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -40,6 +40,12 @@ export const useRegistrationLogic = ({
 
   const methods = useForm<RegForm>({ mode: "onChange" });
   const verifyMethods = useForm<{ code: string }>({ mode: "onChange" });
+
+  // При смене языка сбрасываем ошибки, чтобы сообщения обновились
+  useEffect(() => {
+    methods.clearErrors();
+    verifyMethods.clearErrors();
+  }, [lang, methods, verifyMethods]);
 
   const { setError, reset } = methods;
 

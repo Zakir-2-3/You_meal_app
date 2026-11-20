@@ -31,8 +31,8 @@ const AvatarSection = ({
         className={`personal-account__avatar ${
           shouldAnimateAvatar ? "animate-avatar" : ""
         }`}
-        width={350}
-        height={350}
+        width={320}
+        height={320}
         alt="avatar"
         referrerPolicy="no-referrer"
         crossOrigin="anonymous"

@@ -20,7 +20,25 @@ const ProductActions = ({
         onClickMinus={onClickMinus}
       />
       <button className="product-section__add-cart-btn" onClick={onClickAdd}>
-        {isAdded ? translations.removeFromCart : translations.addToCart}
+        {isAdded ? (
+          <>
+            <span className="product-section__add-cart-btn--full">
+              {translations.removeFromCart}
+            </span>
+            <span className="product-section__add-cart-btn--short">
+              {translations.removeFromCartShort}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="product-section__add-cart-btn--full">
+              {translations.addToCart}
+            </span>
+            <span className="product-section__add-cart-btn--short">
+              {translations.addToCartShort}
+            </span>
+          </>
+        )}
       </button>
     </div>
   );

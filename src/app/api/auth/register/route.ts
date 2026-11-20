@@ -258,16 +258,7 @@ export async function POST(req: Request) {
     // Первая регистрация (нет existingCode)
     const { code, expires_at } = generateVerificationCode(now);
 
-    // 1. Сначала пытаемся отправить письмо (без предварительного сохранения)
-    try {
-      await sendVerificationEmail(code, email, lang);
-    } catch (emailError) {
-      console.error("Failed to send verification email:", emailError);
-      // Письмо не ушло – ничего не сохраняем
-      return NextResponse.json({ error: "EMAIL_SEND_FAILED" }, { status: 500 });
-    }
-
-    // 2. Письмо успешно отправлено – теперь сохраняем код
+    // 1. Сначала сохраняем код и хэш пароля в базу данных
     const { error: upsertError } = await upsertVerificationCode(
       supabaseAdmin,
       email,
@@ -283,9 +274,36 @@ export async function POST(req: Request) {
     );
 
     if (upsertError) {
-      console.error("Error upserting record:", upsertError.message);
+      console.error("Error upserting record:", upsertError);
+
+      // Принудительно удаляем запись из-за медленной сети/VPN запрос долетел до базы уже после того, как сработал тайм-аут
+      await supabaseAdmin
+        .from("VerificationCode")
+        .delete()
+        .eq("email", email)
+        .eq("purpose", "register");
+
       return NextResponse.json(
         { error: "VERIFICATION_INSERT_ERROR" },
+        { status: 500 },
+      );
+    }
+
+    // 2. База точно обновилась — пытаемся отправить письмо
+    try {
+      await sendVerificationEmail(code, email, lang);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+
+      // Страховка для ошибки отправки почты
+      await supabaseAdmin
+        .from("VerificationCode")
+        .delete()
+        .eq("email", email)
+        .eq("purpose", "register");
+
+      return NextResponse.json(
+        { error: "EMAIL_EMAIL_SEND_FAILED" },
         { status: 500 },
       );
     }

@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,9 +19,16 @@ import { CartPageItemProps } from "@/types/components/product/cart-page";
 
 import "./CartPageItem.scss";
 
-const CartPageItem = ({ item, discount, hasDiscount }: CartPageItemProps) => {
+const CartPageItem = ({
+  item,
+  discount,
+  hasDiscount,
+  isProductNavigating,
+  onNavigate,
+}: CartPageItemProps) => {
   const { t } = useTranslate();
 
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
 
   const { getConvertedPrice } = usePriceFormatter();
@@ -43,6 +51,14 @@ const CartPageItem = ({ item, discount, hasDiscount }: CartPageItemProps) => {
     price_rub: discountedItemTotal,
     price_usd: discountedItemTotalUSD,
   });
+
+  const handleProductClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === `/product/${item.instanceId}` || isProductNavigating) {
+      e.preventDefault();
+      return;
+    }
+    onNavigate?.();
+  };
 
   const handlePlus = () => {
     dispatch(
@@ -68,11 +84,25 @@ const CartPageItem = ({ item, discount, hasDiscount }: CartPageItemProps) => {
       </div>
 
       <div className="cart-page-section__description">
-        <Link href={`/product/${item.instanceId}`}>
+        <Link
+          href={`/product/${item.instanceId}`}
+          onClick={handleProductClick}
+          style={{
+            pointerEvents:
+              pathname === `/product/${item.instanceId}` || isProductNavigating
+                ? "none"
+                : "auto",
+            opacity:
+              pathname === `/product/${item.instanceId}` || isProductNavigating
+                ? 0.6
+                : 1,
+          }}
+        >
           <h3 className="cart-page-section__name">{item.name}</h3>
         </Link>
         <div className="cart-page-section__size">
-          {item.size} {grams}
+          {item.size}
+          {grams}
         </div>
       </div>
 

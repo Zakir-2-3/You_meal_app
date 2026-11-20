@@ -238,7 +238,6 @@ export const useProductPagination = ({
     if (Object.keys(patch).length) {
       dispatch(setManyRatings(patch));
       if (isAuth) {
-        console.time("sync-ratings");
         try {
           const email = (await import("@/store/store")).store.getState().user
             .email;
@@ -252,7 +251,6 @@ export const useProductPagination = ({
         } catch (err) {
           console.error("Failed to sync ratings with DB:", err);
         }
-        console.timeEnd("sync-ratings");
       }
     }
 

@@ -13,3 +13,15 @@
 .Toastify__toast-container--top-right {
   top: 70px;
 }
+
+@media only screen and (max-width: 480px) {
+  .Toastify__toast-container--top-right {
+    top: 1em !important;
+    right: 1em !important;
+    left: auto !important;
+  }
+
+  .Toastify__toast-container {
+    width: auto !important;
+  }
+}

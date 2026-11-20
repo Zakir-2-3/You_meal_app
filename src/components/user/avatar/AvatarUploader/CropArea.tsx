@@ -18,10 +18,10 @@ export default function CropArea({
   onZoomAdjust,
   isUploading = false,
 }: CropAreaProps) {
+  const [localZoom, setLocalZoom] = useState(zoom);
+
   const { t } = useTranslate();
   const { save, changeTr } = t.buttons;
-
-  const [localZoom, setLocalZoom] = useState(zoom);
 
   // Сброс кропа и зума при смене изображения
   useEffect(() => {
@@ -38,7 +38,14 @@ export default function CropArea({
   const handleZoomButton = (delta: number) => {
     const newZoom = localZoom + delta;
     const clampedZoom = Math.min(3, Math.max(1, newZoom));
-    onZoomAdjust(clampedZoom);
+
+    // обновляем и локальный стейт, и родительский проп
+    handleZoomChange(clampedZoom);
+
+    // Если родитель делает что-то еще в onZoomAdjust, оставляем его
+    if (onZoomAdjust) {
+      onZoomAdjust(clampedZoom);
+    }
   };
 
   return (
@@ -53,6 +60,7 @@ export default function CropArea({
           onCropChange={onCropChange}
           onZoomChange={handleZoomChange}
           onCropComplete={onCropComplete}
+          onTouchRequest={() => false}
         />
       </div>
 
@@ -60,7 +68,11 @@ export default function CropArea({
         <div className="controls__zoom">
           <button
             type="button"
-            onClick={() => handleZoomButton(-0.1)}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleZoomButton(-0.1);
+            }}
             className="controls__zoom-button"
           >
             -
@@ -76,7 +88,11 @@ export default function CropArea({
           />
           <button
             type="button"
-            onClick={() => handleZoomButton(0.1)}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleZoomButton(0.1);
+            }}
             className="controls__zoom-button"
           >
             +

@@ -1,4 +1,5 @@
 import type { Middleware, Dispatch, Action } from "@reduxjs/toolkit";
+
 import { RootState } from "../store/store";
 
 import { syncUserData } from "@/utils/user/syncUserData";
@@ -44,7 +45,7 @@ export const autoSaveMiddleware: Middleware<
   }
 
   const state = store.getState();
-  const { isAuth, email, balance, avatarUrl, geoCity, isUserDataLoaded } =
+  const { isAuth, email, balance, avatarUrl, name, geoCity, isUserDataLoaded } =
     state.user;
   const cart = state.cart.items;
   const promoActivated = state.promo.activated;
@@ -65,6 +66,7 @@ export const autoSaveMiddleware: Middleware<
       await syncUserData({
         type: "save",
         email,
+        name,
         cart,
         balance,
         avatar: avatarUrl,

@@ -233,7 +233,6 @@ const PromoSection = ({ translations }: PromoSectionProps) => {
             )}
             placeholder={translations.enterPromoCodePlaceholder}
             onActivate={handleActivateFromInput}
-            activateText={translations.activateTr}
             maxLengthReached={promoInput.length === 13}
             maxLengthMessage={translations.promoCodeMax}
             maxActivatedReached={maxActivatedReached}

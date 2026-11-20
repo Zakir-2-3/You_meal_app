@@ -31,31 +31,15 @@ export function SyncAuthUserWithRedux() {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { items } = useSelector((state: RootState) => state.cart);
-  const { activated, customAvailable } = useSelector(
-    (state: RootState) => state.promo,
-  );
-  const { balance, avatarUrl, name } = useSelector(
-    (state: RootState) => state.user,
-  );
+  const { avatarUrl, name } = useSelector((state: RootState) => state.user);
 
   const { t } = useTranslate();
 
   // Флаг для однократной загрузки
   const hasSyncedRef = useRef(false);
 
-  // Ref для хранения предыдущих значений
-  const prevDataRef = useRef({
-    items,
-    activated,
-    customAvailable,
-    balance,
-    avatarUrl,
-    name,
-  });
-
-  // Храним локальную корзину до очистки
-  const localCartRef = useRef(items);
+  // Локальная корзина до слияния с данными сервера
+  const localCartRef = useRef(store.getState().cart.items);
 
   const isGoogleUser = !!session?.user?.image;
 
@@ -88,7 +72,7 @@ export function SyncAuthUserWithRedux() {
         String(localCartRef.current.length),
       );
 
-      // 1. Сохраняем локальную корзину и очищаем Redux
+      // 1. Сохраняем локальную корзину перед слиянием с серверной
       localCartRef.current = store.getState().cart.items;
 
       // 2. Включаем флаг загрузки
@@ -269,71 +253,6 @@ export function SyncAuthUserWithRedux() {
 
     loadData();
   }, [status, session]);
-
-  // Сохранение данных при их изменении
-  useEffect(() => {
-    const arraysEqual = (a: any[], b: any[]) =>
-      a.length === b.length && a.every((val, idx) => val === b[idx]);
-
-    const prev = prevDataRef.current;
-    const current = {
-      items,
-      activated,
-      customAvailable,
-      balance,
-      avatarUrl,
-      name,
-    };
-
-    const hasChanged =
-      !arraysEqual(prev.items, current.items) ||
-      !arraysEqual(prev.activated, current.activated) ||
-      !arraysEqual(prev.customAvailable, current.customAvailable) ||
-      prev.balance !== current.balance ||
-      prev.avatarUrl !== current.avatarUrl ||
-      prev.name !== current.name;
-
-    if (!hasChanged) {
-      return;
-    }
-
-    prevDataRef.current = current;
-
-    const saveData = async () => {
-      if (
-        status !== "authenticated" ||
-        !session?.user?.email ||
-        !hasSyncedRef.current ||
-        localStorage.getItem("hasLoggedOut") === "true"
-      ) {
-        return;
-      }
-
-      try {
-        const { ratings, favorites } = store.getState().productMeta;
-
-        await fetch("/api/user/update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: session.user.email,
-            name,
-            avatar: avatarUrl,
-            cart: items,
-            promoCodes: { activated, customAvailable },
-            balance,
-            ratings,
-            favorites,
-          }),
-        });
-      } catch (err) {
-        console.error("Error saving user data:", err);
-      }
-    };
-
-    const timeoutId = setTimeout(saveData, 500);
-    return () => clearTimeout(timeoutId);
-  }, [items, activated, customAvailable, balance, avatarUrl, name]);
 
   return null;
 }

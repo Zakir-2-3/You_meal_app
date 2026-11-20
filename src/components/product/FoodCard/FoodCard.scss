@@ -13,10 +13,6 @@
   transform-origin: center center;
   overflow: hidden;
   transition: all 0.3s ease-in;
-  -webkit-transition: all 0.3s ease-in;
-  -moz-transition: all 0.3s ease-in;
-  -ms-transition: all 0.3s ease-in;
-  -o-transition: all 0.3s ease-in;
 
   &.removing {
     max-height: 0;
@@ -41,17 +37,9 @@
   &:hover {
     box-shadow: rgb(0 0 0 / 16%) 1px 5px 16px -5px;
     transform: translateY(-8px);
-    -webkit-transform: translateY(-8px);
-    -moz-transform: translateY(-8px);
-    -ms-transform: translateY(-8px);
-    -o-transform: translateY(-8px);
   }
   &-img {
     border-radius: 12px;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    -ms-border-radius: 12px;
-    -o-border-radius: 12px;
     overflow: hidden;
     text-align: center;
     margin-bottom: 8px;
@@ -101,7 +89,8 @@
       color: #fff;
       background: #ff7020;
       border-radius: 0 3px 3px 3px;
-      padding: 2px 4px 2px 12px;
+      padding: 3px 4px 3px 12px;
+      line-height: 1;
       font-size: 13px;
       position: relative;
       clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
@@ -141,17 +130,9 @@
       color: #000;
       background-color: #f2f2f3;
       font-size: 17px;
-      font-weight: 400;
-      border-radius: 8px;
-      -webkit-border-radius: 8px;
-      -moz-border-radius: 8px;
-      -ms-border-radius: 8px;
-      -o-border-radius: 8px;
+      font-weight: 600;
+      border-radius: 6px;
       transition: all 0.2s ease-in;
-      -webkit-transition: all 0.2s ease-in;
-      -moz-transition: all 0.2s ease-in;
-      -ms-transition: all 0.2s ease-in;
-      -o-transition: all 0.2s ease-in;
       &--active {
         background-color: #f86310;
       }
@@ -166,6 +147,322 @@
     &-btn--delete {
       background-color: #f86310;
       color: #fff;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .food-section__card {
+    width: 268px;
+    &-name,
+    &-price,
+    & .old-price,
+    & .discounted-price {
+      font-size: 19px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .food-section__card {
+    min-height: 380px;
+    width: 218px;
+
+    & > div:first-child {
+      top: 8px;
+      right: 8px;
+      width: 22px !important;
+      height: 22px !important;
+
+      & > div:first-child {
+        width: 56px !important;
+        height: 56px !important;
+      }
+    }
+
+    &-name,
+    &-price,
+    & .old-price,
+    & .discounted-price {
+      font-size: 17px;
+    }
+
+    & .active-discount {
+      border-radius: 0 2px 2px 3px;
+      padding: 3px 3px 3px 12px;
+      font-size: 12px;
+    }
+
+    & .star-btn {
+      font-size: 19px;
+    }
+
+    & .star-count {
+      font-size: 12px;
+    }
+  }
+  .food-section__card-add-btn,
+  .food-section__card-add-btn--delete {
+    height: 36px;
+    line-height: 1;
+    font-size: 15px;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 500px) {
+  .food-section__card {
+    min-height: 320px;
+    width: 176px;
+    &-price .active-discount {
+      font-size: 10px;
+    }
+    &-name,
+    &-price,
+    & .old-price,
+    & .discounted-price {
+      font-size: 15px;
+    }
+    & .star-btn {
+      font-size: 14px;
+    }
+    & .star-count {
+      font-size: 9px;
+      margin-left: 0;
+    }
+    &-size {
+      font-size: 13px;
+    }
+  }
+  .food-section__card-add-btn,
+  .food-section__card-add-btn--delete {
+    height: 32px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .food-section__card {
+    padding: 10px;
+    width: 140px;
+    min-height: 270px;
+    &-name,
+    &-price,
+    & .old-price,
+    & .discounted-price {
+      font-size: 12px;
+    }
+    & .active-discount {
+      padding: 2px 2px 2px 12px;
+      border-radius: 0 2px 2px 3px;
+      font-size: 9px;
+    }
+    & .old-price::before {
+      height: 1.5px;
+    }
+    & .discounted-price {
+      margin: 0 8px;
+      font-size: 13px;
+    }
+    & .rating-stars {
+      gap: 3px;
+    }
+    & .star-btn {
+      font-size: 13px;
+    }
+    & .star-count {
+      font-size: 8px;
+    }
+    &-size {
+      font-size: 12px;
+    }
+
+    & > div:first-child {
+      top: 6px;
+      right: 6px;
+      width: 20px !important;
+      height: 18px !important;
+
+      & > div:first-child {
+        width: 46px !important;
+        height: 46px !important;
+      }
+    }
+  }
+  .food-section__card-add-btn,
+  .food-section__card-add-btn--delete {
+    font-size: 10px;
+    height: 28px;
+    border-radius: 6px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .food-section__card {
+    &:hover {
+      box-shadow: none;
+      transform: none;
+    }
+
+    & > div:first-child {
+      &:hover {
+        filter: contrast(0);
+      }
+
+      filter: contrast(0);
+      cursor: pointer;
+
+      &.active-fav {
+        filter: contrast(2);
+      }
+    }
+
+    &-add-btn {
+      &:hover {
+        color: #000;
+        background-color: #f2f2f3;
+      }
+      &--delete:hover {
+        color: #fff;
+        background-color: #f86310;
+      }
+    }
+  }
+  .food-section__card-description > a:hover,
+  .food-section__card-description > a:active {
+    color: inherit;
+  }
+}
+
+.food-section__card--skeleton {
+  background-color: transparent;
+  pointer-events: none;
+  user-select: none;
+  transition: none;
+
+  &:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  > div:first-child {
+    position: static;
+    top: auto;
+    right: auto;
+    filter: none;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .sk-block {
+    @include mixins.sk-block();
+  }
+
+  .sk-block--image {
+    @include mixins.sk-block(18px);
+    width: 100%;
+    aspect-ratio: 276 / 180;
+    margin-bottom: 16px;
+  }
+  .sk-block--title {
+    height: 26px;
+    width: 76%;
+    margin-bottom: 10px;
+  }
+  .sk-block--price {
+    height: 24px;
+    width: 19%;
+    margin-bottom: 15px;
+  }
+  .sk-block--middle {
+    @include mixins.sk-block(5px);
+    height: 22px;
+    width: 51%;
+  }
+  .sk-block--small {
+    height: 20px;
+    width: 16%;
+    margin-top: auto;
+    margin-bottom: 16px;
+  }
+  .sk-block--button {
+    @include mixins.sk-block(6px);
+    height: 38px;
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .sk-block--image {
+      margin-bottom: 14px;
+      border-radius: 16px;
+    }
+    .sk-block--title {
+      height: 22px;
+      margin-bottom: 9px;
+    }
+    .sk-block--price {
+      height: 20px;
+      margin-bottom: 13px;
+    }
+    .sk-block--middle {
+      height: 19px;
+    }
+    .sk-block--small {
+      height: 17px;
+      margin-bottom: 14px;
+    }
+    .sk-block--button {
+      height: 34px;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .sk-block--image {
+      margin-bottom: 12px;
+      border-radius: 14px;
+    }
+    .sk-block--title {
+      height: 19px;
+      margin-bottom: 7px;
+    }
+    .sk-block--price {
+      height: 17px;
+      margin-bottom: 11px;
+    }
+    .sk-block--middle {
+      height: 16px;
+    }
+    .sk-block--small {
+      height: 15px;
+      margin-bottom: 12px;
+    }
+    .sk-block--button {
+      height: 28px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .sk-block--image {
+      margin-bottom: 10px;
+      border-radius: 12px;
+    }
+    .sk-block--title {
+      height: 16px;
+      margin-bottom: 6px;
+    }
+    .sk-block--price {
+      height: 14px;
+      margin-bottom: 9px;
+    }
+    .sk-block--middle {
+      height: 13px;
+    }
+    .sk-block--small {
+      height: 11px;
+      margin-bottom: 10px;
+    }
+    .sk-block--button {
+      height: 24px;
     }
   }
 }

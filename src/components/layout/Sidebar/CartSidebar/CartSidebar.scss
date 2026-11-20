@@ -11,13 +11,9 @@
   grid-area: left;
   position: sticky;
   top: 30px;
-  margin-top: 85px;
+  margin-top: 66px;
   background-color: #fff;
   border-radius: 18px;
-  -webkit-border-radius: 18px;
-  -moz-border-radius: 18px;
-  -ms-border-radius: 18px;
-  -o-border-radius: 18px;
   &__total-orders {
     display: flex;
     flex-flow: row nowrap;
@@ -40,10 +36,6 @@
       font-weight: 600;
       background-color: #f2f2f3;
       border-radius: 6px;
-      -webkit-border-radius: 6px;
-      -moz-border-radius: 6px;
-      -ms-border-radius: 6px;
-      -o-border-radius: 6px;
     }
   }
   &__description-orders {
@@ -60,10 +52,6 @@
     &::-webkit-scrollbar-thumb {
       background-color: #c9c9c9;
       border-radius: 20px;
-      -webkit-border-radius: 20px;
-      -moz-border-radius: 20px;
-      -ms-border-radius: 20px;
-      -o-border-radius: 20px;
     }
     &--has-scroll {
       padding-right: 6px;
@@ -117,7 +105,8 @@
       width: 100%;
       color: #fff !important;
       font-size: 17px;
-      font-weight: 400;
+      font-weight: 600;
+      line-height: 1;
       @include mixins.btn-box-shadow-hover;
     }
     a.disabled {
@@ -135,11 +124,7 @@
       align-items: flex-end;
       gap: 0 8px;
       transition: 0.3s ease;
-      -webkit-transition: 0.3s ease;
-      -moz-transition: 0.3s ease;
-      -ms-transition: 0.3s ease;
-      -o-transition: 0.3s ease;
-      line-height: 21px;
+      line-height: 18px;
       width: fit-content;
       & > div {
         padding-top: 3px;
@@ -148,8 +133,10 @@
         animation: wheelie 0.8s ease-in-out;
         transform-origin: center bottom;
       }
-      &:hover {
-        color: #0027ff !important;
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          color: #0027ff !important;
+        }
       }
     }
   }
@@ -164,5 +151,11 @@
   }
   100% {
     transform: rotate(0deg);
+  }
+}
+
+@media (max-width: 1000px) {
+  .cart-sidebar {
+    display: none;
   }
 }

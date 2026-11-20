@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["192.168.100.90", "*.trycloudflare.com"],
+
   images: {
     remotePatterns: [
       {
@@ -17,6 +19,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "hxkhkagppruuaudgtbwt.supabase.co",
         pathname: "/storage/v1/object/public/avatars/**",
+      },
+      {
+        protocol: "https",
+        hostname: "orderapp-app-static.burgerkingrus.ru",
+        pathname: "/**",
       },
     ],
   },
@@ -46,6 +53,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: ["http://localhost:3000"],
     },
+    imgOptTimeoutInSeconds: 15,
   },
 
   async headers() {

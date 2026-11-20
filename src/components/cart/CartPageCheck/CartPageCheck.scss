@@ -1,3 +1,5 @@
+@use "@/styles/mixins";
+
 .total-price-title {
   font-size: 22px;
   margin-bottom: 6px;
@@ -21,7 +23,7 @@
   & ul {
     display: flex;
     flex-flow: column nowrap;
-    gap: 7px 0;
+    gap: 8px 0;
     padding-right: 8px;
   }
   & li {
@@ -45,10 +47,6 @@
   &::-webkit-scrollbar-thumb {
     background-color: #c9c9c9;
     border-radius: 20px;
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    -ms-border-radius: 20px;
-    -o-border-radius: 20px;
   }
 }
 
@@ -140,10 +138,6 @@
     font-weight: 500;
     letter-spacing: -0.5px;
     transition: all 0.1s ease-in-out;
-    -webkit-transition: all 0.1s ease-in-out;
-    -moz-transition: all 0.1s ease-in-out;
-    -ms-transition: all 0.1s ease-in-out;
-    -o-transition: all 0.1s ease-in-out;
     &:hover,
     &--active {
       color: green;
@@ -153,10 +147,41 @@
   }
   & .tip-option:disabled {
     transform: none;
-    -webkit-transform: none;
-    -moz-transform: none;
-    -ms-transform: none;
-    -o-transform: none;
     pointer-events: none;
   }
+}
+
+@media (max-width: 1100px) {
+  .total-price-item-list li {
+    & > span:nth-of-type(2) {
+      line-height: 21px;
+    }
+  }
+}
+
+@media (hover: none) {
+  .tip-option:hover {
+    color: inherit !important;
+    border-bottom: 1px dotted #000 !important;
+  }
+
+  .tip-option--active,
+  .tip-option--active:hover {
+    color: green !important;
+    border-bottom: 1px solid green !important;
+  }
+}
+
+.total-price-item-list ul.total-price-item-list-skeleton {
+  padding-right: 0;
+
+  .sk-block {
+    @include mixins.sk-block(2px);
+    height: 21px;
+    width: 100%;
+  }
+}
+
+.total-price-item-list:has(.total-price-item-list-skeleton) {
+  overflow: hidden;
 }

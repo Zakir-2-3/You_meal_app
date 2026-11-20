@@ -3,19 +3,19 @@
 import { useState, useEffect } from "react";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
 import { LottieIcon } from "@/components/ui/LottieIcon";
+import DeliveryLink from "@/components/layout/DeliveryLink/DeliveryLink";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
 
 import { validRoutes } from "@/constants/user/validRoutes";
 
-import footerLogo from "@/assets/images/footer-logo.png";
+import footerLogo from "@/assets/images/footer-logo.svg";
 import socialIcon_1 from "@/assets/icons/socialIcon_1.svg?url";
 import socialIcon_2 from "@/assets/icons/socialIcon_2.svg?url";
 import socialIcon_3 from "@/assets/icons/socialIcon_3.svg?url";
@@ -32,7 +32,7 @@ const Footer = () => {
 
   const { isAuth } = useSelector((state: RootState) => state.user);
 
-  const { t } = useTranslate();
+  const { t, lang } = useTranslate();
 
   const { design, rights, orderNumber, socialNetworks } = t.footer;
 
@@ -89,7 +89,7 @@ const Footer = () => {
       <div className="container footer-container">
         <div className="footer__logo">
           <Link href="/" onClick={handleLogoClick}>
-            <Image src={footerLogo} alt="footer-logo" width={305} height={68} />
+            <img src={footerLogo} alt="footer-logo" width={305} height={68} />
           </Link>
         </div>
         <div className="footer__number">
@@ -150,6 +150,13 @@ const Footer = () => {
             © YouMeal {new Date().getFullYear()}. {rights}
           </p>
           <p>{design} Anastasia Ilina</p>
+        </div>
+        <div
+          className={`footer__delivery ${
+            lang === "ru" ? "footer__delivery--ru" : ""
+          }`}
+        >
+          <DeliveryLink className="footer__delivery-link" />
         </div>
       </div>
     </footer>

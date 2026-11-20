@@ -212,7 +212,8 @@ const FoodCard: FC<ExtendedFoodCardProps> = ({
       </Link>
 
       <p className="food-section__card-size">
-        {size} {grams}
+        {size}
+        {grams}
       </p>
 
       <div className="food-section__card-add">

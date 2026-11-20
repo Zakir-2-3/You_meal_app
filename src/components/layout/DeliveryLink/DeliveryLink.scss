@@ -1,0 +1,38 @@
+.delivery-link {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+  gap: 0 8px;
+  transition: 0.3s ease;
+  line-height: 21px;
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 400;
+
+  & > div {
+    padding-top: 3px;
+  }
+
+  &:hover > div {
+    animation: wheelie 0.8s ease-in-out;
+    transform-origin: center bottom;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: #0027ff !important;
+    }
+  }
+}
+
+@keyframes wheelie {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}

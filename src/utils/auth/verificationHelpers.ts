@@ -75,17 +75,38 @@ export async function upsertVerificationCode(
   data: Record<string, any>,
   isUpdate: boolean,
 ) {
-  if (isUpdate) {
-    const { error, data: updatedData } = await supabaseAdmin
+  const TIMEOUT_MS = 8000; // Таймаут 8 секунд для защиты от зависаний сети/VPN
+
+  const dbOperation = async () => {
+    if (isUpdate) {
+      const { error, data: updatedData } = await supabaseAdmin
+        .from("VerificationCode")
+        .update(data)
+        .eq("email", email)
+        .eq("purpose", purpose)
+        .select("*");
+      return { error, data: updatedData };
+    }
+    const { error } = await supabaseAdmin
       .from("VerificationCode")
-      .update(data)
-      .eq("email", email)
-      .eq("purpose", purpose)
-      .select("*");
-    return { error, data: updatedData };
+      .upsert([{ email, purpose, ...data }], { onConflict: "email" });
+    return { error, data: null };
+  };
+
+  try {
+    const result = (await Promise.race([
+      dbOperation(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("DB_TIMEOUT")), TIMEOUT_MS),
+      ),
+    ])) as { error: any; data: any };
+
+    return result;
+  } catch (err: any) {
+    console.error("Supabase upsert timeout or network error:", err);
+    return {
+      error: { message: err.message || "DB_TIMEOUT" },
+      data: null,
+    };
   }
-  const { error } = await supabaseAdmin
-    .from("VerificationCode")
-    .upsert([{ email, purpose, ...data }], { onConflict: "email" });
-  return { error, data: null };
 }

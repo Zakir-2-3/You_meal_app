@@ -20,24 +20,19 @@
   }
   &__btn {
     font-size: 20px;
-    margin-top: 80px;
+    margin-top: 30px;
     color: #fff;
     border-radius: 25px;
     padding: 8px 22px;
     background: #ff7020;
     transition: 0.1s ease-in-out;
-    -webkit-transition: 0.1s ease-in-out;
-    -moz-transition: 0.1s ease-in-out;
-    -ms-transition: 0.1s ease-in-out;
-    -o-transition: 0.1s ease-in-out;
-    &:hover {
-      font-weight: 600;
-      box-shadow: 1px 4px 0px 0px #e0621c;
-      transform: translate(-5px, -5px);
-      -webkit-transform: translate(-5px, -5px);
-      -moz-transform: translate(-5px, -5px);
-      -ms-transform: translate(-5px, -5px);
-      -o-transform: translate(-5px, -5px);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        font-weight: 600;
+        box-shadow: 1px 4px 0px 0px #e0621c;
+        transform: translate(-5px, -5px);
+      }
     }
   }
   &__title b {
@@ -45,9 +40,26 @@
     text-shadow:
       0 0 10px #be7e06b8,
       0 10px 3px #c88403b8;
-    -webkit-transform: perspective(300px) rotateX(0deg) scaleY(0.8);
-    -moz-transform: perspective(300px) rotateX(0deg) scaleY(0.8);
-    -ms-transform: perspective(300px) rotateX(0deg) scaleY(0.8);
-    -o-transform: perspective(300px) rotateX(0deg) scaleY(0.8);
+  }
+}
+
+@media (max-width: 520px) {
+  .not-found-wrapper {
+    font-size: clamp(10px, 3.1vw, 16px);
+    &__title {
+      font-size: 46vw;
+    }
+    & img {
+      width: 30vw;
+      height: 30vw;
+    }
+    &__description {
+      font-size: 4.5vw;
+    }
+    &__btn {
+      font-size: 3.8vw;
+      margin-top: 12vw;
+      padding: 2vw 4vw;
+    }
   }
 }

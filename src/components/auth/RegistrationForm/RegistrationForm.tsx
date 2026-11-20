@@ -67,31 +67,6 @@ const RegistrationForm = () => {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!ui.isFormOpen || ui.closing) return;
-    const handler = (e: MouseEvent) => {
-      if (formRef.current && !formRef.current.contains(e.target as Node)) {
-        // Проверяем все текстовые поля в форме
-        const inputs = formRef.current.querySelectorAll(
-          'input:not([type="hidden"])',
-        );
-        let hasValue = false;
-        for (const input of inputs) {
-          if ((input as HTMLInputElement).value.trim() !== "") {
-            hasValue = true;
-            break;
-          }
-        }
-        // Если ни в одном поле нет текста — закрываем
-        if (!hasValue) {
-          ui.handleCloseForm();
-        }
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [ui.isFormOpen, ui.handleCloseForm, ui.closing]);
-
-  useEffect(() => {
     ui.handleCloseForm();
   }, [pathname, ui.handleCloseForm]);
 
@@ -136,6 +111,18 @@ const RegistrationForm = () => {
     }
   }, [session, isGoogleUser, isAuth, dispatch, loadUserData]);
 
+  const handleOverlayClick = () => {
+    if (ui.closing) return;
+    if (ui.step !== "form" || ui.forgotMode) return;
+
+    const values = logic.methods.getValues();
+    const isEmpty = !values.name && !values.email && !values.password;
+
+    if (isEmpty) {
+      ui.handleCloseForm();
+    }
+  };
+
   const handleSetNewPasswordSubmit = async (data: { password: string }) => {
     const res = await fetch("/api/auth/reset-password", {
       method: "POST",
@@ -167,9 +154,10 @@ const RegistrationForm = () => {
     <>
       <div
         className={`overlay ${ui.isFormOpen ? "overlay--visible" : ""} ${ui.closing ? "overlay--fade-out" : ""}`}
+        onClick={handleOverlayClick}
       />
       <div
-        className={`registration-form ${ui.closing ? "registration-form--closing" : ""}`}
+        className={`registration-form ${ui.closing ? "registration-form--closing" : ""} ${ui.forgotMode ? "registration-form--forgot" : ""}`}
         ref={formRef}
         style={ui.step === "verify" ? { height: "350px" } : {}}
       >
@@ -260,7 +248,10 @@ const RegistrationForm = () => {
           ) : null}
 
           {ui.step === "form" && !ui.forgotMode && (
-            <GoogleSignInButton onClose={ui.handleCloseForm} />
+            <GoogleSignInButton
+              onClose={ui.handleCloseForm}
+              disabled={logic.isSubmitting}
+            />
           )}
         </div>
 

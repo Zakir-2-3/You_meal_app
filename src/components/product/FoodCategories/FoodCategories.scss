@@ -1,9 +1,10 @@
 .food-categories__list {
-  display: flex;
-  flex-flow: row wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 20px 33px;
 }
 .food-categories__item {
   width: fit-content;
@@ -11,10 +12,6 @@
   font-weight: 400;
   background-color: #fff;
   border-radius: 20px;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
   box-shadow: 1px 1px 1px 0px #00000047;
 }
 .food-categories__btn {
@@ -24,20 +21,72 @@
   justify-content: center;
   padding: 7px 14px 8px;
   border-radius: 20px;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
   transition: 0.3s ease;
-  -webkit-transition: 0.3s ease;
-  -moz-transition: 0.3s ease;
-  -ms-transition: 0.3s ease;
-  -o-transition: 0.3s ease;
   &--active {
     background-color: #ffab08;
     color: #fff;
   }
   &:hover {
     box-shadow: inset 0px 0px 0px 2px #ffab08;
+  }
+}
+
+@media (max-width: 800px) {
+  .food-categories__list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0 20px;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 2px;
+
+    &::after {
+      content: "";
+      flex: 0 0 4px;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .food-categories__item {
+    flex: 0 0 auto;
+    width: auto;
+  }
+}
+
+@media (max-width: 500px) {
+  .food-categories__list {
+    gap: 0 15px;
+  }
+  .food-categories__btn {
+    gap: 0 6px;
+    padding: 6px 12px 7px;
+    font-size: 14px;
+    & img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .food-categories__list {
+    gap: 0 10px;
+  }
+  .food-categories__btn {
+    align-items: center;
+    gap: 0 5px;
+    padding: 5px 8px;
+    font-size: 13px;
+    line-height: 1;
+    & img {
+      width: 16px;
+      height: 16px;
+    }
   }
 }

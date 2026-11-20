@@ -56,6 +56,17 @@ button {
   background-color: transparent;
   border: none;
   cursor: pointer;
+  color: inherit;
+  -webkit-text-fill-color: currentColor;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+ul,
+ul li {
+  list-style: none;
+  color: inherit;
 }
 
 input,

@@ -5,10 +5,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
-  -webkit-transform: translate(-50%, -50%) scale(1);
-  -moz-transform: translate(-50%, -50%) scale(1);
-  -ms-transform: translate(-50%, -50%) scale(1);
-  -o-transform: translate(-50%, -50%) scale(1);
   display: flex;
   align-items: center;
   max-width: 800px;
@@ -100,11 +96,11 @@
     }
     &:nth-child(2) p {
       left: 55px;
-      top: 2px;
+      top: 1px;
     }
     &:nth-child(3) p {
       left: 65px;
-      top: 2px;
+      top: 1px;
     }
   }
 
@@ -123,10 +119,6 @@
     font-size: 18px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
-    -o-border-radius: 4px;
     &--error {
       position: absolute;
       top: 1px;
@@ -141,10 +133,6 @@
 
   &__button {
     border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
-    -o-border-radius: 4px;
     width: 100%;
     padding: 10px;
     font-size: 16px;
@@ -159,8 +147,12 @@
       border: solid 1px rgb(48 149 71);
       color: #fff;
 
-      &:hover {
+      &:not(:disabled):hover {
         @include mixins.light-dark-filter-mouse-hover;
+      }
+
+      &:disabled {
+        @include mixins.disabled-state;
       }
     }
 
@@ -170,8 +162,12 @@
       font-weight: 600;
       font-size: 15px;
 
-      &:hover {
+      &:not(:disabled):hover {
         @include mixins.light-dark-filter-mouse-hover;
+      }
+
+      &:disabled {
+        @include mixins.disabled-state;
       }
     }
   }
@@ -185,10 +181,6 @@
     top: 50%;
     right: 10px;
     transform: translate(0px, -50%);
-    -webkit-transform: translate(0px, -50%);
-    -moz-transform: translate(0px, -50%);
-    -ms-transform: translate(0px, -50%);
-    -o-transform: translate(0px, -50%);
   }
 
   &__actions {
@@ -215,15 +207,9 @@
     height: 20px;
     & > img {
       filter: saturate(0.8);
-      -webkit-filter: saturate(0.8);
       transition: filter 0.2s ease;
-      -webkit-transition: filter 0.2s ease;
-      -moz-transition: filter 0.2s ease;
-      -ms-transition: filter 0.2s ease;
-      -o-transition: filter 0.2s ease;
       &:hover {
         filter: saturate(1);
-        -webkit-filter: saturate(1);
       }
     }
   }
@@ -247,7 +233,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 100;
+  z-index: 999;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -274,8 +260,11 @@ input[type="password"]::-ms-clear {
     margin-bottom: 3px;
   }
   & > .registration-form__input--error {
-    top: 2px;
+    top: 1px;
     left: 102px;
+  }
+  & > .registration-form__input--error--en {
+    left: 86px;
   }
   & > .registration-form__button--secondary {
     text-align: left;
@@ -320,4 +309,244 @@ input[type="password"]::-ms-clear {
   margin: 0 10px;
   color: #737373ab;
   font-size: 13px;
+}
+
+@media (max-width: 840px) {
+  .registration-form {
+    width: calc(100% - 60px);
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .registration-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: fit-content !important;
+    min-height: auto;
+    padding: 30px 20px;
+    &__image-container {
+      display: none;
+    }
+    &--forgot {
+      min-height: auto;
+    }
+  }
+}
+
+@media (max-width: 460px) {
+  .registration-form {
+    width: calc(100% - 30px);
+    &__sign-up input::placeholder {
+      font-size: 16px;
+    }
+    &__field:nth-child(1) p,
+    &__field:nth-child(2) p,
+    &__field:nth-child(3) p,
+    &__sign-in .registration-form__field:nth-of-type(1) .registration-form__input--error {
+      top: 3px;
+    }
+    &__input--error {
+      top: 2px;
+      font-size: 13px;
+    }
+    &__input--error--en {
+      top: 3px !important;
+    }
+    &__content {
+      padding: 0;
+    }
+    &__title {
+      font-size: 23px;
+    }
+    &__close-btn {
+      top: 11px;
+      right: 11px;
+      width: 16px;
+      height: 16px;
+      & img {
+        width: 16px;
+        height: 16px;
+      }
+    }
+    &__button--secondary {
+      font-size: 13px;
+    }
+    &--forgot {
+      & .registration-form__forgot-error {
+        font-size: 13px;
+        top: 71px;
+      }
+    }
+    &__forgot--code,
+    &__forgot-error--code1 {
+      top: 3px !important;
+    }
+    &__forgot--code,
+    &__forgot-error--code2 {
+      top: 117px !important;
+    }
+    &__forgot--code,
+    &__forgot-error--code3 {
+      top: auto !important;
+    }
+  }
+  .code-input-cell {
+    width: 40px;
+    height: 42px;
+    font-size: 22px;
+  }
+  .registration-form__verify > .registration-form__input--error {
+    top: 3px;
+  }
+}
+
+@media (max-width: 360px) {
+  .code-input-wrapper {
+    gap: 0;
+  }
+  .code-input-cell {
+    width: 36px;
+    height: 38px;
+    font-size: 21px;
+  }
+  .registration-form__forgot--code .registration-form__forgot-error--code2 {
+    top: 113px !important;
+  }
+}
+
+@media (max-width: 320px) {
+  .registration-form {
+    padding: 15px 20px 25px 20px;
+    width: calc(100% - 20px);
+    &__title {
+      font-size: 22px;
+    }
+    &__content {
+      width: 100%;
+    }
+    &__button--primary {
+      margin: 16px auto 6px;
+    }
+    &__button--primary,
+    & .sign-in-btn-google {
+      padding: 8px;
+      font-size: 14px;
+    }
+    &__input {
+      padding: 6px !important;
+      font-size: 16px !important;
+      &::placeholder {
+        font-size: 14px !important;
+      }
+    }
+    &__label {
+      font-size: 13px;
+    }
+    &__button--secondary {
+      font-size: 13px;
+    }
+    &__sign-up div:nth-child(3) {
+      margin-bottom: 4px;
+    }
+    & #password {
+      padding: 6px 28px 6px 6px !important;
+    }
+    &__toggle-password,
+    &__toggle-password img {
+      width: 18px;
+      height: 18px;
+    }
+    &__toggle-password {
+      right: 6px;
+    }
+    & .sign-in-btn-google {
+      gap: 8px;
+    }
+    & .sign-in-btn-google .google-icon {
+      width: 18px;
+      height: 18px;
+    }
+    &__divider {
+      margin-bottom: 6px;
+    }
+    &__or {
+      font-size: 12px;
+    }
+    &__input--error {
+      top: 2px !important;
+      font-size: 11px;
+    }
+    &__field:nth-child(1) p {
+      left: 38px;
+    }
+    &__field:nth-child(2) p {
+      left: 50px;
+    }
+    &__field:nth-child(3) p {
+      left: 60px;
+    }
+    &--forgot {
+      & .registration-form__forgot-error {
+        font-size: 12px;
+        top: 58px;
+      }
+    }
+    &__sign-in .registration-form__field:nth-of-type(1) .english-style {
+      left: 45px !important;
+    }
+  }
+  .registration-form__sign-in .registration-form__field:nth-of-type(1) .registration-form__input--error {
+    left: 50px;
+    top: 2px !important;
+  }
+  .registration-form__sign-in .registration-form__field:nth-of-type(2) .registration-form__input--error {
+    top: 2px !important;
+    left: 60px;
+  }
+  .registration-form__sign-in .registration-form__field:nth-of-type(2) .english-style {
+    top: 2px !important;
+    left: 70px;
+  }
+  .registration-form__sign-up .registration-form__field .english-style {
+    left: 45px;
+  }
+  .registration-form__sign-up .registration-form__field:nth-child(3) .english-style {
+    left: 70px;
+  }
+  .registration-form__forgot--code {
+    .registration-form__forgot-error--code2 {
+      top: 106px !important;
+      left: 102px !important;
+
+      &.registration-form__forgot-error--en {
+        top: 102.5px !important;
+      }
+    }
+  }
+
+  .registration-form__forgot--code .registration-form__forgot-error--code3 {
+    bottom: 83px;
+  }
+  .code-input-cell {
+    width: 34px;
+    height: 36px;
+    font-size: 20px;
+  }
+  .registration-form__forgot--code .registration-form__forgot-error--code1 {
+    left: 96px;
+    top: 2px !important;
+  }
+  .registration-form__forgot--code .registration-form__forgot-error--code1--en {
+    left: 110px;
+    top: 1px !important;
+  }
+  .registration-form__verify > .registration-form__input--error {
+    left: 90px;
+  }
+  .registration-form__verify > .registration-form__input--error--en {
+    left: 74px;
+  }
 }

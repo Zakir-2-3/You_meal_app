@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
+import fitText from "@activetheory/fit-text";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
+
+import CloseButton from "@/UI/buttons/CloseButton/CloseButton";
 
 import { DEFAULT_PROMOS } from "@/constants/user/defaults";
 
@@ -15,26 +17,33 @@ const ActivePromos = ({
   removingPromo,
   onRemovePromo,
 }: ActivePromosProps) => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
   const { t } = useTranslate();
 
   const containerRefs = useRef<Array<HTMLDivElement | null>>([]);
   const promoTagRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const textRefs = useRef<Array<HTMLParagraphElement | null>>([]);
 
+  const isTouchDevice = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  // Логика для ПК (mousemove) — оставляем как было
   useEffect(() => {
+    if (isTouchDevice()) return; // на тач не вешаем
+
     // Функция для обработки движения мыши
     const handleMouseMove = (e: MouseEvent, index: number) => {
       const container = containerRefs.current[index];
       const promoTag = promoTagRefs.current[index];
-
       if (!container || !promoTag) return;
 
       // Получаем позицию курсора относительно контейнера
       const rect = container.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
-      const containerWidth = rect.width;
-
       // Определяем границы: Правые 25% контейнера
-      const rightAreaStart = containerWidth * 0.75;
+      const rightAreaStart = rect.width * 0.75;
 
       // Снимаем предыдущие классы
       promoTag.classList.remove("move-left-partial", "move-left-full");
@@ -58,36 +67,61 @@ const ActivePromos = ({
 
     const cleanupFunctions = containerRefs.current.map((container, index) => {
       if (!container) return () => {};
-
-      const mouseMoveHandler = (e: MouseEvent) => handleMouseMove(e, index);
-      const mouseLeaveHandler = () => handleMouseLeave(index);
-
-      container.addEventListener("mousemove", mouseMoveHandler);
-      container.addEventListener("mouseleave", mouseLeaveHandler);
+      const mm = (e: MouseEvent) => handleMouseMove(e, index);
+      const ml = () => handleMouseLeave(index);
+      container.addEventListener("mousemove", mm);
+      container.addEventListener("mouseleave", ml);
 
       return () => {
-        container.removeEventListener("mousemove", mouseMoveHandler);
-        container.removeEventListener("mouseleave", mouseLeaveHandler);
+        container.removeEventListener("mousemove", mm);
+        container.removeEventListener("mouseleave", ml);
       };
     });
 
     // Очистка при размонтировании
     return () => {
-      cleanupFunctions.forEach((cleanup) => cleanup && cleanup());
+      cleanupFunctions.forEach((c) => c && c());
     };
   }, [activatedPromoCodes.length]);
 
-  const getFontSize = (code: string) => {
-    const length = code.length;
-    if (length >= 13) return 9;
-    if (length === 12) return 11;
-    if (length === 11) return 12;
-    if (length === 10) return 14;
-    if (length === 9) return 15;
-    if (length === 8) return 16;
-    if (length <= 7) return 17;
-    return 15;
-  };
+  // Клик вне - закрывает раскрытый блок
+  useEffect(() => {
+    if (!isTouchDevice()) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (expandedIndex === null) return;
+      const container = containerRefs.current[expandedIndex];
+      if (container && !container.contains(e.target as Node)) {
+        setExpandedIndex(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [expandedIndex]);
+
+  // Подгоняем размер шрифта под ширину блока для каждого промокода
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      activatedPromoCodes.forEach((_, index) => {
+        const el = textRefs.current[index];
+        const box = containerRefs.current[index];
+
+        if (el && box) {
+          fitText({
+            el,
+            box,
+            singleLine: true,
+            minFontSize: 8,
+            maxFontSize: 17,
+            boxMultiplier: [0.95, 1],
+          });
+        }
+      });
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [activatedPromoCodes]);
 
   if (activatedPromoCodes.length === 0) return null;
 
@@ -98,6 +132,7 @@ const ActivePromos = ({
         const title = isDefault
           ? (t.user as any)[code] || t.user.newPromoCodeTitle
           : t.user.newPromoCodeTitle;
+        const isExpanded = expandedIndex === index;
 
         return (
           <div
@@ -109,7 +144,17 @@ const ActivePromos = ({
               removingPromo === code
                 ? "personal-account__promo-container--removing"
                 : ""
-            }`}
+            } ${isExpanded ? "personal-account__promo-container--expanded" : ""}`}
+            onClick={(e) => {
+              if (!isTouchDevice()) return;
+              if (
+                (e.target as HTMLElement).closest(
+                  ".personal-account__promo-remove",
+                )
+              )
+                return;
+              setExpandedIndex(isExpanded ? null : index);
+            }}
           >
             <div
               ref={(el) => {
@@ -122,11 +167,20 @@ const ActivePromos = ({
                   : "personal-account__promo-item--custom"
               }`}
             >
-              <p style={{ fontSize: getFontSize(code) }}>{code}</p>
+              <p
+                ref={(el) => {
+                  textRefs.current[index] = el;
+                }}
+              >
+                {code}
+              </p>
             </div>
             <CloseButton
               className="personal-account__promo-remove"
-              onClick={() => onRemovePromo(code)}
+              onClick={() => {
+                setExpandedIndex(null);
+                onRemovePromo(code);
+              }}
               width={11}
               height={11}
               ariaLabel={t.buttons.disablePromoCodeAriaLabel}

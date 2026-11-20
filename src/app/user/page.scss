@@ -8,14 +8,14 @@
 
   & > .nav-buttons {
     grid-column: 1 / -1;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
     padding-bottom: 0;
   }
 }
 
 .personal-account__title {
   grid-column: span 2;
-  margin: 20px 0 0;
+  margin: 15px 0 0;
   font-size: 36px;
 }
 .personal-account__left {
@@ -31,23 +31,7 @@
   margin-bottom: 10px;
   border: 1px solid #000000ba;
   border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-  -webkit-transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-  -moz-transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-  -ms-transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-  -o-transition:
     opacity 0.3s ease,
     transform 0.3s ease;
 }
@@ -92,13 +76,18 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: max-height 0.2s ease;
-  max-height: 192px;
   & .personal-account__field:nth-child(1),
   & .personal-account__field:nth-child(2) {
     gap: 16px 10px;
+    & input {
+      margin: 0;
+    }
   }
   & .personal-account__field:nth-child(3) {
     gap: 0 10px;
+    & input {
+      margin: 0;
+    }
   }
 }
 
@@ -127,10 +116,17 @@
 }
 
 .personal-account__input {
-  padding: 5px;
+  padding: 5px 20px 5px 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 166px;
+  width: 162px;
+  margin-left: 11px;
+}
+
+.personal-account__user-info--edit {
+  & input {
+    padding: 5px;
+  }
 }
 
 .personal-account__controls {
@@ -153,7 +149,8 @@
 }
 
 .personal-account__button {
-  padding: 8px 12px;
+  padding: 0 12px;
+  height: 35px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -250,10 +247,6 @@
 
 .personal-account__button--edit-info {
   transition: all 0.3s ease;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
 }
 
 .personal-account__password-group {
@@ -274,10 +267,6 @@
   cursor: not-allowed;
   pointer-events: none;
   transition: opacity 0.3s ease;
-  -webkit-transition: opacity 0.3s ease;
-  -moz-transition: opacity 0.3s ease;
-  -ms-transition: opacity 0.3s ease;
-  -o-transition: opacity 0.3s ease;
 }
 
 .personal-account__value-container {
@@ -328,7 +317,7 @@
   display: grid;
   grid-template-columns: auto;
   align-items: start;
-  max-height: 228px;
+  max-height: fit-content;
   & .personal-account__field:nth-child(3) {
     display: flex;
     align-items: baseline;
@@ -394,12 +383,16 @@
   & .personal-account__password-error,
   .personal-account__name-error,
   .personal-account__repeat-password-error {
-    top: 9px;
-    left: 286px;
+    top: 8px;
+    left: 283px;
   }
   & .personal-account__repeat-password-error {
     top: 60px;
   }
+}
+
+.personal-account__user-info--form-edit {
+  min-height: fit-content;
 }
 
 .personal-account__edit-buttons--edit {
@@ -417,14 +410,14 @@
   flex-direction: column;
   gap: 16px 0;
   & > .personal-account__input--edit:first-child {
-    padding-right: 30px;
+    padding-right: 24px;
   }
 }
 
 .personal-account__value-toggle {
   position: absolute;
-  right: 7px;
-  top: 7px;
+  right: 4px;
+  top: 6px;
   width: 20px;
   height: 20px;
 }
@@ -441,4 +434,651 @@
 .personal-account__user-info--edit .personal-account__field:nth-child(2) .personal-account__hint {
   color: red;
   font-size: 14px;
+}
+
+@media (max-width: 1000px) {
+  .personal-account {
+    &__promo-list {
+      left: -126px;
+    }
+    &__left {
+      max-width: none;
+      min-width: auto;
+      width: fit-content;
+    }
+    &__title {
+      font-size: 34px;
+    }
+    &__user-info--edit {
+      max-height: fit-content;
+    }
+    &__user-info {
+      & .personal-account__field:nth-child(1),
+      & .personal-account__field:nth-child(2) {
+        gap: 20px 10px;
+      }
+    }
+  }
+
+  .personal-account__user-info--form-edit {
+    & .personal-account__repeat-password-error {
+      top: 82px !important;
+    }
+  }
+
+  .personal-account__user-info--edit {
+    & .personal-account__password-error,
+    .personal-account__name-error,
+    .personal-account__repeat-password-error {
+      top: 34px;
+      left: 110px;
+      font-size: 13px;
+    }
+  }
+
+  .personal-account__user-info--edit .personal-account__field:nth-child(3) .personal-account__hint,
+  .personal-account__user-info--edit .personal-account__field:nth-child(2) .personal-account__hint {
+    position: absolute;
+    left: 111px;
+    top: -18px;
+    font-size: 13px;
+  }
+
+  .personal-account__user-info--edit .personal-account__field:nth-child(2) .personal-account__hint:first-of-type {
+    display: none;
+  }
+
+  .personal-account__user-info:not(.personal-account__user-info--en) {
+    .personal-account__repeat-password-error {
+      top: 82px;
+    }
+  }
+
+  .modal-content {
+    max-height: 650px;
+  }
+}
+
+@media (max-width: 880px) {
+  .personal-account {
+    &__title {
+      font-size: 30px;
+    }
+    &__avatar {
+      width: 250px;
+      height: 250px;
+    }
+    &__promo,
+    &__balance,
+    &__user-info {
+      padding: 20px 14px;
+    }
+    &__promo-error {
+      left: 0;
+    }
+    &__promo::after {
+      left: 126px;
+    }
+    &__promo .promo-hint-3 {
+      left: 238px;
+    }
+    &__promo > .personal-account__field {
+      gap: 16px 0;
+    }
+    &__promo-wrapper {
+      margin-left: 12px;
+    }
+    &__promo-wrapper > .personal-account__promo-clear-btn {
+      left: 128px;
+    }
+    &__promo-wrapper > .personal-account__input {
+      width: 148px;
+      margin: 0;
+      padding-right: 18px;
+      &::placeholder {
+        font-size: 14px;
+      }
+    }
+  }
+  .modal-content {
+    max-height: 550px;
+  }
+}
+
+@media (max-width: 768px) {
+  .personal-account {
+    & > .container {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    &__title {
+      grid-column: 1;
+    }
+    & > .container > .nav-buttons {
+      grid-column: 1;
+      margin-bottom: 30px;
+    }
+    &__left {
+      grid-column: 1;
+      margin: 0 auto;
+      margin-bottom: 30px;
+    }
+    &__right {
+      grid-column: 1;
+      gap: 20px;
+      width: 100%;
+      max-width: 100%;
+      margin-bottom: 30px;
+    }
+  }
+  .modal-content {
+    max-height: 500px;
+    margin: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .personal-account {
+    &__title {
+      margin: 10px 0 0;
+    }
+    &__label {
+      font-size: 15px;
+    }
+    &__promo-list {
+      width: 150px;
+      left: -116px;
+    }
+    &__promo-item {
+      font-size: 14px;
+      & > p {
+        line-height: 1;
+      }
+    }
+  }
+  .personal-account__promo > .personal-account__field {
+    align-content: space-between;
+  }
+  .personal-account__promo::after,
+  .personal-account__promo::before,
+  .personal-account__promo .promo-hint-3 {
+    top: 74px;
+  }
+  .modal-content {
+    max-height: 400px;
+    margin: 30px;
+    padding-bottom: 20px;
+  }
+  .modal-close {
+    top: 8px;
+    right: 8px;
+  }
+  .crop__text {
+    font-size: 19px;
+  }
+  .crop__icon {
+    width: 85px;
+    height: 85px;
+  }
+  .controls__actions {
+    & .controls__button--primary,
+    & .controls__button--secondary {
+      padding: 10px 12px;
+      font-size: 15px;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .personal-account {
+    &__balance-controls,
+    &__actions,
+    &__actions-bottom,
+    &__edit-buttons {
+      gap: 10px;
+    }
+    &__title {
+      font-size: 26px;
+    }
+    &__avatar {
+      width: 220px;
+      height: 220px;
+      margin-bottom: 0;
+    }
+    &__label {
+      min-width: 90px;
+      padding-right: 10px;
+      font-size: 13px;
+    }
+    &__promo-wrapper {
+      margin-left: 0;
+      gap: 10px;
+      & > .personal-account__promo-clear-btn {
+        left: 114px;
+      }
+      & > .personal-account__input {
+        width: 134px;
+        height: 32px;
+        font-size: 15px;
+        &::placeholder {
+          font-size: 12px !important;
+        }
+      }
+    }
+    &__button,
+    &__button--sign-out {
+      padding: 0 8px;
+      font-size: 12px;
+      height: 32px;
+    }
+
+    &__promo-item {
+      font-size: 13px;
+      padding: 0 8px !important;
+    }
+    &__promo-toggle {
+      & > div:first-child {
+        width: 32px !important;
+        height: 32px !important;
+        & > div:first-child {
+          width: 32px !important;
+          height: 32px !important;
+        }
+      }
+    }
+    &__user-info {
+      & .personal-account__field:nth-child(1),
+      & .personal-account__field:nth-child(2),
+      & .personal-account__field:nth-child(3) {
+        gap: 20px 0px;
+      }
+    }
+  }
+  .personal-account__user-info--edit:not(.personal-account__user-info--en) {
+    .personal-account__password-error,
+    .personal-account__name-error,
+    .personal-account__repeat-password-error {
+      left: 88px;
+      font-size: 12px;
+    }
+  }
+  .personal-account__user-info--edit .personal-account__field:nth-child(3) .personal-account__hint,
+  .personal-account__user-info--edit .personal-account__field:nth-child(2) .personal-account__hint {
+    left: 88px;
+    font-size: 12px;
+  }
+  .personal-account__user-info--edit.personal-account__user-info--en:not(.personal-account__user-info--form-edit)
+    .personal-account__field:nth-child(3)
+    .personal-account__hint {
+    left: 98px !important;
+  }
+  .personal-account__user-info--edit.personal-account__user-info--en {
+    .personal-account__password-error,
+    .personal-account__name-error,
+    .personal-account__repeat-password-error {
+      left: 98px;
+      font-size: 12px;
+    }
+  }
+  .personal-account__user-info--edit {
+    & .personal-account__input {
+      margin-left: 0;
+    }
+  }
+  .personal-account__user-info {
+    & .personal-account__edit-buttons {
+      margin-top: 0px !important;
+    }
+  }
+  .personal-account__user-info--edit {
+    & .personal-account__edit-buttons {
+      margin-top: 20px !important;
+    }
+  }
+  .personal-account__promo-wrapper .personal-account__button--primary {
+    width: 32px;
+    height: 32px;
+    & img {
+      width: 18px;
+      height: 17px;
+    }
+  }
+  .personal-account__balance .personal-account__field {
+    gap: 10px 0;
+  }
+  .personal-account__promo .promo-hint-3 {
+    left: 230px;
+  }
+  .personal-account__promo::after {
+    left: 122px;
+  }
+  .personal-account__user-info--edit {
+    & > div:first-child > label {
+      min-width: auto;
+      padding-right: 59px;
+    }
+
+    & > div:nth-child(2) > label {
+      min-width: auto;
+      padding-right: 46px;
+    }
+
+    & > div:nth-child(2) .personal-account__label--en {
+      padding-right: 60px;
+    }
+
+    & > div:nth-child(3) > label {
+      min-width: auto;
+      padding-right: 37px;
+    }
+  }
+  .personal-account__user-info--form-edit {
+    & > div:nth-child(3) > label {
+      min-width: auto;
+      padding-right: 35px;
+    }
+  }
+  .modal-content {
+    max-height: 350px;
+    margin: 20px;
+    & .modal-close {
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+  .crop__icon {
+    width: 70px;
+    height: 70px;
+  }
+  .crop__text {
+    font-size: 17px;
+  }
+  .controls {
+    gap: 10px;
+    &__zoom {
+      gap: 6px;
+    }
+    &__zoom-button {
+      font-size: 20px;
+      min-width: 22px;
+      min-height: 22px;
+    }
+    &__zoom-slider {
+      max-width: 90px !important;
+    }
+  }
+  .controls__actions {
+    gap: 10px;
+    & .controls__button--primary,
+    .controls__button--secondary {
+      height: 36px;
+      font-size: 14px;
+      padding: 0 10px;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .personal-account__avatar {
+    width: 180px;
+    height: 180px;
+  }
+  .personal-account__promo,
+  .personal-account__balance,
+  .personal-account__user-info {
+    padding: 15px 10px;
+    width: auto;
+    height: auto;
+  }
+  .personal-account__balance {
+    & label {
+      min-width: auto;
+      padding-right: 32px;
+    }
+    & span {
+      font-size: 14px;
+    }
+  }
+  .personal-account__user-info .personal-account__value {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  .personal-account__user-info > div:first-child label {
+    min-width: auto;
+    padding-right: 48px;
+  }
+  .personal-account__user-info > div:nth-child(2) label {
+    min-width: auto;
+    padding-right: 37px;
+  }
+  .personal-account__user-info > div:nth-child(3) label {
+    min-width: auto;
+    padding-right: 30px;
+  }
+  .personal-account__user-info--en > div:nth-child(1) label {
+    min-width: auto;
+    padding-right: 42px;
+  }
+  .personal-account__user-info--en > div:nth-child(2) label {
+    min-width: auto;
+    padding-right: 44px !important;
+  }
+
+  .personal-account__user-info--en > div:nth-child(3) label {
+    min-width: auto;
+    padding-right: 22px;
+  }
+  .personal-account__edit-buttons {
+    margin: 0;
+  }
+  .personal-account__user-info--edit .personal-account__field:nth-child(3) .personal-account__hint,
+  .personal-account__user-info--edit .personal-account__field:nth-child(2) .personal-account__hint {
+    font-size: 11px;
+    left: 75px;
+    top: -16px;
+  }
+  .personal-account__user-info--edit:not(.personal-account__user-info--en) {
+    .personal-account__password-error,
+    .personal-account__name-error,
+    .personal-account__repeat-password-error {
+      left: 74px;
+      top: 27px !important;
+      font-size: 11px;
+    }
+  }
+  .personal-account__user-info--edit.personal-account__user-info--en {
+    .personal-account__password-error,
+    .personal-account__name-error,
+    .personal-account__repeat-password-error {
+      left: 76px;
+      top: 27px !important;
+      font-size: 11px;
+    }
+  }
+  .personal-account__user-info--edit.personal-account__user-info--en .personal-account__repeat-password-error {
+    top: 72px !important;
+  }
+
+  .personal-account__user-info--edit:not(.personal-account__user-info--en) .personal-account__repeat-password-error {
+    top: 72px !important;
+  }
+  .personal-account__input-password-wrapper > .personal-account__input--edit:first-child {
+    padding-right: 20px;
+  }
+  .personal-account__user-info--edit input::placeholder {
+    font-size: 12px !important;
+  }
+  .personal-account__promo .personal-account__promo-error {
+    font-size: 11px;
+    top: -15px;
+  }
+  .personal-account__user-info--edit .personal-account__edit-buttons {
+    margin-top: 15px;
+  }
+  .personal-account__user-info--edit.personal-account__user-info--en:not(.personal-account__user-info--form-edit)
+    .personal-account__field:nth-child(3)
+    .personal-account__hint {
+    left: 75px !important;
+  }
+  .personal-account__user-info .personal-account__field:nth-child(1),
+  .personal-account__user-info .personal-account__field:nth-child(2),
+  .personal-account__user-info .personal-account__field:nth-child(3) {
+    gap: 15px 0;
+  }
+  .personal-account__user-info--edit .personal-account__input--edit {
+    height: 28px;
+    width: 140px;
+    font-size: 13px;
+  }
+  .personal-account__promo {
+    height: 104px;
+  }
+  .personal-account__label {
+    font-size: 11px;
+  }
+  .personal-account__promo label {
+    font-size: 11px;
+    min-width: auto;
+  }
+  .personal-account__promo .personal-account__input {
+    height: 28px !important;
+    width: 118px !important;
+    padding-right: 16px;
+    font-size: 12px;
+    &::placeholder {
+      font-size: 10px !important;
+    }
+  }
+  .personal-account__value-toggle {
+    top: 6px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    & img {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  .personal-account__promo-wrapper .personal-account__button--primary {
+    width: 28px;
+    height: 28px;
+  }
+  .personal-account__promo-toggle > div:first-child {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .personal-account__promo-toggle > div:first-child > div:first-child {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .personal-account__promo::after,
+  .personal-account__promo::before,
+  .personal-account__promo .promo-hint-3 {
+    width: 74px;
+    height: 28px;
+    top: 61px;
+    font-size: 11px;
+  }
+  .personal-account__promo::after {
+    left: 103px;
+  }
+  .personal-account__promo .promo-hint-3 {
+    left: 195px;
+  }
+  .personal-account__button,
+  .personal-account__button--sign-out {
+    height: 28px;
+  }
+  .personal-account__promo-wrapper .personal-account__promo-clear-btn {
+    display: flex;
+    width: 16px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    left: 100px;
+    & img {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  .personal-account__promo-list {
+    left: -102px;
+    width: 130px;
+  }
+  .personal-account__promo-item {
+    height: 28px;
+    padding: 0 6px !important;
+    font-size: 12px;
+    & .personal-account__promo-remove {
+      width: 14px;
+      height: 14px;
+      & img {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+  .personal-account__promo-container {
+    width: 74px;
+    height: fit-content;
+    & .personal-account__promo-tag {
+      width: 74px;
+      height: 28px;
+      padding: 0;
+    }
+    & .personal-account__promo-remove {
+      height: 26px !important;
+      right: 1px;
+      & img {
+        width: 10px;
+        height: 10px;
+      }
+    }
+  }
+  .personal-account__user-info--form-edit {
+    & .personal-account__repeat-password-error {
+      top: 71px !important;
+    }
+  }
+  .modal-content {
+    max-height: 250px;
+    margin: 10px;
+    padding: 20px;
+    & .modal-close {
+      width: 15px !important;
+      height: 15px !important;
+      top: 4px;
+      right: 4px;
+    }
+  }
+  .crop-container {
+    margin-bottom: 20px;
+  }
+  .crop__icon {
+    width: 60px;
+    height: 60px;
+  }
+  .crop__text {
+    font-size: 15px;
+  }
+  .crop__content {
+    gap: 20px;
+  }
+  .controls__actions {
+    & .controls__button--primary,
+    & .controls__button--secondary {
+      height: 30px;
+      font-size: 12px;
+      padding: 0 6px;
+    }
+  }
+  .controls__zoom-button {
+    min-width: 18px;
+    min-height: 18px;
+    font-size: 18px;
+  }
 }

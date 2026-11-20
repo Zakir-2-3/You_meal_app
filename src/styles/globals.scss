@@ -3,6 +3,9 @@ body {
   flex-direction: column;
   overflow: hidden auto;
   background-color: #f9f9f9;
+  &:has(.registration-form) {
+    overflow: hidden;
+  }
 }
 
 html::-webkit-scrollbar {
@@ -16,10 +19,6 @@ html::-webkit-scrollbar-track {
 html::-webkit-scrollbar-thumb {
   background-color: #ff5c00;
   border-radius: 20px;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
 }
 
 .main {
@@ -27,8 +26,8 @@ html::-webkit-scrollbar-thumb {
 }
 
 .container {
-  max-width: 1310px;
-  padding: 0 10px;
+  max-width: 1330px;
+  padding: 0 20px;
   margin: 0 auto;
 }
 
@@ -60,4 +59,10 @@ html::-webkit-scrollbar-thumb {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 9999;
+}
+
+@media (max-width: 460px) {
+  .container {
+    padding: 0 15px;
+  }
 }

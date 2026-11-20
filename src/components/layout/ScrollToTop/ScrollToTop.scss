@@ -37,3 +37,29 @@
     transform: translateY(-1px) scale(1.02);
   }
 }
+
+@media (max-width: 600px) {
+  .scroll-to-top {
+    right: 50px;
+    bottom: 60px;
+    width: 40px;
+    height: 40px;
+
+    & img {
+      width: 25px;
+      height: 25px;
+    }
+  }
+}
+
+@media (max-width: 460px) {
+  .scroll-to-top {
+    right: 40px;
+  }
+}
+
+@media (max-width: 320px) {
+  .scroll-to-top {
+    right: 30px;
+  }
+}

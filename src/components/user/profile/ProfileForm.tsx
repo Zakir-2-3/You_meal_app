@@ -44,7 +44,11 @@ const ProfileForm = ({
     <form
       className={`personal-account__user-info ${
         editMode ? "personal-account__user-info--edit" : ""
-      }`}
+      } ${
+        editMode && !isGoogleUser && lang === "en"
+          ? "personal-account__user-info--form-edit"
+          : ""
+      } ${lang === "en" ? "personal-account__user-info--en" : ""}`}
       onSubmit={handleSubmit(onSubmit)}
     >
       {/* Поле имени */}
@@ -94,7 +98,12 @@ const ProfileForm = ({
       <div className="personal-account__field">
         {editMode ? (
           <>
-            <label className="personal-account__label" htmlFor="user-email">
+            <label
+              className={`personal-account__label ${
+                lang === "en" ? "personal-account__label--en" : ""
+              }`}
+              htmlFor="user-email"
+            >
               {translations.emailLabel}
             </label>
             <input

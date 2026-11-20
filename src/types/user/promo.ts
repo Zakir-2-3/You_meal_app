@@ -13,7 +13,6 @@ export interface PromoSectionProps {
     enterPromoCodePlaceholder: string;
     promoCodeMax: string;
     promoCodeMin: string;
-    activateTr: string;
     maxActivatedMessage?: string;
   };
 }
@@ -25,7 +24,6 @@ export interface PromoInputProps {
   disabled: boolean;
   placeholder: string;
   onActivate: () => void;
-  activateText: string;
   canAddNewCustomPromo?: boolean;
   isDefaultPromo?: boolean;
   maxLengthReached?: boolean;

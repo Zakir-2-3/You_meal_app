@@ -50,8 +50,8 @@ export default function AvatarUploader({ onClose }: AvatarUploaderProps) {
         <CloseButton
           className="modal-close"
           onClick={handleRequestClose}
-          width={20}
-          height={20}
+          width={22}
+          height={22}
           ariaLabel={closeAvatarUploadWindowAriaLabel}
         />
 

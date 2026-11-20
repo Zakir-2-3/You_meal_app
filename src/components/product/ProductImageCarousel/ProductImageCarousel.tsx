@@ -44,7 +44,7 @@ const ProductImageCarousel = ({
                 width={170}
                 height={170}
                 className="carousel__image"
-                priority={index === 0} // первое изображение загружается сразу
+                priority={index === 0}
               />
             </div>
           ))}

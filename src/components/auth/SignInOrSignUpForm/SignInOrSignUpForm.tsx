@@ -155,6 +155,7 @@ export default function SignInOrSignUpForm({
           type="button"
           onClick={onForgotPassword}
           className="registration-form__button--secondary registration-form__forgot-button"
+          disabled={isSubmitting}
         >
           {forgotPassword}
         </button>
@@ -163,6 +164,7 @@ export default function SignInOrSignUpForm({
           type="button"
           onClick={onSwitchMode}
           className="registration-form__button--secondary"
+          disabled={isSubmitting}
         >
           {isSignUpMode ? signInAccountTr : signUpTr}
         </button>

@@ -1,22 +1,21 @@
-import ContentLoader from "react-content-loader";
-
 const CartPageItemSkeleton = () => (
-  <ContentLoader
-    speed={2}
-    width={810}
-    height={140}
-    viewBox="0 0 810 140"
-    backgroundColor="#f3f3f3"
-    foregroundColor="#ffffff"
-    uniqueKey="cart-page-item-skeleton"
+  <li
+    className="cart-page-section__item cart-page-section__item--skeleton"
+    aria-hidden="true"
   >
-    <rect x="0" y="23" rx="5" ry="5" width="100" height="90" />
-    <rect x="120" y="23" rx="4" ry="4" width="360" height="28" />
-    <rect x="120" y="95" rx="4" ry="4" width="42" height="23" />
-    <rect x="589" y="57" rx="4" ry="4" width="58" height="26" />
-    <rect x="668" y="45" rx="6" ry="6" width="86" height="46" />
-    <rect x="780" y="55" rx="25" ry="25" width="30" height="30" />
-  </ContentLoader>
+    <div className="cart-page-section__img">
+      <span className="sk-block sk-block--img" />
+    </div>
+
+    <div className="cart-page-section__description">
+      <span className="sk-block sk-block--name" />
+      <span className="cart-page-section__size sk-block sk-block--size" />
+    </div>
+
+    <span className="sk-block sk-block--price" />
+    <span className="sk-block sk-block--qty" />
+    <span className="sk-block sk-block--remove" />
+  </li>
 );
 
 export default CartPageItemSkeleton;

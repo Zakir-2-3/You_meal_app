@@ -15,15 +15,20 @@ import { GoogleSignInButtonProps } from "@/types/auth/registration";
 
 import "./GoogleSignInButton.scss";
 
-const GoogleSignInButton = ({ onClose }: GoogleSignInButtonProps) => {
+const GoogleSignInButton = ({
+  onClose,
+  disabled = false,
+}: GoogleSignInButtonProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const doCleanup = useCleanupOnAuth();
-  const cart = useSelector((state: RootState) => state.cart.items);
 
-  const { t } = useTranslate();
+  const cart = useSelector((state: RootState) => state.cart.items);
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslate();
+
+  const isDisabled = isLoading || disabled;
 
   const handleClick = async () => {
     if (isLoading) return;
@@ -53,10 +58,10 @@ const GoogleSignInButton = ({ onClose }: GoogleSignInButtonProps) => {
 
   return (
     <button
-      className={`sign-in-btn-google ${isLoading ? "sign-in-btn-google--loading" : ""}`}
+      className={`sign-in-btn-google ${isDisabled ? "sign-in-btn-google--loading" : ""}`}
       type="button"
       onClick={handleClick}
-      disabled={isLoading}
+      disabled={isDisabled}
     >
       <svg
         className="google-icon"

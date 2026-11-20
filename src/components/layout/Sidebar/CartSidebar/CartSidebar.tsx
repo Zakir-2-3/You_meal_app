@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
-import { LottieIcon } from "@/components/ui/LottieIcon";
+import DeliveryLink from "@/components/layout/DeliveryLink/DeliveryLink";
 import CartSidebarItem from "../CartSidebarItem/CartSidebarItem";
 
 import { useTranslate } from "@/hooks/app/useTranslate";
@@ -18,37 +18,25 @@ import { usePriceFormatter } from "@/hooks/cart/usePriceFormatter";
 
 import CartSidebarItemSkeleton from "@/UI/skeletons/CartSidebarItemSkeleton";
 
-import deliveryAnimation from "@/assets/animations/delivery_animation.json";
-
 import "./CartSidebar.scss";
 
 const CartSidebar = () => {
-  const [hovered, setHovered] = useState(false);
   const [isCartNavigating, setIsCartNavigating] = useState(false);
-  const [isDeliveryNavigating, setIsDeliveryNavigating] = useState(false);
 
   const pathname = usePathname();
 
-  // Сброс блокировок при смене пути
+  // Сброс блокировки при смене пути
   useEffect(() => {
     setIsCartNavigating(false);
-    setIsDeliveryNavigating(false);
   }, [pathname]);
 
-  // Таймауты подстраховки
+  // Таймаут подстраховки
   useEffect(() => {
     if (isCartNavigating) {
       const timer = setTimeout(() => setIsCartNavigating(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [isCartNavigating]);
-
-  useEffect(() => {
-    if (isDeliveryNavigating) {
-      const timer = setTimeout(() => setIsDeliveryNavigating(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isDeliveryNavigating]);
 
   const { items } = useSelector((state: RootState) => state.cart);
   const activated = useSelector((state: RootState) => state.promo.activated);
@@ -95,7 +83,6 @@ const CartSidebar = () => {
   });
 
   const { checkout } = t.buttons;
-  const { freeShipping, freeShipping2 } = t.deliveryPage;
   const { title, emptyCart, total2 } = t.cart;
 
   const totalCount = effectiveItems.reduce(
@@ -113,14 +100,6 @@ const CartSidebar = () => {
       skeletonCount = Math.min(Math.max(items.length, 1), 3);
     }
   }
-
-  const handleDeliveryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (pathname === "/delivery" || isDeliveryNavigating) {
-      e.preventDefault();
-      return;
-    }
-    setIsDeliveryNavigating(true);
-  };
 
   const handleCheckoutClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     // Если корзина пуста – отменяем
@@ -210,29 +189,7 @@ const CartSidebar = () => {
       </div>
 
       <div className="cart-sidebar__delivery">
-        <Link
-          href="/delivery"
-          className="cart-sidebar__delivery-link"
-          title={freeShipping2}
-          onClick={handleDeliveryClick}
-          style={{
-            pointerEvents:
-              pathname === "/delivery" || isDeliveryNavigating
-                ? "none"
-                : "auto",
-            opacity: pathname === "/delivery" || isDeliveryNavigating ? 0.6 : 1,
-          }}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
-          <LottieIcon
-            animationData={deliveryAnimation}
-            trigger="hover+load"
-            size={32}
-            isHovered={hovered}
-          />
-          {freeShipping}
-        </Link>
+        <DeliveryLink className="cart-sidebar__delivery-link" />
       </div>
     </aside>
   );

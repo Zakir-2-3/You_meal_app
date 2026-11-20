@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 import { useEffect, useState } from "react";
 
@@ -26,11 +27,13 @@ import "./page.scss";
 
 export default function CartClient() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isProductNavigating, setIsProductNavigating] = useState(false);
   const [popup, setPopup] = useState<null | {
     type: "auth" | "success";
     orderNumber?: number;
   }>(null);
 
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
 
   const { items } = useSelector((state: RootState) => state.cart);
@@ -68,6 +71,10 @@ export default function CartClient() {
   } = t.cart;
 
   const showOverlay = isLoading || cartLoading;
+
+  useEffect(() => {
+    setIsProductNavigating(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!cartLoading) {
@@ -206,6 +213,8 @@ export default function CartClient() {
                 item={item}
                 discount={discount}
                 hasDiscount={hasDiscount}
+                isProductNavigating={isProductNavigating}
+                onNavigate={() => setIsProductNavigating(true)}
               />
             ))}
           </ul>
